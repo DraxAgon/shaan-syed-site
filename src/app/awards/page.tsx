@@ -51,7 +51,13 @@ export default function AwardsPage() {
                   className={`ledger-body${group.label === "In progress" ? " muted" : ""}`}
                 >
                   {cert.href ? (
-                    <a className="inline-link" href={cert.href} rel="noopener noreferrer">
+                    <a
+                      className="inline-link"
+                      href={cert.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${cert.name}, opens the credential in a new tab`}
+                    >
                       {cert.name}
                     </a>
                   ) : (

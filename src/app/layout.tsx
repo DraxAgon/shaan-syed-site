@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Source_Serif_4, IBM_Plex_Mono } from "next/font/google";
+import {
+  Source_Serif_4,
+  IBM_Plex_Mono,
+  Bricolage_Grotesque,
+  Instrument_Sans,
+  JetBrains_Mono,
+} from "next/font/google";
+import Link from "next/link";
 
 import { Icon } from "@/components/icon";
 import { SiteNav } from "@/components/site-nav";
@@ -19,6 +26,38 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500"],
   display: "swap",
   variable: "--font-mono-src",
+});
+
+/* Redi's own three faces, for the walkthrough on /projects and nowhere else.
+   They are the app's real type system, so the panel reads as the product
+   rather than as this site drawing a picture of it: Bricolage Grotesque 700
+   for question text and titles, Instrument Sans for everything readable, and
+   JetBrains Mono for the uppercase eyebrows and timers.
+
+   preload is off on all three. They are used on one panel of one page, and
+   preloading a face the home page never draws is bytes spent on nothing. */
+const rediDisplay = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["700"],
+  display: "swap",
+  preload: false,
+  variable: "--font-display-src",
+});
+
+const rediBody = Instrument_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+  preload: false,
+  variable: "--font-body-src",
+});
+
+const rediMeta = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["500"],
+  display: "swap",
+  preload: false,
+  variable: "--font-meta-src",
 });
 
 export const metadata: Metadata = {
@@ -66,14 +105,27 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${serif.variable} ${mono.variable}`}>
+    <html
+      lang="en"
+      className={`${serif.variable} ${mono.variable} ${rediDisplay.variable} ${rediBody.variable} ${rediMeta.variable}`}
+    >
       <body>
         <a href="#main" className="skip-link">
           Skip to content
         </a>
 
         <header className="site-header">
-          <SiteNav />
+          <div className="site-header-inner">
+            {/* The nav says where you can go. Nothing said whose site you
+                were on once you left the home page, so the name rides
+                along, drawn with the same brass rule as the share card
+                rather than a second logo to keep in step. */}
+            <Link href="/" className="brand">
+              <span aria-hidden="true" className="brand-rule" />
+              <span>{profile.name}</span>
+            </Link>
+            <SiteNav />
+          </div>
         </header>
 
         <main id="main" className="site-main">
