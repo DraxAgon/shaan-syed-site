@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = {
   title: "Bio",
   description:
-    "Shaan Syed on shipping Rilo to the Chrome Web Store, building Phantom at Ignition Hacks, and starting a Computer Science and Business double degree at Waterloo and Lazaridis.",
+    "Shaan Syed on piano and cross country, lifeguarding for the City of Toronto, shipping Rilo to the Chrome Web Store, and a Computer Science and Business double degree at Waterloo and Lazaridis.",
 };
 
 export default function BioPage() {

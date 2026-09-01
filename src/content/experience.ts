@@ -54,7 +54,7 @@ export const experience: ExperienceEntry[] = [
     dates: "September 2023 to June 2026",
     meta: "Volunteer",
     location: "Toronto, ON",
-    logo: null,
+    logo: "/images/logo-northern.webp",
     bullets: [
       "Tutored math in group sessions, working with roughly 100 students over four years",
       "Ran one-on-one sessions with about ten students",

@@ -84,10 +84,17 @@ node scripts/generate-placeholders.mjs # the two portrait placeholders
 ```
 
 `fetch-logos.mjs` prints MISS for any org it cannot find a logo for.
-Northern Secondary School and Sumo Dino currently MISS, so they render
-as monogram tiles, which is deliberate rather than a broken image. Drop
-a real `logo-northern.webp` or `logo-sumodino.webp` (256x256) into
-`public/images` and set the path in `experience.ts` to use it.
+Only Sumo Dino MISSes now, so it renders as a monogram tile, which is
+deliberate rather than a broken image. Drop a real `logo-sumodino.webp`
+(256x256) into `public/images` and set the path in `experience.ts` to
+use it.
+
+Northern Secondary School publishes no standalone crest. The script
+crops it out of the school's own site banner, which runs crest, photo,
+crest. It cuts at the white gutter after the first crest rather than at
+a fixed fraction, then keys the white ground to transparent. That lives
+in the `PREP` map at the top of `fetch-logos.mjs`, which is the one
+place to fix if TDSB ever reshoots the banner.
 
 ## 5. Redeploy
 
@@ -119,7 +126,7 @@ first; a broken build on `main` is a failed deploy.
 | Your portrait | placeholder | `public/images/portrait-*.webp` |
 | Rilo copy vs riloai.app | conflict, see below | `projects.ts` |
 | Phantom links | none, repo is private | `projects.ts` |
-| Northern and Sumo Dino logos | monogram | `experience.ts` |
+| Sumo Dino logo | monogram | `experience.ts` |
 | Northern start year | `2022` | `education.ts` |
 | First co-op employer | omitted | `bio.ts` |
 

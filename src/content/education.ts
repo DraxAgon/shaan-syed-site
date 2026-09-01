@@ -33,7 +33,7 @@ export const highSchool: EducationEntry = {
   credential: "Toronto, ON",
   dates: "2022 to 2026",
   note: "98.33% average",
-  logo: null,
+  logo: "/images/logo-northern.webp",
 };
 
 /* Context, not a second resume. No dates needed. */
