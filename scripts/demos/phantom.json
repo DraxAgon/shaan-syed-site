@@ -1,0 +1,13 @@
+{
+  "url": "https://ignitionhackv7.onrender.com/",
+  "name": "phantom-demo",
+  "seconds": 20,
+  "width": 1440,
+  "height": 900,
+  "settleMs": 10000,
+  "steps": [
+    { "atSecond": 2.6, "clickText": "Baixo Xingu Forest Project" },
+    { "atSecond": 6.5, "clickText": "Run independent verification" },
+    { "atSecond": 13.6, "clickText": "Kariba case" }
+  ]
+}

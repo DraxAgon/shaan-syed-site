@@ -455,22 +455,46 @@
     border: 1px solid var(--color-hairline); background: var(--color-lift);
   }
 
-  /* ---------------- recorded demo ---------------- */
-  .demo { width: 100%; margin: 0; display: grid; gap: 8px; }
+  /* ---------------- recorded demo and live embed ---------------- */
+  .demo { width: 100%; margin: 0; display: grid; gap: 9px; }
 
-  .demo-video {
-    width: 100%; height: auto; display: block;
+  .demo-stage {
+    position: relative;
+    width: 100%;
     aspect-ratio: 16 / 10;
     border-radius: 10px;
     border: 1px solid var(--color-hairline);
     background: var(--color-lift);
+    overflow: hidden;
+  }
+
+  .demo-video,
+  .demo-frame {
+    display: block;
+    width: 100%; height: 100%;
+    border: 0;
+    background: var(--color-lift);
+  }
+
+  .demo-video { object-fit: cover; }
+
+  .demo-waking {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-family: var(--font-mono); font-size: 0.75rem;
+    color: var(--color-ink-muted);
+    background: var(--color-lift);
+    z-index: 1;
   }
 
   .demo-caption {
-    display: inline-flex; align-items: center; gap: 7px;
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 8px 16px;
     font-family: var(--font-mono); font-size: 0.6875rem;
     color: var(--color-ink-muted);
   }
+
+  .demo-caption-text { display: inline-flex; align-items: center; gap: 7px; }
 
   .demo-dot {
     width: 6px; height: 6px; border-radius: 50%;
@@ -480,6 +504,27 @@
   .demo-dot.is-live {
     background: var(--color-brass);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brass) 22%, transparent);
+  }
+  /* The live app gets a steady ring rather than the playback pulse. */
+  .demo-dot.is-real {
+    background: #6fbf8b;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #6fbf8b 22%, transparent);
+  }
+
+  .demo-toggle {
+    font: inherit;
+    color: var(--color-brass);
+    background: none;
+    border: 1px solid color-mix(in srgb, var(--color-brass) 38%, transparent);
+    border-radius: 999px;
+    padding: 4px 11px;
+    cursor: pointer;
+    transition: border-color 160ms ease, background-color 160ms ease;
+  }
+  .demo-toggle:hover,
+  .demo-toggle:focus-visible {
+    border-color: var(--color-brass);
+    background: color-mix(in srgb, var(--color-brass) 10%, transparent);
   }
   .browser-title { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.022em; }
   .browser-descriptor { font-size: 1rem; color: var(--color-ink); margin-top: -6px; }

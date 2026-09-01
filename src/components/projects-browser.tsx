@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-import { DemoVideo } from "./demo-video";
+import { ProjectDemo } from "./project-demo";
 import { Icon } from "./icon";
 import { hasIcon } from "./icons";
 import { projects } from "@/content/projects";
@@ -60,10 +60,12 @@ export function ProjectsBrowser() {
           crossfade replays on every switch. */}
       <div className="browser-detail" key={active}>
         {project.demo ? (
-          <DemoVideo
+          <ProjectDemo
             src={project.demo.src}
             poster={project.demo.poster}
             label={project.demo.label}
+            liveUrl={project.demo.liveUrl}
+            liveLabel={project.demo.liveLabel}
           />
         ) : project.image ? (
           <Image

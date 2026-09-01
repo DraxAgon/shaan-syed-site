@@ -22,7 +22,16 @@ export type Project = {
   /* Optional recorded scroll-through of the live product. Takes the
      place of the still when present. Produced by
      scripts/record-demo.mjs. */
-  demo?: { src: string; poster: string; label: string };
+  demo?: {
+    src: string;
+    poster: string;
+    label: string;
+    /* Set only when the app allows framing. riloai.app sends
+       X-Frame-Options: SAMEORIGIN, so it has a recording but no live
+       mode. */
+    liveUrl?: string;
+    liveLabel?: string;
+  };
 };
 
 export const projects: Project[] = [
@@ -85,10 +94,19 @@ export const projects: Project[] = [
       "It outputs a year-by-year clearing view inside the project boundary, the project's auditor and the buyers holding its credits, and a PDF export.",
     ],
     stack: ["Public satellite forest-loss datasets", "Base44"],
-    /* The Ignition Hacks repo is private, so linking it would 404 for
-       every visitor. Add the link back once it is public, or add the
-       Base44 app URL when there is one. */
-    links: [],
+    links: [
+      {
+        label: "ignitionhackv7.onrender.com",
+        href: "https://ignitionhackv7.onrender.com/",
+      },
+    ],
+    demo: {
+      src: "/media/phantom-demo.mp4",
+      poster: "/media/phantom-demo-poster.webp",
+      label: "Recorded run of Phantom",
+      liveUrl: "https://ignitionhackv7.onrender.com/",
+      liveLabel: "Phantom, running live",
+    },
   },
   {
     name: "Loxbox",
