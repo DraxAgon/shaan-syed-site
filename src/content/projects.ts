@@ -26,11 +26,16 @@ export type Project = {
     src: string;
     poster: string;
     label: string;
-    /* Set only when the app allows framing. riloai.app sends
-       X-Frame-Options: SAMEORIGIN, so it has a recording but no live
-       mode. */
+    /* Set only when the app allows framing, giving a fully clickable
+       embed. */
     liveUrl?: string;
     liveLabel?: string;
+    /* For sites that refuse to be framed: a capture of the whole page
+       the visitor can scroll through in place. */
+    scrollImage?: string;
+    scrollImageWidth?: number;
+    scrollImageHeight?: number;
+    scrollLabel?: string;
   };
 };
 
@@ -62,6 +67,13 @@ export const projects: Project[] = [
       src: "/media/rilo-demo.mp4",
       poster: "/media/rilo-demo-poster.webp",
       label: "Screen recording of riloai.app",
+      /* riloai.app sends X-Frame-Options: SAMEORIGIN, so it cannot be
+         embedded live. The full page is captured instead and scrolls
+         in place. */
+      scrollImage: "/media/rilo-page.webp",
+      scrollImageWidth: 1280,
+      scrollImageHeight: 5846,
+      scrollLabel: "riloai.app in full, scroll inside it",
     },
   },
   {
@@ -103,7 +115,7 @@ export const projects: Project[] = [
     demo: {
       src: "/media/phantom-demo.mp4",
       poster: "/media/phantom-demo-poster.webp",
-      label: "Recorded run of Phantom",
+      label: "Recorded run of the Kariba case",
       liveUrl: "https://ignitionhackv7.onrender.com/",
       liveLabel: "Phantom, running live",
     },

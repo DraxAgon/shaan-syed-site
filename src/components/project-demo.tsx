@@ -1,39 +1,52 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-/* A recorded run of the live product, with an optional switch to the
-   real thing.
+type Mode = "video" | "live" | "scroll";
 
-   The recording is what loads first, on purpose. It starts instantly,
-   costs one small file, and never shows a cold start. The live app is
-   only fetched when someone asks for it, which matters when the app is
-   on a free tier that sleeps.
+/* A recorded run of the live product, plus a hands-on mode.
 
-   Not every app can be framed: riloai.app sends
-   X-Frame-Options: SAMEORIGIN, so it has no live mode and the button
-   is simply absent. */
+   The recording always loads first: it starts instantly, costs one
+   small file, and never shows a cold start. The hands-on mode is only
+   fetched when someone asks for it, which matters when the app is on a
+   free tier that sleeps.
+
+   Which hands-on mode a project gets depends on whether it can be
+   framed. Phantom sends no X-Frame-Options, so it embeds live and is
+   fully clickable. riloai.app sends X-Frame-Options: SAMEORIGIN, so it
+   gets a scrollable capture of the whole page instead. */
 export function ProjectDemo({
   src,
   poster,
   label,
   liveUrl,
   liveLabel,
+  scrollImage,
+  scrollImageWidth,
+  scrollImageHeight,
+  scrollLabel,
 }: {
   src: string;
   poster: string;
   label: string;
   liveUrl?: string;
   liveLabel?: string;
+  scrollImage?: string;
+  scrollImageWidth?: number;
+  scrollImageHeight?: number;
+  scrollLabel?: string;
 }) {
   const video = useRef<HTMLVideoElement>(null);
+  const [mode, setMode] = useState<Mode>("video");
   const [playing, setPlaying] = useState(false);
-  const [live, setLive] = useState(false);
   const [frameLoaded, setFrameLoaded] = useState(false);
+
+  const altMode: Mode | null = liveUrl ? "live" : scrollImage ? "scroll" : null;
 
   useEffect(() => {
     const el = video.current;
-    if (!el || live) return;
+    if (!el || mode !== "video") return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -48,12 +61,26 @@ export function ProjectDemo({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [live]);
+  }, [mode]);
+
+  const toggleLabel =
+    mode !== "video"
+      ? "Back to the recording"
+      : altMode === "live"
+        ? "Open the live app"
+        : "Scroll the real page";
+
+  const captionText =
+    mode === "live"
+      ? (liveLabel ?? "Live app")
+      : mode === "scroll"
+        ? (scrollLabel ?? "The real page, scroll inside it")
+        : label;
 
   return (
     <figure className="demo">
-      <div className="demo-stage">
-        {live && liveUrl ? (
+      <div className={`demo-stage${mode === "scroll" ? " is-scroll" : ""}`}>
+        {mode === "live" && liveUrl ? (
           <>
             {!frameLoaded ? (
               <p className="demo-waking">Waking the app, this can take a moment</p>
@@ -67,6 +94,17 @@ export function ProjectDemo({
               sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
             />
           </>
+        ) : mode === "scroll" && scrollImage ? (
+          <div className="demo-scroll" tabIndex={0} role="group" aria-label={scrollLabel ?? "The full page"}>
+            <Image
+              src={scrollImage}
+              alt={scrollLabel ?? "The full page"}
+              width={scrollImageWidth ?? 1280}
+              height={scrollImageHeight ?? 5846}
+              className="demo-scroll-img"
+              unoptimized
+            />
+          </div>
         ) : (
           <video
             ref={video}
@@ -88,22 +126,26 @@ export function ProjectDemo({
       <figcaption className="demo-caption">
         <span className="demo-caption-text">
           <span
-            className={`demo-dot${!live && playing ? " is-live" : ""}${live ? " is-real" : ""}`}
+            className={
+              "demo-dot" +
+              (mode === "video" && playing ? " is-live" : "") +
+              (mode !== "video" ? " is-real" : "")
+            }
             aria-hidden="true"
           />
-          {live ? (liveLabel ?? "Live app") : label}
+          {captionText}
         </span>
 
-        {liveUrl ? (
+        {altMode ? (
           <button
             type="button"
             className="demo-toggle"
             onClick={() => {
-              setLive((v) => !v);
+              setMode((m) => (m === "video" ? altMode : "video"));
               setFrameLoaded(false);
             }}
           >
-            {live ? "Back to the recording" : "Open the live app"}
+            {toggleLabel}
           </button>
         ) : null}
       </figcaption>

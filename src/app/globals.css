@@ -478,6 +478,25 @@
 
   .demo-video { object-fit: cover; }
 
+  /* Scrollable full-page capture, for sites that refuse to be framed. */
+  .demo-scroll {
+    width: 100%; height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-hairline) transparent;
+    overscroll-behavior: contain;
+  }
+
+  .demo-scroll::-webkit-scrollbar { width: 8px; }
+  .demo-scroll::-webkit-scrollbar-thumb {
+    background: var(--color-hairline); border-radius: 4px;
+  }
+
+  .demo-scroll-img { display: block; width: 100%; height: auto; }
+
+  .demo-stage.is-scroll { background: #fff; }
+
   .demo-waking {
     position: absolute; inset: 0;
     display: grid; place-items: center;

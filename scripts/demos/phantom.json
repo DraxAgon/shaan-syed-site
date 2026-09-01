@@ -1,13 +1,14 @@
 {
-  "url": "https://ignitionhackv7.onrender.com/",
+  "url": "https://ignitionhackv7.onrender.com/#companies",
   "name": "phantom-demo",
-  "seconds": 20,
+  "seconds": 17.5,
   "width": 1440,
   "height": 900,
-  "settleMs": 10000,
+  "settleMs": 11000,
   "steps": [
-    { "atSecond": 2.6, "clickText": "Baixo Xingu Forest Project" },
-    { "atSecond": 6.5, "clickText": "Run independent verification" },
-    { "atSecond": 13.6, "clickText": "Kariba case" }
+    { "atSecond": 3.0, "clickText": "Gucci" },
+    { "atSecond": 6.6, "clickText": "Volkswagen brand" },
+    { "atSecond": 10.2, "clickText": "Delta Air Lines" },
+    { "atSecond": 13.8, "clickText": "Kariba REDD+" }
   ]
 }

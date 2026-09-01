@@ -66,6 +66,10 @@ export function ProjectsBrowser() {
             label={project.demo.label}
             liveUrl={project.demo.liveUrl}
             liveLabel={project.demo.liveLabel}
+            scrollImage={project.demo.scrollImage}
+            scrollImageWidth={project.demo.scrollImageWidth}
+            scrollImageHeight={project.demo.scrollImageHeight}
+            scrollLabel={project.demo.scrollLabel}
           />
         ) : project.image ? (
           <Image

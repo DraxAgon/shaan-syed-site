@@ -83,6 +83,34 @@ node scripts/shoot-project-sites.mjs   # screenshot riloai.app
 node scripts/generate-placeholders.mjs # the two portrait placeholders
 ```
 
+### The project demos
+
+```
+node scripts/record-demo.mjs https://riloai.app rilo-demo 14
+node scripts/record-interaction.mjs scripts/demos/phantom.json
+node scripts/capture-fullpage.mjs https://riloai.app rilo-page 1280
+```
+
+`record-demo.mjs` pans down a page. `record-interaction.mjs` drives an
+app through a timed click script, which is what Phantom needs since it
+is a dashboard rather than a scrolling page; its steps live in
+`scripts/demos/phantom.json`. `capture-fullpage.mjs` grabs a whole page
+as one tall WebP for the scroll mode.
+
+Whether a project gets a live embed or a scrollable capture comes down
+to one header. Phantom sends no `X-Frame-Options`, so it embeds live and
+stays clickable. riloai.app sends `X-Frame-Options: SAMEORIGIN`, so a
+browser refuses to frame it and the scroll capture stands in. If you
+ever want Rilo embedded live, that header on your own server is the
+thing to change, and weakening it only for this is probably not worth
+it.
+
+Phantom's demo deliberately runs the **Kariba case** rather than the
+Amazon list. Kariba is a real project with real buyers on public
+record; the Amazon entries are marked "Illustrative project" in the app
+itself, so putting them in a portfolio demo would show invented numbers
+as if they were findings.
+
 `fetch-logos.mjs` prints MISS for any org it cannot find a logo for.
 Only Sumo Dino MISSes now, so it renders as a monogram tile, which is
 deliberate rather than a broken image. Drop a real `logo-sumodino.webp`

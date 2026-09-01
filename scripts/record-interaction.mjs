@@ -91,22 +91,58 @@ const steps = (cfg.steps ?? []).map((step) => ({
   done: false,
 }));
 
-const clickScript = (step) => {
-  if (step.clickSelector) {
-    return `(()=>{const e=document.querySelector(${JSON.stringify(step.clickSelector)});
-      if(!e) return 'no match'; e.click(); return 'clicked';})()`;
-  }
-  return `(()=>{const want=${JSON.stringify(step.clickText)}.toLowerCase();
-    const all=[...document.querySelectorAll('button,a[href],[role=button]')];
-    const hit=all.find(e=>(e.innerText||'').trim().toLowerCase().includes(want));
-    if(!hit) return 'no match'; hit.click(); return 'clicked: '+(hit.innerText||'').trim().slice(0,40);})()`;
+/* Resolve a step to viewport coordinates.
+
+   Matching runs over every element, not just buttons and links, because
+   SVG nodes carry no innerText and are not focusable. Returning a point
+   lets the click go through as a real mouse event, which also fires the
+   hover states an app draws on its own nodes. */
+const locateScript = (step) => {
+  const target = step.clickSelector
+    ? `document.querySelector(${JSON.stringify(step.clickSelector)})`
+    : `(()=>{const want=${JSON.stringify(step.clickText ?? "")}.toLowerCase();
+        const all=[...document.querySelectorAll('button,a[href],[role=button],text,tspan,g,div,span,li')];
+        const hit=all.find(e=>{
+          const txt=(e.textContent||'').replace(/\\s+/g,' ').trim().toLowerCase();
+          return txt && txt.includes(want) && txt.length < want.length + 60;
+        });
+        return hit || null;})()`;
+
+  return `(()=>{
+    const el = ${target};
+    if(!el) return JSON.stringify({ok:false});
+    const r = el.getBoundingClientRect();
+    if(!r.width && !r.height) return JSON.stringify({ok:false});
+    return JSON.stringify({
+      ok:true,
+      x: Math.round(r.left + r.width/2),
+      y: Math.round(r.top + r.height/2),
+      text: (el.textContent||'').replace(/\\s+/g,' ').trim().slice(0,44)
+    });
+  })()`;
 };
+
+async function performStep(step) {
+  const raw = await ev(locateScript(step));
+  let hit;
+  try { hit = JSON.parse(raw); } catch { hit = { ok: false }; }
+  if (!hit.ok) return "no match";
+
+  for (const type of ["mouseMoved", "mousePressed", "mouseReleased"]) {
+    await send("Input.dispatchMouseEvent", {
+      type, x: hit.x, y: hit.y, button: "left",
+      clickCount: type === "mouseMoved" ? 0 : 1,
+    }, s);
+    await sleep(40);
+  }
+  return `clicked "${hit.text}" at ${hit.x},${hit.y}`;
+}
 
 let written = 0;
 for (let f = 0; f < TOTAL; f++) {
   for (const step of steps) {
     if (!step.done && f >= step.atFrame) {
-      const outcome = await ev(clickScript(step));
+      const outcome = await performStep(step);
       console.log(`  ${(f / FPS).toFixed(1)}s  ${step.clickText ?? step.clickSelector} -> ${outcome}`);
       step.done = true;
     }
