@@ -9,8 +9,7 @@ export type EducationEntry = {
 /* One double degree across two institutions, not two unrelated degrees. */
 export const doubleDegree = {
   heading: "Double degree",
-  summary:
-    "One program across two schools, starting fall 2026. My first co-op term begins at the same time.",
+  summary: "One program, taken across both schools over five years.",
   entries: [
     {
       institution: "University of Waterloo",

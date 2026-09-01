@@ -21,466 +21,478 @@
   --measure: 680px;
 }
 
-/* ---------------------------------------------------------------
-   Base
-   --------------------------------------------------------------- */
-html {
-  background-color: var(--color-plate);
-  -webkit-text-size-adjust: 100%;
+@layer base {
+  html {
+    background-color: var(--color-plate);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-plate);
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-brass);
+    color: var(--color-plate);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brass);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
 }
 
-body {
-  background-color: var(--color-plate);
-  color: var(--color-ink);
-  font-family: var(--font-serif);
-  font-size: 1.0625rem;
-  line-height: 1.65;
-  font-variant-numeric: tabular-nums;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+@layer components {
+  /* ---------------------------------------------------------------
+     Base
+     --------------------------------------------------------------- */
 
-::selection {
-  background-color: var(--color-brass);
-  color: var(--color-plate);
-}
 
-:focus-visible {
-  outline: 2px solid var(--color-brass);
-  outline-offset: 3px;
-  border-radius: 1px;
-}
 
-/* ---------------------------------------------------------------
-   Shell: rail + measure, right-aligned to one vertical axis.
-   That axis is the measure's left edge.
-   --------------------------------------------------------------- */
-.shell {
-  width: 100%;
-  max-width: calc(var(--rail-width) + var(--rail-gap) + var(--measure));
-  margin-inline: auto;
-  padding-inline: 20px;
-}
 
-.rail {
-  display: grid;
-  grid-template-columns: 1fr;
-  row-gap: 8px;
-}
 
-/* The rail cell: metadata, section headings, logos, dates. */
-.rail > .rail-side {
-  color: var(--color-ink-muted);
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  line-height: 1.5;
-  font-weight: 500;
-  letter-spacing: 0;
-}
 
-.rail > .rail-main {
-  min-width: 0;
-}
 
-@media (min-width: 768px) {
+
+  /* ---------------------------------------------------------------
+     Shell: rail + measure, right-aligned to one vertical axis.
+     That axis is the measure's left edge.
+     --------------------------------------------------------------- */
+  .shell {
+    width: 100%;
+    max-width: calc(var(--rail-width) + var(--rail-gap) + var(--measure));
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
+
   .rail {
-    grid-template-columns: var(--rail-width) minmax(0, 1fr);
-    column-gap: var(--rail-gap);
-    row-gap: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 8px;
   }
 
+  /* The rail cell: metadata, section headings, logos, dates. */
   .rail > .rail-side {
-    text-align: right;
+    color: var(--color-ink-muted);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: 0;
   }
-}
 
-/* Sections sit on the same axis, so Skills, Awards and Certifications
-   read as three views of one system rather than three designed blocks. */
-.section + .section {
-  margin-top: 56px;
-}
+  .rail > .rail-main {
+    min-width: 0;
+  }
 
-/* ---------------------------------------------------------------
-   Dates and figures. Set at body optical size, not shrunk to
-   caption grey. Plex Mono's large x-height holds the column.
-   --------------------------------------------------------------- */
-.figure-text {
-  font-family: var(--font-mono);
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  font-weight: 400;
-  color: var(--color-ink-muted);
-  font-variant-numeric: tabular-nums slashed-zero;
-  letter-spacing: 0;
-}
+  @media (min-width: 768px) {
+    .rail {
+      grid-template-columns: var(--rail-width) minmax(0, 1fr);
+      column-gap: var(--rail-gap);
+      row-gap: 0;
+    }
 
-/* ---------------------------------------------------------------
-   The one motion moment: the underline tightens toward the
-   baseline on hover and focus. Gradient background rather than
-   text-decoration so the offset animates in every engine.
-   --------------------------------------------------------------- */
-.link {
-  color: inherit;
-  text-decoration: none;
-  background-image: linear-gradient(to bottom, currentColor, currentColor);
-  background-repeat: no-repeat;
-  background-size: 100% 1px;
-  background-position: 0 calc(100% - 0.09em);
-  padding-bottom: 0.06em;
-  transition:
-    background-position 170ms cubic-bezier(0.2, 0.7, 0.2, 1),
-    color 170ms ease;
-}
+    .rail > .rail-side {
+      text-align: right;
+    }
+  }
 
-.link:hover,
-.link:focus-visible {
-  color: var(--color-brass);
-  background-position: 0 calc(100% - 0.01em);
-}
+  /* Sections sit on the same axis, so Skills, Awards and Certifications
+     read as three views of one system rather than three designed blocks. */
+  .section + .section {
+    margin-top: 56px;
+  }
 
-.link-quiet {
-  color: var(--color-ink-muted);
-  text-decoration: none;
-  background-image: linear-gradient(to bottom, currentColor, currentColor);
-  background-repeat: no-repeat;
-  background-size: 100% 1px;
-  background-position: 0 calc(100% - 0.09em);
-  padding-bottom: 0.06em;
-  transition:
-    background-position 170ms cubic-bezier(0.2, 0.7, 0.2, 1),
-    color 170ms ease;
-}
+  /* ---------------------------------------------------------------
+     Dates and figures. Set at body optical size, not shrunk to
+     caption grey. Plex Mono's large x-height holds the column.
+     --------------------------------------------------------------- */
+  .figure-text {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--color-ink-muted);
+    font-variant-numeric: tabular-nums slashed-zero;
+    letter-spacing: 0;
+  }
 
-.link-quiet:hover,
-.link-quiet:focus-visible {
-  color: var(--color-brass);
-  background-position: 0 calc(100% - 0.01em);
-}
+  /* ---------------------------------------------------------------
+     The one motion moment: the underline tightens toward the
+     baseline on hover and focus. Gradient background rather than
+     text-decoration so the offset animates in every engine.
+     --------------------------------------------------------------- */
+  .link {
+    color: inherit;
+    text-decoration: none;
+    background-image: linear-gradient(to bottom, currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: 0 calc(100% - 0.09em);
+    padding-bottom: 0.06em;
+    transition:
+      background-position 170ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      color 170ms ease;
+  }
 
-/* Nav links carry no rest-state underline; the current route is
-   marked in brass. */
-.nav-link {
-  color: var(--color-ink-muted);
-  text-decoration: none;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  font-weight: 500;
-  background-image: linear-gradient(to bottom, currentColor, currentColor);
-  background-repeat: no-repeat;
-  background-size: 0% 1px;
-  background-position: 0 calc(100% + 0.12em);
-  padding-bottom: 0.16em;
-  transition:
-    background-size 170ms cubic-bezier(0.2, 0.7, 0.2, 1),
-    color 170ms ease;
-}
+  .link:hover,
+  .link:focus-visible {
+    color: var(--color-brass);
+    background-position: 0 calc(100% - 0.01em);
+  }
 
-.nav-link:hover,
-.nav-link:focus-visible {
-  color: var(--color-brass);
-  background-size: 100% 1px;
-}
+  .link-quiet {
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    background-image: linear-gradient(to bottom, currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: 0 calc(100% - 0.09em);
+    padding-bottom: 0.06em;
+    transition:
+      background-position 170ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      color 170ms ease;
+  }
 
-.nav-link[aria-current="page"] {
-  color: var(--color-brass);
-  background-size: 100% 1px;
-}
+  .link-quiet:hover,
+  .link-quiet:focus-visible {
+    color: var(--color-brass);
+    background-position: 0 calc(100% - 0.01em);
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  .link,
-  .link-quiet,
+  /* Nav links carry no rest-state underline; the current route is
+     marked in brass. */
   .nav-link {
-    transition: none;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+    background-image: linear-gradient(to bottom, currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    background-position: 0 calc(100% + 0.12em);
+    padding-bottom: 0.16em;
+    transition:
+      background-size 170ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      color 170ms ease;
   }
-}
 
-/* ---------------------------------------------------------------
-   Skip link
-   --------------------------------------------------------------- */
-.skip-link {
-  position: absolute;
-  left: -9999px;
-  top: 0;
-  z-index: 10;
-  background-color: var(--color-plate);
-  color: var(--color-brass);
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  padding: 12px 16px;
-  border: 1px solid var(--color-brass);
-}
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--color-brass);
+    background-size: 100% 1px;
+  }
 
-.skip-link:focus {
-  left: 8px;
-  top: 8px;
-}
+  .nav-link[aria-current="page"] {
+    color: var(--color-brass);
+    background-size: 100% 1px;
+  }
 
-/* ---------------------------------------------------------------
-   Headings
-   --------------------------------------------------------------- */
-.name-heading {
-  font-family: var(--font-serif);
-  font-size: clamp(2.125rem, 1.55rem + 2.4vw, 2.875rem);
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.02;
-  /* Pinned below the rendered size so the stems stay sturdy
-     light-on-dark. Auto opsz thins the hairlines at 46px. */
-  font-variation-settings: "opsz" 28;
-  color: var(--color-ink);
-  margin: 0;
-}
+  @media (prefers-reduced-motion: reduce) {
+    .link,
+    .link-quiet,
+    .nav-link {
+      transition: none;
+    }
+  }
 
-.page-heading {
-  font-family: var(--font-serif);
-  font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.25rem);
-  font-weight: 400;
-  letter-spacing: -0.015em;
-  line-height: 1.1;
-  font-variation-settings: "opsz" 24;
-  color: var(--color-ink);
-  margin: 0;
-}
+  /* ---------------------------------------------------------------
+     Skip link
+     --------------------------------------------------------------- */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 10;
+    background-color: var(--color-plate);
+    color: var(--color-brass);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    padding: 12px 16px;
+    border: 1px solid var(--color-brass);
+  }
 
-/* Section headings live in the rail, beside their content rather
-   than above it. There is no eyebrow slot to fill. */
-.section-heading {
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  font-weight: 500;
-  letter-spacing: 0;
-  line-height: 1.5;
-  color: var(--color-ink-muted);
-  margin: 0;
-}
+  .skip-link:focus {
+    left: 8px;
+    top: 8px;
+  }
 
-.entry-title {
-  font-family: var(--font-serif);
-  font-size: 1.0625rem;
-  line-height: 1.45;
-  margin: 0;
-  color: var(--color-ink);
-}
+  /* ---------------------------------------------------------------
+     Headings
+     --------------------------------------------------------------- */
+  .name-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(2.125rem, 1.55rem + 2.4vw, 2.875rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+    /* Pinned below the rendered size so the stems stay sturdy
+       light-on-dark. Auto opsz thins the hairlines at 46px. */
+    font-variation-settings: "opsz" 28;
+    color: var(--color-ink);
+    margin: 0;
+  }
 
-.entry-title .org {
-  font-weight: 600;
-}
+  .page-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.25rem);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+    font-variation-settings: "opsz" 24;
+    color: var(--color-ink);
+    margin: 0;
+  }
 
-.entry-title .role {
-  font-weight: 400;
-  color: var(--color-ink-muted);
-}
+  /* Section headings live in the rail, beside their content rather
+     than above it. There is no eyebrow slot to fill. */
+  .section-heading {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
 
-.project-title {
-  font-family: var(--font-serif);
-  font-size: 1.375rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.3;
-  color: var(--color-ink);
-  margin: 0;
-}
+  .entry-title {
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    margin: 0;
+    color: var(--color-ink);
+  }
 
-.prose-text {
-  color: var(--color-ink);
-  margin: 0;
-  text-wrap: pretty;
-}
+  .entry-title .org {
+    font-weight: 600;
+  }
 
-.prose-text + .prose-text {
-  margin-top: 1.05em;
-}
+  .entry-title .role {
+    font-weight: 400;
+    color: var(--color-ink-muted);
+  }
 
-/* Logo tile. A backing surface so a white-on-transparent PNG has
-   something to sit on. */
-.logo-tile {
-  width: 28px;
-  height: 28px;
-  border-radius: 2px;
-  background-color: var(--color-lift);
-  border: 1px solid var(--color-hairline);
-  object-fit: contain;
-  display: block;
-}
+  .project-title {
+    font-family: var(--font-serif);
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    color: var(--color-ink);
+    margin: 0;
+  }
 
-@media (min-width: 768px) {
+  .prose-text {
+    color: var(--color-ink);
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  .prose-text + .prose-text {
+    margin-top: 1.05em;
+  }
+
+  /* Logo tile. A backing surface so a white-on-transparent PNG has
+     something to sit on. */
   .logo-tile {
-    margin-left: auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 2px;
+    background-color: var(--color-lift);
+    border: 1px solid var(--color-hairline);
+    object-fit: contain;
+    display: block;
   }
-}
 
-/* ---------------------------------------------------------------
-   Lists
-   --------------------------------------------------------------- */
-.bullets {
-  list-style: disc;
-  margin: 10px 0 0;
-  padding-left: 1.1em;
-}
+  @media (min-width: 768px) {
+    .logo-tile {
+      margin-left: auto;
+    }
+  }
 
-.bullets > li {
-  margin: 0;
-  padding-left: 0.15em;
-  line-height: 1.6;
-}
+  /* ---------------------------------------------------------------
+     Lists
+     --------------------------------------------------------------- */
+  .bullets {
+    list-style: disc;
+    margin: 10px 0 0;
+    padding-left: 1.1em;
+  }
 
-.bullets > li + li {
-  margin-top: 4px;
-}
+  .bullets > li {
+    margin: 0;
+    padding-left: 0.15em;
+    line-height: 1.6;
+  }
 
-.bullets > li::marker {
-  color: var(--color-hairline);
-  font-size: 0.9em;
-}
+  .bullets > li + li {
+    margin-top: 4px;
+  }
 
-/* Plain lists: no marker, no separator glyph. Proximity does the
-   work that punctuation usually does. */
-.run {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 1.35em;
-  row-gap: 0.35rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+  .bullets > li::marker {
+    color: var(--color-hairline);
+    font-size: 0.9em;
+  }
 
-.run > li {
-  white-space: nowrap;
-  color: var(--color-ink);
-}
+  /* Plain lists: no marker, no separator glyph. Proximity does the
+     work that punctuation usually does. */
+  .run {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.35em;
+    row-gap: 0.35rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 
-.stack-run {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 1.15em;
-  row-gap: 0.3rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  color: var(--color-ink-muted);
-}
+  .run > li {
+    white-space: nowrap;
+    color: var(--color-ink);
+  }
 
-.stack-run > li {
-  white-space: nowrap;
-}
+  .stack-run {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.15em;
+    row-gap: 0.3rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-ink-muted);
+  }
 
-.plain-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+  .stack-run > li {
+    white-space: nowrap;
+  }
 
-.plain-list > li + li {
-  margin-top: 6px;
-}
+  .plain-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 
-/* ---------------------------------------------------------------
-   Row rhythm. On desktop the side and main cells share a grid row,
-   so the main cell's bottom margin sets the spacing between rows.
-   On mobile they stack, so the side cell needs a small gap of its own.
-   --------------------------------------------------------------- */
-.section > .rail-main {
-  margin-bottom: 32px;
-}
+  .plain-list > li + li {
+    margin-top: 6px;
+  }
 
-.section > .rail-side {
-  margin-bottom: 8px;
-}
+  /* ---------------------------------------------------------------
+     Row rhythm. On desktop the side and main cells share a grid row,
+     so the main cell's bottom margin sets the spacing between rows.
+     On mobile they stack, so the side cell needs a small gap of its own.
+     --------------------------------------------------------------- */
+  .section > .rail-main {
+    margin-bottom: 32px;
+  }
 
-@media (min-width: 768px) {
   .section > .rail-side {
-    margin-bottom: 0;
+    margin-bottom: 8px;
   }
-}
 
-.section + .section {
-  margin-top: 40px;
-}
+  @media (min-width: 768px) {
+    .section > .rail-side {
+      margin-bottom: 0;
+    }
+  }
 
-.hero {
-  margin-bottom: 72px;
-}
+  .section + .section {
+    margin-top: 40px;
+  }
 
-.portrait-hero {
-  width: 112px;
-  height: auto;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  border-radius: 2px;
-  background-color: var(--color-lift);
-  border: 1px solid var(--color-hairline);
-}
+  .hero {
+    margin-bottom: 72px;
+  }
 
-@media (min-width: 768px) {
   .portrait-hero {
-    margin-left: auto;
+    width: 112px;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 2px;
+    background-color: var(--color-lift);
+    border: 1px solid var(--color-hairline);
   }
-}
 
-.portrait-bio {
-  width: 112px;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 2px;
-  background-color: var(--color-lift);
-  border: 1px solid var(--color-hairline);
-}
+  @media (min-width: 768px) {
+    .portrait-hero {
+      margin-left: auto;
+    }
+  }
 
-@media (min-width: 768px) {
   .portrait-bio {
-    margin-left: auto;
+    width: 112px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 2px;
+    background-color: var(--color-lift);
+    border: 1px solid var(--color-hairline);
   }
-}
 
-/* ---------------------------------------------------------------
-   Small metadata text
-   --------------------------------------------------------------- */
-.date-text {
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  font-weight: 400;
-  color: var(--color-ink-muted);
-  font-variant-numeric: tabular-nums slashed-zero;
-}
+  @media (min-width: 768px) {
+    .portrait-bio {
+      margin-left: auto;
+    }
+  }
 
-.muted {
-  color: var(--color-ink-muted);
-}
+  /* ---------------------------------------------------------------
+     Small metadata text
+     --------------------------------------------------------------- */
+  .date-text {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--color-ink-muted);
+    font-variant-numeric: tabular-nums slashed-zero;
+  }
 
-.ledger-line {
-  line-height: 1.5;
-}
+  .muted {
+    color: var(--color-ink-muted);
+  }
 
-.cert-item {
-  line-height: 1.55;
-}
+  .ledger-line {
+    line-height: 1.5;
+  }
 
-.cert-item + .cert-item {
-  margin-top: 6px;
-}
+  .cert-item {
+    line-height: 1.55;
+  }
 
-/* ---------------------------------------------------------------
-   Project shot and resume frame
-   --------------------------------------------------------------- */
-.project-shot {
-  width: 100%;
-  height: auto;
-  margin-top: 20px;
-  border-radius: 2px;
-  border: 1px solid var(--color-hairline);
-  background-color: var(--color-lift);
-}
+  .cert-item + .cert-item {
+    margin-top: 6px;
+  }
 
-.resume-frame {
-  width: 100%;
-  height: 78vh;
-  min-height: 420px;
-  border: 1px solid var(--color-hairline);
-  border-radius: 2px;
-  background-color: var(--color-lift);
+  /* ---------------------------------------------------------------
+     Project shot and resume frame
+     --------------------------------------------------------------- */
+  .project-shot {
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+    border-radius: 2px;
+    border: 1px solid var(--color-hairline);
+    background-color: var(--color-lift);
+  }
+
+  .resume-frame {
+    width: 100%;
+    height: 78vh;
+    min-height: 420px;
+    border: 1px solid var(--color-hairline);
+    border-radius: 2px;
+    background-color: var(--color-lift);
+  }
 }

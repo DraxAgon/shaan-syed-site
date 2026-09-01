@@ -3,7 +3,7 @@ import path from "node:path";
 
 import type { Metadata } from "next";
 
-import { Row, Section } from "@/components/section";
+import { SectionBeside } from "@/components/section";
 
 export const metadata: Metadata = {
   title: "Resume",
@@ -30,8 +30,7 @@ export default function ResumePage() {
         </div>
       </div>
 
-      <Section heading="PDF" id="resume">
-        <Row side={<span>Download</span>}>
+      <SectionBeside heading="Resume PDF" id="resume">
           {hasResume ? (
             <>
               <p className="mb-0">
@@ -58,8 +57,7 @@ export default function ResumePage() {
               public folder and redeploy.
             </p>
           )}
-        </Row>
-      </Section>
+      </SectionBeside>
     </>
   );
 }

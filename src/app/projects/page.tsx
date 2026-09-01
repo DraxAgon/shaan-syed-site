@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 
-import { Row, Section } from "@/components/section";
+import { RailGroup, Row } from "@/components/section";
 import { projects } from "@/content/projects";
 
 export const metadata: Metadata = {
@@ -20,14 +20,14 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      <Section heading="Built" id="built">
+      <RailGroup label="Projects">
         {projects.map((project) => (
           <Row
             key={project.name}
             as="article"
             side={<span>{project.railStatus}</span>}
           >
-            <h3 className="project-title">{project.name}</h3>
+            <h2 className="project-title">{project.name}</h2>
             <p className="prose-text mt-1">{project.descriptor}</p>
             <p className="date-text mt-1 mb-0">{project.status}</p>
 
@@ -77,7 +77,7 @@ export default function ProjectsPage() {
             ) : null}
           </Row>
         ))}
-      </Section>
+      </RailGroup>
     </>
   );
 }

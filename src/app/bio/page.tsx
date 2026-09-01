@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 
-import { Row, Section } from "@/components/section";
+import { Row, Section, SectionBeside } from "@/components/section";
 import { bioParagraphs } from "@/content/bio";
 import {
   doubleDegree,
@@ -100,27 +100,25 @@ export default function BioPage() {
       </Section>
 
       {/* Context, not a second resume. */}
-      <Section heading="High school" id="high-school">
-        <Row>
-          <ul className="plain-list">
-            {highSchoolRecord.map((item) => (
-              <li key={item} className="ledger-line">
-                {item}
-              </li>
-            ))}
-          </ul>
-        </Row>
-      </Section>
+      <SectionBeside heading="High school" id="high-school">
+        <ul className="plain-list">
+          {highSchoolRecord.map((item) => (
+            <li key={item} className="ledger-line">
+              {item}
+            </li>
+          ))}
+        </ul>
+      </SectionBeside>
 
-      <Section heading="Interests" id="interests">
-        <Row>
-          <ul className="run">
-            {interests.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </Row>
-      </Section>
+      <SectionBeside heading="Interests" id="interests">
+        <ul className="plain-list">
+          {interests.map((item) => (
+            <li key={item} className="ledger-line">
+              {item}
+            </li>
+          ))}
+        </ul>
+      </SectionBeside>
     </>
   );
 }

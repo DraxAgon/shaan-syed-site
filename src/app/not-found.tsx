@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Page not found",
-  description: "That page does not exist on shaansyed.dev.",
+  description:
+    "That page does not exist. Shaan Syed's site has a home page, a bio, projects, and a resume.",
 };
 
 export default function NotFound() {
@@ -14,7 +15,7 @@ export default function NotFound() {
       <div className="rail-main">
         <h1 className="page-heading">Page not found</h1>
         <p className="prose-text mt-5">
-          That page does not exist. The site has four:{" "}
+          That page does not exist. Try{" "}
           <Link className="link" href="/">
             Home
           </Link>
@@ -26,7 +27,7 @@ export default function NotFound() {
           <Link className="link" href="/projects">
             Projects
           </Link>
-          , and{" "}
+          , or{" "}
           <Link className="link" href="/resume">
             Resume
           </Link>
