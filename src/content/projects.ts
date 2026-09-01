@@ -16,10 +16,13 @@ export type Project = {
   prose: string[];
   stack: string[];
   links: ProjectLink[];
-  /* Optional. Set the path once a real screenshot exists in
-     public/images. Left unset, the entry renders as prose with no
-     empty box. See public/images/PLACEHOLDERS.md. */
+  /* Optional still. Left unset, the entry renders as prose with no
+     empty box. */
   image?: string;
+  /* Optional recorded scroll-through of the live product. Takes the
+     place of the still when present. Produced by
+     scripts/record-demo.mjs. */
+  demo?: { src: string; poster: string; label: string };
 };
 
 export const projects: Project[] = [
@@ -46,6 +49,11 @@ export const projects: Project[] = [
     ],
     links: [{ label: "riloai.app", href: "https://riloai.app" }],
     image: "/images/project-rilo.webp",
+    demo: {
+      src: "/media/rilo-demo.mp4",
+      poster: "/media/rilo-demo-poster.webp",
+      label: "Screen recording of riloai.app",
+    },
   },
   {
     name: "Redi AI",

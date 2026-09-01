@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+import { DemoVideo } from "./demo-video";
 import { Icon } from "./icon";
 import { hasIcon } from "./icons";
 import { projects } from "@/content/projects";
@@ -58,7 +59,13 @@ export function ProjectsBrowser() {
       {/* Keyed on the active index so React remounts the panel and the
           crossfade replays on every switch. */}
       <div className="browser-detail" key={active}>
-        {project.image ? (
+        {project.demo ? (
+          <DemoVideo
+            src={project.demo.src}
+            poster={project.demo.poster}
+            label={project.demo.label}
+          />
+        ) : project.image ? (
           <Image
             src={project.image}
             alt={`${project.name}, ${project.descriptor}`}
