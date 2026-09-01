@@ -113,11 +113,17 @@ export default function HomePage() {
           {skills.map((run) => (
             <p key={run.label} className="skill-run">
               <span className="skill-label">{run.label}:</span>{" "}
+              {/* The separator trails its item rather than leading the
+                  next one, so a wrapped line never opens with a dot. */}
               {run.items.map((item, i) => (
                 <span key={item} className="skill-item">
-                  {i > 0 ? <span aria-hidden="true" className="sep"> · </span> : null}
                   {hasIcon(item) ? <Icon name={item} size={11} /> : null}
-                  {item}
+                  <span>{item}</span>
+                  {i < run.items.length - 1 ? (
+                    <span aria-hidden="true" className="sep">
+                      ·
+                    </span>
+                  ) : null}
                 </span>
               ))}
             </p>

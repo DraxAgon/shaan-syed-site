@@ -345,8 +345,14 @@
   .skills-block { display: grid; gap: 8px; padding-top: 4px; }
   .skill-run { font-size: 0.8125rem; line-height: 1.85; color: var(--color-ink-muted); }
   .skill-label { font-weight: 700; color: var(--color-ink); }
-  .skill-item { display: inline-flex; align-items: center; gap: 4px; }
-  .sep { color: color-mix(in srgb, var(--color-ink-muted) 55%, transparent); }
+  .skill-item {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-right: 6px; white-space: nowrap;
+  }
+  .sep {
+    margin-left: 4px;
+    color: color-mix(in srgb, var(--color-ink-muted) 55%, transparent);
+  }
 
   /* ---------------- generic pages ---------------- */
   .page { width: 100%; animation: rise 460ms cubic-bezier(.2,.7,.2,1) both; }
