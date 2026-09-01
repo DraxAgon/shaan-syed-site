@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { ProjectDemo } from "./project-demo";
+import { RediDemo } from "./redi-demo";
 import { Icon } from "./icon";
 import { hasIcon } from "./icons";
 import { projects } from "@/content/projects";
@@ -59,7 +60,19 @@ export function ProjectsBrowser() {
       {/* Keyed on the active index so React remounts the panel and the
           crossfade replays on every switch. */}
       <div className="browser-detail" key={active}>
-        {project.demo ? (
+        {project.mockup ? (
+          <figure className="demo">
+            <div className="demo-stage is-mockup">
+              <RediDemo />
+            </div>
+            <figcaption className="demo-caption">
+              <span className="demo-caption-text">
+                <span className="demo-dot is-mock" aria-hidden="true" />
+                {project.mockup.label}
+              </span>
+            </figcaption>
+          </figure>
+        ) : project.demo ? (
           <ProjectDemo
             src={project.demo.src}
             poster={project.demo.poster}
@@ -70,6 +83,7 @@ export function ProjectsBrowser() {
             scrollImageWidth={project.demo.scrollImageWidth}
             scrollImageHeight={project.demo.scrollImageHeight}
             scrollLabel={project.demo.scrollLabel}
+            hotspots={project.demo.hotspots}
           />
         ) : project.image ? (
           <Image

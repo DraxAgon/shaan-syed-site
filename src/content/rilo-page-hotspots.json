@@ -1,0 +1,191 @@
+[
+ {
+  "label": "R Rilo",
+  "kind": "site",
+  "href": "https://www.riloai.app/",
+  "left": 3.125,
+  "top": 0.3421,
+  "width": 6.4062,
+  "height": 0.6158
+ },
+ {
+  "label": "Home",
+  "kind": "anchor",
+  "scrollPct": 0,
+  "left": 29.6875,
+  "top": 0.479,
+  "width": 2.9688,
+  "height": 0.3421
+ },
+ {
+  "label": "Demo",
+  "kind": "anchor",
+  "scrollPct": 16.8149,
+  "left": 35.1563,
+  "top": 0.479,
+  "width": 2.9688,
+  "height": 0.3421
+ },
+ {
+  "label": "Pricing",
+  "kind": "anchor",
+  "scrollPct": 37.8378,
+  "left": 40.7031,
+  "top": 0.479,
+  "width": 3.5937,
+  "height": 0.3421
+ },
+ {
+  "label": "FAQ",
+  "kind": "anchor",
+  "scrollPct": 54.6528,
+  "left": 46.7188,
+  "top": 0.479,
+  "width": 2.1094,
+  "height": 0.3421
+ },
+ {
+  "label": "Contact",
+  "kind": "anchor",
+  "scrollPct": 76.2231,
+  "left": 51.3281,
+  "top": 0.479,
+  "width": 4.0625,
+  "height": 0.3421
+ },
+ {
+  "label": "Add to Chrome",
+  "kind": "external",
+  "href": "https://chromewebstore.google.com/detail/rilo-ai-reply-assistant-f/calgejppbenflephoedkeaabpielidpp",
+  "left": 75.625,
+  "top": 0.2908,
+  "width": 11.0938,
+  "height": 0.7184
+ },
+ {
+  "label": "Get Started",
+  "kind": "site",
+  "href": "https://www.riloai.app/login",
+  "left": 87.6563,
+  "top": 0.3079,
+  "width": 9.2188,
+  "height": 0.6842
+ },
+ {
+  "label": "Add to Chrome, it's free",
+  "kind": "external",
+  "href": "https://chromewebstore.google.com/detail/rilo-ai-reply-assistant-f/calgejppbenflephoedkeaabpielidpp",
+  "left": 3.125,
+  "top": 10.999,
+  "width": 18.3594,
+  "height": 0.8895
+ },
+ {
+  "label": "Watch 60s Demo",
+  "kind": "anchor",
+  "scrollPct": 16.8149,
+  "left": 22.5781,
+  "top": 10.9819,
+  "width": 14.7656,
+  "height": 0.9237
+ },
+ {
+  "label": "Add to Chrome",
+  "kind": "external",
+  "href": "https://chromewebstore.google.com/detail/rilo-ai-reply-assistant-f/calgejppbenflephoedkeaabpielidpp",
+  "left": 12.2656,
+  "top": 51.2487,
+  "width": 20.8594,
+  "height": 0.7184
+ },
+ {
+  "label": "Start Pro",
+  "kind": "site",
+  "href": "https://www.riloai.app/dashboard?cycle=monthly",
+  "left": 39.2188,
+  "top": 50.4276,
+  "width": 21.4844,
+  "height": 0.7013
+ },
+ {
+  "label": "R Rilo",
+  "kind": "site",
+  "href": "https://www.riloai.app/",
+  "left": 3.125,
+  "top": 94.8512,
+  "width": 5.4688,
+  "height": 0.479
+ },
+ {
+  "label": "Demo",
+  "kind": "site",
+  "href": "https://www.riloai.app/#demo",
+  "left": 51.9531,
+  "top": 95.4499,
+  "width": 2.9688,
+  "height": 0.3079
+ },
+ {
+  "label": "Pricing",
+  "kind": "site",
+  "href": "https://www.riloai.app/#pricing",
+  "left": 51.9531,
+  "top": 95.9973,
+  "width": 3.4375,
+  "height": 0.3079
+ },
+ {
+  "label": "FAQ",
+  "kind": "site",
+  "href": "https://www.riloai.app/#faq",
+  "left": 51.9531,
+  "top": 96.5446,
+  "width": 2.0313,
+  "height": 0.3079
+ },
+ {
+  "label": "Privacy Policy",
+  "kind": "site",
+  "href": "https://www.riloai.app/privacy",
+  "left": 68.5938,
+  "top": 95.4499,
+  "width": 6.9531,
+  "height": 0.3079
+ },
+ {
+  "label": "Terms of Service",
+  "kind": "site",
+  "href": "https://www.riloai.app/terms",
+  "left": 68.5938,
+  "top": 95.9973,
+  "width": 8.2813,
+  "height": 0.3079
+ },
+ {
+  "label": "Refunds & Cancellation",
+  "kind": "site",
+  "href": "https://www.riloai.app/refund-policy",
+  "left": 68.5938,
+  "top": 96.5446,
+  "width": 11.6406,
+  "height": 0.3079
+ },
+ {
+  "label": "Security",
+  "kind": "site",
+  "href": "https://www.riloai.app/security",
+  "left": 68.5938,
+  "top": 97.092,
+  "width": 4.1406,
+  "height": 0.3079
+ },
+ {
+  "label": "Contact form",
+  "kind": "site",
+  "href": "https://www.riloai.app/#contact",
+  "left": 85.2344,
+  "top": 95.9973,
+  "width": 6.5625,
+  "height": 0.3079
+ }
+]

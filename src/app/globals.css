@@ -581,3 +581,155 @@
     scroll-behavior: auto !important;
   }
 }
+
+@layer components {
+  /* Hotspots sit invisibly over the buttons the capture already shows,
+     and only announce themselves on hover or keyboard focus. */
+  .demo-scroll-inner { position: relative; }
+
+  .demo-hotspot {
+    position: absolute;
+    display: block;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    transition: border-color 140ms ease, background-color 140ms ease;
+  }
+
+  .demo-hotspot:hover,
+  .demo-hotspot:focus-visible {
+    border-color: var(--color-brass);
+    background: color-mix(in srgb, var(--color-brass) 16%, transparent);
+  }
+}
+
+@layer components {
+  /* ---------------- Redi mockup ---------------- */
+  .demo-stage.is-mockup { background: #14100c; overflow-y: auto; }
+  .demo-dot.is-mock { background: var(--color-ink-muted); }
+
+  .redi {
+    display: grid; gap: 10px;
+    padding: 14px 16px 18px;
+    font-size: 0.8125rem;
+  }
+
+  /* Pinned, so the mockup label stays visible however far the panel
+     is scrolled. */
+  .redi-bar {
+    position: sticky; top: 0; z-index: 2;
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px;
+    margin: -14px -16px 0; padding: 12px 16px 8px;
+    background: #14100c;
+  }
+  .redi-mark {
+    font-family: var(--font-serif); font-size: 1.0625rem; font-weight: 700;
+    letter-spacing: -0.02em; color: var(--color-ink);
+  }
+  .redi-tag {
+    font-family: var(--font-mono); font-size: 0.625rem;
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-hairline);
+    border-radius: 999px; padding: 2px 8px;
+  }
+
+  .redi-input-row { display: flex; gap: 7px; }
+
+  .redi-input {
+    flex: 1; min-width: 0;
+    font-family: var(--font-mono); font-size: 0.75rem;
+    color: var(--color-ink);
+    background: #1c1610;
+    border: 1px solid var(--color-hairline);
+    border-radius: 7px; padding: 7px 10px;
+  }
+  .redi-input::placeholder { color: color-mix(in srgb, var(--color-ink-muted) 70%, transparent); }
+  .redi-input:focus-visible { border-color: var(--color-brass); outline: none; }
+
+  .redi-go {
+    font-family: var(--font-mono); font-size: 0.75rem;
+    color: var(--color-plate); background: var(--color-brass);
+    border: 0; border-radius: 7px; padding: 7px 13px;
+    cursor: pointer; white-space: nowrap;
+    transition: opacity 150ms ease;
+  }
+  .redi-go:hover, .redi-go:focus-visible { opacity: 0.85; }
+
+  .redi-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .redi-chip {
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    color: var(--color-ink-muted);
+    background: transparent;
+    border: 1px solid var(--color-hairline);
+    border-radius: 999px; padding: 3px 9px; cursor: pointer;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .redi-chip:hover { color: var(--color-ink); }
+  .redi-chip.is-on { color: var(--color-brass); border-color: var(--color-brass); }
+
+  .redi-meta {
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    color: var(--color-ink-muted);
+  }
+  .redi-meta strong { color: var(--color-ink); font-weight: 500; }
+
+  .redi-questions { display: grid; gap: 4px; }
+
+  .redi-question {
+    display: flex; gap: 10px; width: 100%; text-align: left;
+    font: inherit; color: var(--color-ink);
+    background: #1a1510;
+    border: 1px solid transparent; border-radius: 8px;
+    padding: 9px 11px; cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease;
+  }
+  .redi-question:hover { border-color: var(--color-hairline); }
+  .redi-question.is-open { border-color: var(--color-brass); background: #1f1811; }
+
+  .redi-num {
+    font-family: var(--font-mono); font-size: 0.625rem;
+    color: var(--color-ink-muted); padding-top: 2px;
+  }
+  .redi-text { line-height: 1.45; }
+
+  .redi-score {
+    display: grid; gap: 7px;
+    padding: 10px 11px 12px 32px;
+  }
+  .redi-score-head {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 0.625rem;
+    color: var(--color-ink-muted);
+  }
+  .redi-illustrative {
+    color: var(--color-brass);
+    border: 1px solid color-mix(in srgb, var(--color-brass) 40%, transparent);
+    border-radius: 999px; padding: 1px 7px;
+  }
+
+  .redi-row {
+    display: grid; grid-template-columns: 66px 1fr; gap: 3px 9px;
+    align-items: center;
+  }
+  .redi-row-name {
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    color: var(--color-ink);
+  }
+  .redi-bar {
+    height: 5px; border-radius: 3px;
+    background: var(--color-hairline); overflow: hidden;
+  }
+  .redi-fill {
+    display: block; height: 100%;
+    background: var(--color-brass);
+    transition: width 420ms cubic-bezier(.2,.7,.2,1);
+  }
+  .redi-row-note {
+    grid-column: 2;
+    font-size: 0.6875rem; line-height: 1.4;
+    color: var(--color-ink-muted);
+  }
+}

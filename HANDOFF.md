@@ -74,6 +74,19 @@ node scripts/copy-audit.mjs    # another
 Exits non-zero if a banned word, an em dash, an en dash, or an
 exclamation point reaches the rendered pages.
 
+### The interaction check
+
+`next build` says nothing about whether the demos, the disclosure rows
+or the nav menu still work. This does:
+
+```
+npm run build && npm run start   # one terminal
+node scripts/check-site.mjs      # another
+```
+
+24 checks, exits non-zero on the first failure. Set `BASE` to point it
+at the deployed site instead of localhost.
+
 ## 4. Regenerating assets
 
 ```
@@ -104,6 +117,26 @@ browser refuses to frame it and the scroll capture stands in. If you
 ever want Rilo embedded live, that header on your own server is the
 thing to change, and weakening it only for this is probably not worth
 it.
+
+Every project has something hands-on:
+
+| Project | Recording | Hands-on |
+|---|---|---|
+| Rilo | 14s scroll-through | Scroll the real page, buttons work |
+| Redi AI | none, nothing public yet | Interactive mockup of the flow |
+| Phantom | 17.5s Kariba walkthrough | Open the live app, fully clickable |
+
+The Rilo capture is flat, so `capture-fullpage.mjs` also records where
+every button sits and where it points, into
+`src/content/rilo-page-hotspots.json`. Those become invisible overlays:
+Add to Chrome opens the Web Store, Get Started opens the login page, and
+the in-page links scroll the panel instead of leaving the site.
+Re-running the capture regenerates the hotspots, so the two never drift.
+
+Redi AI has no public build, so its panel is an interactive mockup of
+the flow rather than a capture. It is labelled as one on the page, and
+its scores carry an "illustrative" badge. If you want it replaced with
+real screens, an Expo build or a TestFlight link is all it takes.
 
 Phantom's demo deliberately runs the **Kariba case** rather than the
 Amazon list. Kariba is a real project with real buyers on public

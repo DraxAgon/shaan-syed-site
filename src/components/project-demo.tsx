@@ -5,6 +5,19 @@ import { useEffect, useRef, useState } from "react";
 
 type Mode = "video" | "live" | "scroll";
 
+export type Hotspot = {
+  label: string;
+  kind: "external" | "site" | "anchor";
+  href?: string;
+  /* For anchors: where to scroll the panel, as a percentage of the
+     full capture height. */
+  scrollPct?: number;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
 /* A recorded run of the live product, plus a hands-on mode.
 
    The recording always loads first: it starts instantly, costs one
@@ -26,6 +39,7 @@ export function ProjectDemo({
   scrollImageWidth,
   scrollImageHeight,
   scrollLabel,
+  hotspots,
 }: {
   src: string;
   poster: string;
@@ -36,8 +50,10 @@ export function ProjectDemo({
   scrollImageWidth?: number;
   scrollImageHeight?: number;
   scrollLabel?: string;
+  hotspots?: Hotspot[];
 }) {
   const video = useRef<HTMLVideoElement>(null);
+  const scroller = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<Mode>("video");
   const [playing, setPlaying] = useState(false);
   const [frameLoaded, setFrameLoaded] = useState(false);
@@ -95,15 +111,69 @@ export function ProjectDemo({
             />
           </>
         ) : mode === "scroll" && scrollImage ? (
-          <div className="demo-scroll" tabIndex={0} role="group" aria-label={scrollLabel ?? "The full page"}>
-            <Image
-              src={scrollImage}
-              alt={scrollLabel ?? "The full page"}
-              width={scrollImageWidth ?? 1280}
-              height={scrollImageHeight ?? 5846}
-              className="demo-scroll-img"
-              unoptimized
-            />
+          <div
+            className="demo-scroll"
+            ref={scroller}
+            tabIndex={0}
+            role="group"
+            aria-label={scrollLabel ?? "The full page"}
+          >
+            <div className="demo-scroll-inner">
+              <Image
+                src={scrollImage}
+                alt={scrollLabel ?? "The full page"}
+                width={scrollImageWidth ?? 1280}
+                height={scrollImageHeight ?? 5846}
+                className="demo-scroll-img"
+                unoptimized
+              />
+
+              {/* The capture is flat, so the page's own buttons are put
+                  back as an overlay: real links out, and in-page
+                  anchors that scroll this panel rather than leaving. */}
+              {(hotspots ?? []).map((spot, i) => {
+                const style = {
+                  left: `${spot.left}%`,
+                  top: `${spot.top}%`,
+                  width: `${spot.width}%`,
+                  height: `${spot.height}%`,
+                };
+
+                if (spot.kind === "anchor") {
+                  return (
+                    <button
+                      key={`${spot.label}-${i}`}
+                      type="button"
+                      className="demo-hotspot"
+                      style={style}
+                      aria-label={`${spot.label}, scroll to that section`}
+                      onClick={() => {
+                        const el = scroller.current;
+                        if (!el || spot.scrollPct == null) return;
+                        el.scrollTo({
+                          top: (spot.scrollPct / 100) * el.scrollHeight,
+                          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                            ? "auto"
+                            : "smooth",
+                        });
+                      }}
+                    />
+                  );
+                }
+
+                return (
+                  <a
+                    key={`${spot.label}-${i}`}
+                    className="demo-hotspot"
+                    style={style}
+                    href={spot.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${spot.label}, opens riloai.app in a new tab`}
+                  />
+                );
+              })}
+            </div>
           </div>
         ) : (
           <video

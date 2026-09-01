@@ -13,7 +13,7 @@
  * the component needs to size the panel.
  */
 import { spawn } from "node:child_process";
-import { statSync } from "node:fs";
+import { statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import sharp from "sharp";
@@ -78,6 +78,53 @@ for (let y = 0; y < height; y += 600) {
 await ev(`window.scrollTo(0, 0)`);
 await sleep(1500);
 
+/* Collect every interactive target with its position in the full-page
+   image, so the flat capture can be made clickable again.
+
+   Three kinds come out:
+     external  an absolute URL, opened in a new tab
+     site      a root-relative path, resolved against the origin
+     anchor    an in-page link, resolved to a y offset so clicking it
+               scrolls the panel instead of leaving the site */
+const hotspots = JSON.parse(
+  await ev(`(() => {
+    const origin = location.origin;
+    const out = [];
+    for (const el of document.querySelectorAll('a[href], button')) {
+      const r = el.getBoundingClientRect();
+      if (r.width < 24 || r.height < 14) continue;
+      const label = (el.innerText || el.getAttribute('aria-label') || '')
+        .replace(/\\s+/g, ' ').trim();
+      if (!label) continue;
+      const raw = el.getAttribute('href') || '';
+      let kind = null, href = null, scrollTo = null;
+      if (/^https?:/i.test(raw)) { kind = 'external'; href = raw; }
+      else if (raw.startsWith('#')) {
+        const target = document.querySelector(raw) ||
+          document.getElementById(raw.slice(1));
+        if (target) {
+          kind = 'anchor';
+          scrollTo = Math.round(target.getBoundingClientRect().top + window.scrollY);
+        }
+      } else if (raw.startsWith('/')) { kind = 'site'; href = origin + raw; }
+      if (!kind) continue;
+      out.push({
+        label: label.slice(0, 48), kind, href, scrollTo,
+        x: Math.round(r.left + window.scrollX),
+        y: Math.round(r.top + window.scrollY),
+        w: Math.round(r.width), h: Math.round(r.height),
+      });
+    }
+    /* Drop duplicates that sit on top of each other. */
+    const seen = new Set();
+    return JSON.stringify(out.filter(o => {
+      const k = o.label + '|' + o.y + '|' + o.x;
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    }));
+  })()`),
+);
+
 const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true }, s);
 ws.close();
 chrome.kill();
@@ -92,6 +139,26 @@ const meta = await sharp(buf).metadata();
 const out = `public/media/${NAME}.webp`;
 await sharp(buf).webp({ quality: 78 }).toFile(out);
 
+/* Positions are stored as percentages so the overlay scales with
+   whatever width the panel ends up at. */
+const scaled = hotspots.map((h) => ({
+  label: h.label,
+  kind: h.kind,
+  href: h.href ?? undefined,
+  scrollPct: h.scrollTo == null ? undefined : +((h.scrollTo / meta.height) * 100).toFixed(4),
+  left: +((h.x / meta.width) * 100).toFixed(4),
+  top: +((h.y / meta.height) * 100).toFixed(4),
+  width: +((h.w / meta.width) * 100).toFixed(4),
+  height: +((h.h / meta.height) * 100).toFixed(4),
+}));
+
+const jsonPath = `src/content/${NAME}-hotspots.json`;
+writeFileSync(jsonPath, JSON.stringify(scaled, null, 1) + "\n");
+
 console.log(`wrote ${out}`);
 console.log(`  ${meta.width}x${meta.height}px, ${(statSync(out).size / 1024 / 1024).toFixed(2)} MB`);
 console.log(`  set scrollImageHeight: ${meta.height} in projects.ts`);
+console.log(`wrote ${jsonPath}`);
+for (const k of ["external", "site", "anchor"]) {
+  console.log(`  ${k}: ${scaled.filter((h) => h.kind === k).length}`);
+}
