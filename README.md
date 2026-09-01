@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# shaan-syed-site
 
-## Getting Started
+Personal site for Shaan Syed. Next.js App Router, TypeScript, Tailwind
+CSS v4. Fully static, no CMS, no database, no analytics.
 
-First, run the development server:
+## Local development
 
-```bash
+```
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+npm run build     # production build, must pass clean before deploying
+npm run start     # serve the production build locally
+npm run lint      # eslint
+npx tsc --noEmit  # type check
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Editing content
 
-## Learn More
+All content lives as typed objects in `src/content/`. Pages map over
+that data, so nothing is hard-coded in JSX. Adding a job is a one-object
+edit.
 
-To learn more about Next.js, take a look at the following resources:
+| File | Holds |
+|---|---|
+| `profile.ts` | Name, subtitle, hero line, availability line, social links |
+| `experience.ts` | The Experience list on the home page |
+| `projects.ts` | The four project entries |
+| `education.ts` | Degrees, high school, the high school record, interests |
+| `skills.ts` | The two labelled skill runs |
+| `awards.ts` | Awards and honours |
+| `certifications.ts` | Completed and in-progress certifications |
+| `bio.ts` | The first-person paragraphs on `/bio` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Copy rules
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Site copy follows a strict style: no em dashes, no en dashes, no
+exclamation points, and a banned vocabulary list. The audit is
+automated. With the production server running:
 
-## Deploy on Vercel
+```
+npm run build && npm run start
+node scripts/copy-audit.mjs
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+It exits non-zero if any hard rule is broken. Run it after editing copy.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Images
+
+See `public/images/PLACEHOLDERS.md`. Every slot ships as a committed
+placeholder at the right dimensions; swapping in a real photo is mostly
+a filename drop.
+
+## Design
+
+One idea, applied everywhere: a 112px right-aligned metadata rail. The
+section heading, every org logo and every date align to a single
+vertical axis, and that axis is the left edge of the 680px prose
+measure. `src/components/section.tsx` is the only layout primitive.
+
+Colour tokens and their measured contrast ratios are documented at the
+top of `src/app/globals.css`. `--brass` is text and stroke only; it
+fails contrast as a fill behind light text.
