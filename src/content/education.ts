@@ -3,7 +3,7 @@ export type EducationEntry = {
   credential: string;
   dates: string;
   note?: string;
-  logo: string;
+  logo: string | null;
 };
 
 /* One double degree across two institutions, not two unrelated degrees. */
@@ -33,7 +33,7 @@ export const highSchool: EducationEntry = {
   credential: "Toronto, ON",
   dates: "2022 to 2026",
   note: "98.33% average",
-  logo: "/images/logo-northern.webp",
+  logo: null,
 };
 
 /* Context, not a second resume. No dates needed. */

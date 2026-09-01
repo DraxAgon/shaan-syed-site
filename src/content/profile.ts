@@ -6,8 +6,10 @@ export type SocialLink = {
 export type Profile = {
   name: string;
   subtitle: string;
-  currentWork: string;
-  availability: string;
+  /* Written to stay true without edits. The site is a record of what
+     has been built, not a status feed, so nothing here says "currently"
+     or names a thing in progress. */
+  summary: string;
   location: string;
   email: string;
   siteUrl: string;
@@ -17,10 +19,8 @@ export type Profile = {
 export const profile: Profile = {
   name: "Shaan Syed",
   subtitle: "Computer Science @ Waterloo, Business @ Lazaridis",
-  currentWork:
-    "I'm building Redi AI, a mobile app for interview prep, after shipping Rilo, an AI reply assistant that works inside Gmail.",
-  availability:
-    "I'm looking for SWE and product roles, and open to interesting side projects.",
+  summary:
+    "I build software, usually taking it from an idea to something shipped on my own.",
   location: "Toronto, Ontario",
   email: "shaansaifsyed@gmail.com",
   siteUrl: "https://shaan-syed.vercel.app",

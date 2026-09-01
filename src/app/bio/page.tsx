@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 
-import { Row, Section, SectionBeside } from "@/components/section";
+import { OrgLogo } from "@/components/logo";
 import { bioParagraphs } from "@/content/bio";
 import {
   doubleDegree,
@@ -18,107 +18,66 @@ export const metadata: Metadata = {
 
 export default function BioPage() {
   return (
-    <>
-      <div className="rail hero">
-        <div className="rail-side">
-          <Image
-            src="/images/portrait-bio.webp"
-            alt="Shaan Syed"
-            width={1000}
-            height={1000}
-            sizes="112px"
-            className="portrait-bio"
-          />
-        </div>
-        <div className="rail-main">
-          <h1 className="page-heading">Bio</h1>
-          <div className="mt-6">
-            {bioParagraphs.map((paragraph) => (
-              <p key={paragraph.slice(0, 40)} className="prose-text">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </div>
+    <div className="page">
+      <div className="bio-head">
+        <Image
+          src="/images/portrait-bio.webp"
+          alt="Shaan Syed"
+          width={1000}
+          height={1000}
+          sizes="128px"
+          className="portrait portrait-square"
+        />
+        <h1 className="page-title">Bio</h1>
       </div>
 
-      <Section heading="Education" id="education">
-        <Row side={<span>{doubleDegree.heading}</span>}>
-          <p className="prose-text">{doubleDegree.summary}</p>
-        </Row>
-
-        {doubleDegree.entries.map((entry) => (
-          <Row
-            key={entry.institution}
-            side={
-              <>
-                <Image
-                  src={entry.logo}
-                  alt=""
-                  width={256}
-                  height={256}
-                  sizes="28px"
-                  className="logo-tile"
-                />
-                <span className="block mt-2 date-text">{entry.dates}</span>
-              </>
-            }
-          >
-            <h3 className="entry-title">
-              <span className="org">{entry.institution}</span>{" "}
-              <span className="role">{entry.credential}</span>
-            </h3>
-            {entry.note ? (
-              <p className="date-text mt-1 mb-0">{entry.note}</p>
-            ) : null}
-          </Row>
+      <div className="bio-prose">
+        {bioParagraphs.map((paragraph) => (
+          <p key={paragraph.slice(0, 40)}>{paragraph}</p>
         ))}
+      </div>
 
-        <Row
-          side={
-            <>
-              <Image
-                src={highSchool.logo}
-                alt=""
-                width={256}
-                height={256}
-                sizes="28px"
-                className="logo-tile"
-              />
-              <span className="block mt-2 date-text">{highSchool.dates}</span>
-            </>
-          }
-        >
-          <h3 className="entry-title">
-            <span className="org">{highSchool.institution}</span>{" "}
-            <span className="role">{highSchool.credential}</span>
-          </h3>
-          {highSchool.note ? (
-            <p className="date-text mt-1 mb-0">{highSchool.note}</p>
-          ) : null}
-        </Row>
-      </Section>
+      <section aria-labelledby="edu-h" className="stack-section">
+        <h2 id="edu-h" className="stack-heading">
+          Education
+        </h2>
+        <p className="stack-note">{doubleDegree.summary}</p>
+        <ul className="edu-list">
+          {[...doubleDegree.entries, highSchool].map((entry) => (
+            <li key={entry.institution} className="edu-row">
+              <OrgLogo src={entry.logo} name={entry.institution} size={26} />
+              <span className="edu-body">
+                <span className="edu-name">{entry.institution}</span>
+                <span className="muted"> {entry.credential}</span>
+                {entry.note ? <span className="edu-note">{entry.note}</span> : null}
+              </span>
+              <span className="edu-dates">{entry.dates}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-      {/* Context, not a second resume. */}
-      <SectionBeside heading="High school" id="high-school">
+      <section aria-labelledby="hs-h" className="stack-section">
+        <h2 id="hs-h" className="stack-heading">
+          High school
+        </h2>
         <ul className="plain-list">
           {highSchoolRecord.map((item) => (
-            <li key={item} className="ledger-line">
-              {item}
-            </li>
+            <li key={item}>{item}</li>
           ))}
         </ul>
-      </SectionBeside>
+      </section>
 
-      <SectionBeside heading="Interests" id="interests">
+      <section aria-labelledby="int-h" className="stack-section">
+        <h2 id="int-h" className="stack-heading">
+          Outside software
+        </h2>
         <ul className="plain-list">
           {interests.map((item) => (
-            <li key={item} className="ledger-line">
-              {item}
-            </li>
+            <li key={item}>{item}</li>
           ))}
         </ul>
-      </SectionBeside>
-    </>
+      </section>
+    </div>
   );
 }

@@ -45,6 +45,7 @@ export const projects: Project[] = [
       "Netlify",
     ],
     links: [{ label: "riloai.app", href: "https://riloai.app" }],
+    image: "/images/project-rilo.webp",
   },
   {
     name: "Redi AI",
@@ -76,12 +77,10 @@ export const projects: Project[] = [
       "It outputs a year-by-year clearing view inside the project boundary, the project's auditor and the buyers holding its credits, and a PDF export.",
     ],
     stack: ["Public satellite forest-loss datasets", "Base44"],
-    links: [
-      {
-        label: "github.com/rayaandev/ignitionhacks-2026",
-        href: "https://github.com/rayaandev/ignitionhacks-2026",
-      },
-    ],
+    /* The Ignition Hacks repo is private, so linking it would 404 for
+       every visitor. Add the link back once it is public, or add the
+       Base44 app URL when there is one. */
+    links: [],
   },
   {
     name: "Loxbox",

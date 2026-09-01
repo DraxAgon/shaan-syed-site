@@ -8,7 +8,7 @@
  * titles and alt text, because those are user-facing copy too.
  */
 
-const ROUTES = ["/", "/bio", "/projects", "/resume", "/no-such-page"];
+const ROUTES = ["/", "/bio", "/projects", "/awards", "/no-such-page"];
 const BASE = process.env.AUDIT_BASE ?? "http://localhost:3000";
 
 const BANNED_WORDS = [

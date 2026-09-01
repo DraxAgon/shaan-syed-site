@@ -1,168 +1,150 @@
 # Handoff
 
-Everything you need to change this site yourself.
-
-- **Live site:** https://shaan-syed-git-main-shaan21.vercel.app
-- **Canonical URL (see note below):** https://shaan-syed.vercel.app
+- **Live site:** https://shaan-syed.vercel.app
 - **Repo:** https://github.com/DraxAgon/shaan-syed-site
 - **Local path:** `C:\Users\shaan\Projects\shaan-syed-site`
 
 ---
 
-## 1. Swap in your real photos
+## 1. The one thing only you can supply
 
-Every image is a committed placeholder at the correct dimensions. For
-the portraits and the org logos, **overwrite the file with the same
-filename** and redeploy. No code change.
+**Your photo.** Two slots, both still placeholders:
 
 ```
-public/images/portrait-hero.webp    1200x1500   4:5   home hero
-public/images/portrait-bio.webp     1000x1000   1:1   bio page
-public/images/logo-toronto.webp      256x256    1:1
-public/images/logo-strello.webp      256x256    1:1
-public/images/logo-sumodino.webp     256x256    1:1
-public/images/logo-targetalpha.webp  256x256    1:1
-public/images/logo-northern.webp     256x256    1:1
-public/images/logo-waterloo.webp     256x256    1:1
-public/images/logo-laurier.webp      256x256    1:1
+public/images/portrait-hero.webp   1200x1500  4:5  home
+public/images/portrait-bio.webp    1000x1000  1:1  bio
 ```
 
-Both portraits render at 112px wide, so crop tight. Logos sit on a 28px
-tile, so square crops only.
+Overwrite each with the same filename and push. No code change. The
+home portrait renders at 208px wide and the bio one at 128px, so crop
+tight on your face.
 
-The four `project-*.webp` files are the one exception. Project images
-are off by default so the projects page stays prose-led. To turn one
-on, drop the file in and add one line to that project in
-`src/content/projects.ts`:
+Everything else on the site now uses real imagery: organisation logos
+pulled from their official sites, brand icons for the tech stack, and a
+live screenshot of riloai.app.
 
-```ts
-image: "/images/project-rilo.webp",
-```
+## 2. Pages
 
-Full detail is in `public/images/PLACEHOLDERS.md`.
+| Route | Holds |
+|---|---|
+| `/` | Portrait and identity on the left. Built and Experience as expandable rows on the right, then the skills runs. |
+| `/bio` | The first-person paragraphs, education, high school record, and interests. |
+| `/projects` | A numbered index with a detail panel. `?p=Loxbox` deep-links to one. |
+| `/awards` | Honours, completed certifications, and in-progress certifications. |
 
-## 2. Swap in your real resume
+There is no resume page. Nothing repeats across pages.
 
-Replace `public/Shaan_Syed_Resume.pdf` with the real file, same
-filename. The `/resume` page embeds it and offers it as a download.
-If the file is ever missing the page still renders and says so rather
-than showing a broken frame.
-
-## 3. Edit content
+## 3. Editing content
 
 All content is typed data in `src/content/`. Nothing is hard-coded in
-the page components, so adding a job means adding one object.
+the pages.
 
 | File | Holds |
 |---|---|
-| `profile.ts` | Name, subtitle, hero line, availability line, socials |
-| `experience.ts` | The home page Experience list |
-| `projects.ts` | The four project entries |
+| `profile.ts` | Name, subtitle, the one-line summary, social links |
+| `projects.ts` | The four projects, in the order they appear |
+| `experience.ts` | The Experience rows, in the order they appear |
 | `education.ts` | Degrees, high school, high school record, interests |
-| `skills.ts` | The two labelled skill runs |
-| `awards.ts` | Awards and honours |
-| `certifications.ts` | Completed and in-progress certifications |
-| `bio.ts` | The first-person paragraphs on `/bio` |
+| `skills.ts` | The two skill runs |
+| `awards.ts`, `certifications.ts` | The `/awards` page |
+| `bio.ts` | The `/bio` paragraphs |
 
-### Copy rules are enforced, not just documented
+### The copy is written to not go stale
 
-The site copy bans em dashes, en dashes, exclamation points and a long
-list of filler vocabulary. After editing any copy, run the audit:
-
-```
-npm run build
-npm run start          # in one terminal
-node scripts/copy-audit.mjs   # in another
-```
-
-It exits non-zero if a hard rule is broken and prints exactly what it
-found. It reads the rendered pages, so it catches meta descriptions and
-alt text too.
+The site is a record of what you have built, not a status feed. Nothing
+says "currently" or names a work in progress, so it stays true without
+edits. Keep it that way when you add things.
 
 ### Two facts that must not drift
 
 - The Ignition Hacks result is **`3rd Place, Best Use of Base44`**, a
-  sponsor track placement. It was not an overall hackathon win. Do not
-  let this become "winner", "award-winning" or "Base44 track".
-- In-progress certifications live in their own group and are never
-  styled to read as earned. Only move one to Completed when it is.
+  sponsor track placement, not an overall win. Do not let it become
+  "winner" or "award-winning".
+- In-progress certifications sit in their own group on `/awards` and are
+  never styled to read as earned.
 
-## 4. Redeploy
+### The language check
 
-The Vercel project is connected to the GitHub repo, so:
+```
+npm run build
+npm run start                  # one terminal
+node scripts/copy-audit.mjs    # another
+```
+
+Exits non-zero if a banned word, an em dash, an en dash, or an
+exclamation point reaches the rendered pages.
+
+## 4. Regenerating assets
+
+```
+node scripts/fetch-logos.mjs           # org logos from official sites
+node scripts/generate-icons.mjs        # brand icons from simple-icons
+node scripts/shoot-project-sites.mjs   # screenshot riloai.app
+node scripts/generate-placeholders.mjs # the two portrait placeholders
+```
+
+`fetch-logos.mjs` prints MISS for any org it cannot find a logo for.
+Northern Secondary School and Sumo Dino currently MISS, so they render
+as monogram tiles, which is deliberate rather than a broken image. Drop
+a real `logo-northern.webp` or `logo-sumodino.webp` (256x256) into
+`public/images` and set the path in `experience.ts` to use it.
+
+## 5. Redeploy
 
 ```
 git add -A
-git commit -m "content: update experience"
+git commit -m "content: ..."
 git push
 ```
 
-Vercel builds and deploys `main` automatically. Watch it at
-https://vercel.com/dashboard.
+Vercel builds and deploys `main` automatically. Run `npm run build`
+first; a broken build on `main` is a failed deploy.
 
-Always run `npm run build` locally first. A broken build on `main` means
-a failed deploy.
-
-## 4a. A note on the two URLs
-
-Both hostnames serve the same build and both update on every push to
-`main`.
-
-While the site was being deployed, automated checks hit
-`shaan-syed.vercel.app` often enough that Vercel's edge turned on
-automatic bot mitigation for that one hostname. It answers with a
-"Vercel Security Checkpoint" page instead of the site. Nothing is wrong
-with the project: deployment protection is off, and the same build
-serves fine on the branch alias.
-
-These mitigations expire on their own, usually within the hour. To check:
-
-```
-curl -o /dev/null -w "%{http_code}
-" https://shaan-syed.vercel.app/
-```
-
-`200` means it has cleared. If it has not cleared after a few hours,
-open the project on vercel.com, go to Firewall, and confirm Attack
-Challenge Mode is off.
-
-`siteUrl` in `src/content/profile.ts` is deliberately still set to
-`https://shaan-syed.vercel.app`, because that is the permanent
-canonical address and the checkpoint is temporary. Share the branch
-alias in the meantime.
-
-## 5. Attach a custom domain
-
-The site currently answers on `shaan-syed.vercel.app`, and that value
-is already set as `siteUrl` in `src/content/profile.ts`.
+## 6. Custom domain
 
 `shaansyed.com` and `shaansyed.dev` are the natural choices.
 
-1. Buy the domain (Vercel sells them directly, or use any registrar).
-2. Vercel dashboard, select the project, Settings, Domains, Add.
-3. Vercel shows the DNS records to set. If you bought through Vercel
-   this is automatic; otherwise add an `A` record to `76.76.21.21` or
-   the `CNAME` Vercel gives you.
-4. **Then update `siteUrl` in `src/content/profile.ts`** and push. That
+1. Buy it, then in the Vercel dashboard open the project, Settings,
+   Domains, Add.
+2. Vercel prints the DNS records to set.
+3. **Then set `siteUrl` in `src/content/profile.ts`** and push. That one
    value feeds the canonical URL, the sitemap, `robots.txt`, the JSON-LD
-   `Person` schema and the Open Graph tags. If you skip this, link
-   previews and search results keep pointing at the vercel.app URL.
+   and the Open Graph tags. Skip it and link previews keep pointing at
+   the vercel.app address.
 
-## 6. Open questions
+## 7. Open items
 
-These were flagged rather than guessed. All are one-line edits.
-
-| Item | Currently | Where to change |
+| Item | State | Where |
 |---|---|---|
-| Northern Secondary start year | `2022` | `education.ts`, `highSchool.dates`. LinkedIn says 2022, an older resume said September 2023. 2022 matches a four-year program ending June 2026. |
-| First co-op employer | omitted | Not named anywhere in the source material, so nothing was invented. Add to `bio.ts` when it is signed. |
-| Phantom live app link | omitted | `projects.ts`, add to the Phantom `links` array once the Base44 app URL exists. The repo link is live now; a dead link would have been worse. |
-| Other social handles | GitHub, LinkedIn, email only | `profile.ts`, `socials`. |
+| Your portrait | placeholder | `public/images/portrait-*.webp` |
+| Rilo copy vs riloai.app | conflict, see below | `projects.ts` |
+| Phantom links | none, repo is private | `projects.ts` |
+| Northern and Sumo Dino logos | monogram | `experience.ts` |
+| Northern start year | `2022` | `education.ts` |
+| First co-op employer | omitted | `bio.ts` |
 
-## 7. Things deliberately left out
+### The Rilo conflict is worth a look
 
-- No analytics, no cookie banner, no tracking of any kind.
-- No phone number. It belongs on the resume, not a public page.
-- No install counts for Rilo. They go stale and nobody updates them.
-- No "Hire me" button. The availability line in the footer does that job
-  more quietly.
+The copy you gave me says Rilo "never sends anything" and contrasts it
+against tools that "ask for full OAuth inbox access". Your own landing
+page at riloai.app says "Secure Google OAuth" and "lets you send it
+without ever leaving your inbox", and that screenshot now sits directly
+above the paragraph on `/projects`.
+
+Both claims are on the page at once and they read as contradictory. I
+left your wording untouched because you wrote it, but one of the two
+needs to change.
+
+### Phantom has no links
+
+`github.com/rayaandev/ignitionhacks-2026` is a private repo, so it
+returns 404 for anyone who is not a collaborator. Rather than ship a
+dead link the entry has none. Make the repo public, or supply the
+Base44 app URL, and add it back to the `links` array.
+
+## 8. Deliberately left out
+
+- No analytics, no cookie banner, no tracking.
+- No phone number.
+- No install counts for Rilo. They go stale.
+- No availability line. You asked for it gone.

@@ -1,155 +1,129 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Fragment } from "react";
+import Link from "next/link";
 
-import { Row, Section } from "@/components/section";
-import { awards } from "@/content/awards";
-import { certifications } from "@/content/certifications";
+import { DisclosureRow } from "@/components/disclosure-row";
+import { Icon } from "@/components/icon";
+import { hasIcon } from "@/components/icons";
 import { experience } from "@/content/experience";
 import { profile } from "@/content/profile";
+import { projects } from "@/content/projects";
 import { skills } from "@/content/skills";
 
 export const metadata: Metadata = {
   description:
-    "Shaan Syed builds software. He shipped Rilo, an AI reply assistant for Gmail, to the Chrome Web Store, and is building Redi AI. Computer Science at Waterloo, Business at Lazaridis.",
+    "Shaan Syed builds software. Rilo, an AI reply assistant for Gmail, is on the Chrome Web Store. Computer Science at Waterloo, Business at Lazaridis.",
 };
 
 export default function HomePage() {
   return (
-    <>
-      {/* Hero. The portrait is exactly the rail width, which is where
-          the rail width comes from. */}
-      <div className="rail hero">
-        <div className="rail-side">
-          <Image
-            src="/images/portrait-hero.webp"
-            alt="Shaan Syed"
-            width={1200}
-            height={1500}
-            priority
-            sizes="112px"
-            className="portrait-hero"
-          />
-        </div>
-        <div className="rail-main">
-          <h1 className="name-heading">{profile.name}</h1>
-          <p className="figure-text mt-3 mb-0">{profile.subtitle}</p>
-          <p className="prose-text mt-5">{profile.currentWork}</p>
+    <div className="home">
+      {/* Left: who. Right: what. */}
+      <div className="home-identity">
+        <Image
+          src="/images/portrait-hero.webp"
+          alt="Shaan Syed"
+          width={1200}
+          height={1500}
+          priority
+          sizes="(min-width: 900px) 208px, 160px"
+          className="portrait"
+        />
 
-          <ul className="run mt-6 font-mono text-sm">
-            {profile.socials.map((social) => (
-              <li key={social.label}>
-                <a className="link" href={social.href} rel="me noopener noreferrer">
-                  {social.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+        <h1 className="name">{profile.name}</h1>
+        <p className="subtitle">{profile.subtitle}</p>
+        <p className="summary">{profile.summary}</p>
 
-          <p className="figure-text mt-4 mb-0">{profile.availability}</p>
-        </div>
+        <ul className="social-row">
+          {profile.socials.map((social) => (
+            <li key={social.label}>
+              <a className="social-link" href={social.href} rel="me noopener noreferrer">
+                <Icon name={social.label} size={13} />
+                <span>{social.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <Section heading="Experience" id="experience">
-        {experience.map((entry) => (
-          <Row
-            key={`${entry.org}-${entry.role}`}
-            as="article"
-            side={
-              <>
-                <Image
-                  src={entry.logo}
-                  alt=""
-                  width={256}
-                  height={256}
-                  sizes="28px"
-                  className="logo-tile"
-                />
-                <span className="block mt-2 date-text">{entry.dates}</span>
-              </>
-            }
-          >
-            <h3 className="entry-title">
-              <span className="org">{entry.org}</span>{" "}
-              <span className="role">{entry.role}</span>
-            </h3>
-            <p className="date-text mt-1 mb-0">
-              {entry.meta ? `${entry.meta}, ${entry.location}` : entry.location}
-            </p>
-            <ul className="bullets">
-              {entry.bullets.map((bullet) => (
-                <li key={bullet}>{bullet}</li>
+      <div className="home-record">
+        <section aria-labelledby="built-h">
+          <div className="record-head">
+            <h2 id="built-h">Built</h2>
+            <Link href="/projects" className="record-more">
+              All projects
+            </Link>
+          </div>
+          {projects.map((project) => (
+            <DisclosureRow
+              key={project.name}
+              title={project.name}
+              aside={project.descriptor}
+              meta={project.status}
+            >
+              {project.prose.map((paragraph) => (
+                <p key={paragraph.slice(0, 32)} className="panel-prose">
+                  {paragraph}
+                </p>
               ))}
-            </ul>
-          </Row>
-        ))}
-      </Section>
-
-      {/* A dated ledger. The year hangs in the rail, the citation sits
-          in the measure as one line. */}
-      <Section heading="Awards & honours" id="awards" compact>
-        {awards.map((award) => (
-          <Row
-            key={award.title}
-            side={
-              award.year ? (
-                <time className="figure-text" dateTime={award.year}>
-                  {award.year}
-                </time>
-              ) : null
-            }
-          >
-            <p className="prose-text ledger-line">
-              {award.title}
-              {award.context ? (
-                <span className="muted">, {award.context}</span>
-              ) : null}
-            </p>
-          </Row>
-        ))}
-      </Section>
-
-      <Section heading="Skills" id="skills">
-        {skills.map((run) => (
-          <Row key={run.label} side={<span>{run.label}</span>}>
-            <ul className="run">
-              {run.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </Row>
-        ))}
-      </Section>
-
-      <Section heading="Certifications" id="certifications">
-        {certifications.map((group) => (
-          <Fragment key={group.label}>
-            <Row side={<span>{group.label}</span>}>
-              <ul className="plain-list">
-                {group.items.map((cert) => (
-                  <li key={cert.name} className="cert-item">
-                    <span className={group.label === "Completed" ? "" : "muted"}>
-                      {cert.href ? (
-                        <a className="link" href={cert.href} rel="noopener noreferrer">
-                          {cert.name}
-                        </a>
-                      ) : (
-                        cert.name
-                      )}
-                    </span>
-                    {cert.issuer || cert.date ? (
-                      <span className="date-text">
-                        {" "}
-                        {[cert.issuer, cert.date].filter(Boolean).join(", ")}
-                      </span>
-                    ) : null}
+              <ul className="chip-run">
+                {project.stack.map((item) => (
+                  <li key={item}>
+                    {hasIcon(item) ? <Icon name={item} size={12} /> : null}
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
-            </Row>
-          </Fragment>
-        ))}
-      </Section>
-    </>
+              <Link href="/projects" className="panel-link">
+                Open in Projects
+              </Link>
+            </DisclosureRow>
+          ))}
+        </section>
+
+        <section aria-labelledby="exp-h">
+          <div className="record-head">
+            <h2 id="exp-h">Experience</h2>
+          </div>
+          {experience.map((entry) => (
+            <DisclosureRow
+              key={`${entry.org}-${entry.role}`}
+              logo={entry.logo}
+              title={entry.org}
+              aside={entry.role}
+              meta={
+                entry.meta
+                  ? `${entry.dates}, ${entry.meta}`
+                  : entry.dates
+              }
+            >
+              <ul className="panel-bullets">
+                {entry.bullets.map((bullet) => (
+                  <li key={bullet}>{bullet}</li>
+                ))}
+              </ul>
+            </DisclosureRow>
+          ))}
+        </section>
+
+        <section aria-labelledby="skills-h" className="skills-block">
+          <h2 id="skills-h" className="sr-only">
+            Skills
+          </h2>
+          {skills.map((run) => (
+            <p key={run.label} className="skill-run">
+              <span className="skill-label">{run.label}:</span>{" "}
+              {run.items.map((item, i) => (
+                <span key={item} className="skill-item">
+                  {i > 0 ? <span aria-hidden="true" className="sep"> · </span> : null}
+                  {hasIcon(item) ? <Icon name={item} size={11} /> : null}
+                  {item}
+                </span>
+              ))}
+            </p>
+          ))}
+        </section>
+      </div>
+    </div>
   );
 }

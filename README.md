@@ -57,11 +57,15 @@ a filename drop.
 
 ## Design
 
-One idea, applied everywhere: a 112px right-aligned metadata rail. The
-section heading, every org logo and every date align to a single
-vertical axis, and that axis is the left edge of the 680px prose
-measure. `src/components/section.tsx` is the only layout primitive.
+Two columns on the home page: identity on the left, a record of work on
+the right as expandable rows. The projects page is a numbered index with
+a detail panel. Colour tokens and their measured contrast ratios are at
+the top of `src/app/globals.css`; `--brass` is text and stroke only,
+because it fails contrast as a fill behind light text.
 
-Colour tokens and their measured contrast ratios are documented at the
-top of `src/app/globals.css`. `--brass` is text and stroke only; it
-fails contrast as a fill behind light text.
+## Regenerating assets
+
+    node scripts/fetch-logos.mjs           # org logos from official sites
+    node scripts/generate-icons.mjs        # brand icons from simple-icons
+    node scripts/shoot-project-sites.mjs   # screenshot riloai.app
+    node scripts/generate-placeholders.mjs # portrait placeholders

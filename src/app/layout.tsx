@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Source_Serif_4, IBM_Plex_Mono } from "next/font/google";
 
+import { Icon } from "@/components/icon";
 import { SiteNav } from "@/components/site-nav";
 import { profile } from "@/content/profile";
 
@@ -22,12 +23,9 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(profile.siteUrl),
-  title: {
-    default: "Shaan Syed",
-    template: "%s, Shaan Syed",
-  },
+  title: { default: "Shaan Syed", template: "%s, Shaan Syed" },
   description:
-    "Shaan Syed builds software. Computer Science at Waterloo and Business at Lazaridis, currently building Redi AI after shipping Rilo to the Chrome Web Store.",
+    "Shaan Syed builds software. Rilo, an AI reply assistant for Gmail, is on the Chrome Web Store. Computer Science at Waterloo, Business at Lazaridis.",
   authors: [{ name: "Shaan Syed", url: profile.siteUrl }],
   creator: "Shaan Syed",
   openGraph: {
@@ -58,16 +56,8 @@ const personSchema = {
     "https://linkedin.com/in/shaan-syed-4a6a06306",
   ],
   alumniOf: [
-    {
-      "@type": "CollegeOrUniversity",
-      name: "University of Waterloo",
-      sameAs: "https://uwaterloo.ca",
-    },
-    {
-      "@type": "CollegeOrUniversity",
-      name: "Wilfrid Laurier University",
-      sameAs: "https://wlu.ca",
-    },
+    { "@type": "CollegeOrUniversity", name: "University of Waterloo", sameAs: "https://uwaterloo.ca" },
+    { "@type": "CollegeOrUniversity", name: "Wilfrid Laurier University", sameAs: "https://wlu.ca" },
   ],
   award: "President's Scholarship of Distinction",
 };
@@ -82,42 +72,26 @@ export default function RootLayout({
           Skip to content
         </a>
 
-        <header className="shell pt-10 pb-14 md:pt-14 md:pb-20">
-          <div className="rail">
-            <div className="rail-side" aria-hidden="true" />
-            <div className="rail-main">
-              <SiteNav />
-            </div>
-          </div>
+        <header className="site-header">
+          <SiteNav />
         </header>
 
-        <main id="main" className="shell">
+        <main id="main" className="site-main">
           {children}
         </main>
 
-        <footer className="shell pt-20 pb-16">
-          <div className="rail">
-            <div className="rail-side" aria-hidden="true" />
-            <div className="rail-main">
-              <p className="figure-text m-0">{profile.availability}</p>
-              <ul className="flex flex-wrap gap-x-6 gap-y-1 list-none m-0 mt-4 p-0">
-                {profile.socials.map((social) => (
-                  <li key={social.label}>
-                    <a
-                      className="link-quiet font-mono text-sm"
-                      href={social.href}
-                      rel="me noopener noreferrer"
-                    >
-                      {social.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              <p className="figure-text m-0 mt-6 text-[0.8125rem]">
-                <span>&copy; {new Date().getFullYear()} Shaan Syed</span>
-              </p>
-            </div>
-          </div>
+        <footer className="site-footer">
+          <ul className="footer-socials">
+            {profile.socials.map((social) => (
+              <li key={social.label}>
+                <a className="footer-link" href={social.href} rel="me noopener noreferrer">
+                  <Icon name={social.label} size={12} />
+                  <span>{social.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="footer-copy">&copy; {new Date().getFullYear()} Shaan Syed</p>
         </footer>
 
         <script
