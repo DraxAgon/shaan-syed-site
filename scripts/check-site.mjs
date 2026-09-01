@@ -80,20 +80,35 @@ await ev(`document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape'}))`);
 await sleep(400);
 ck("Escape closes it", await ev(`!document.querySelector('.nav-menu').classList.contains('is-open')`));
 
-console.log("Rilo, the ported demo, the recording and the page");
+console.log("Rilo, the live page, the ported demo and the recording");
 await go("/projects?p=Rilo");
 
-/* Rilo has three modes now, so the panel opens on a switcher rather
-   than a single toggle. */
 const mode = (tab) =>
   `[...document.querySelectorAll('.demo-mode')].find(b => b.textContent.trim() === ${JSON.stringify(tab)})`;
 
 ck("three modes are offered",
   (await ev(`document.querySelectorAll('.demo-mode').length`)) === 3,
   await ev(`[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent).join('|')`));
-ck("it opens on the playable demo", await ev(`!!document.querySelector('.rd')`));
+ck("it opens on the live page", await ev(`!!document.querySelector('.demo-frame')`));
+ck("the frame targets the canonical host",
+  (await ev(`document.querySelector('.demo-frame')?.src`))?.includes("www.riloai.app"));
 
-/* The flow is the whole point, so walk it end to end. */
+/* riloai.app allows framing from the deployed origins only, so the frame
+   genuinely loading can be asserted there and not against localhost. */
+if (BASE.startsWith("https://")) {
+  await sleep(6000);
+  const tree = await send("Page.getFrameTree", {}, s);
+  const kids = tree.result?.frameTree?.childFrames ?? [];
+  ck("the real page loads inside the frame",
+    kids.some((f) => (f.frame.url || "").includes("riloai.app")),
+    JSON.stringify(kids.map((f) => f.frame.url)));
+} else {
+  console.log("  SKIP  frame load (localhost is not on riloai.app's allowlist)");
+}
+
+await ev(`${mode("Try it")}.click()`);
+await sleep(900);
+ck("the ported demo starts in the inbox", await ev(`!!document.querySelector('.rd-row-unread')`));
 await ev(`document.querySelector('.rd-row-unread').click()`);
 await sleep(500);
 await ev(`document.querySelector('.rd-reply').click()`);
@@ -108,31 +123,13 @@ await sleep(600);
 ck("two choices unlock generate", await ev(`!document.querySelector('.rd-go').disabled`));
 await ev(`document.querySelector('.rd-go').click()`);
 await sleep(2600);
-ck("a draft comes back on the path taken",
+ck("the draft matches the path taken",
   (await ev(`document.querySelector('.rd-draft')?.textContent`))?.includes("Count me in"));
 
 await ev(`${mode("Recording")}.click()`);
 await sleep(2500);
 ck("the recording plays",
   await ev(`(()=>{const v=document.querySelector('.demo-video');return !!v&&!v.paused&&v.currentTime>0})()`));
-
-await ev(`${mode("The page")}.click()`);
-await sleep(2200);
-ck("full page capture loads",
-  await ev(`(()=>{const i=document.querySelector('.demo-scroll-img');return !!i&&i.naturalHeight>4000})()`));
-ck("the panel scrolls",
-  await ev(`(()=>{const d=document.querySelector('.demo-scroll');return d.scrollHeight>d.clientHeight+200})()`));
-ck("Add to Chrome points at the Web Store",
-  await ev(`[...document.querySelectorAll('a.demo-hotspot')].some(x=>x.href.includes('chromewebstore.google.com'))`));
-ck("Get Started points at the login page",
-  await ev(`[...document.querySelectorAll('a.demo-hotspot')].some(x=>x.href.includes('/login'))`));
-ck("outbound hotspots are safe",
-  await ev(`[...document.querySelectorAll('a.demo-hotspot')].every(x=>x.target==='_blank'&&x.rel.includes('noopener'))`));
-const before = await ev(`document.querySelector('.demo-scroll').scrollTop`);
-await ev(`[...document.querySelectorAll('button.demo-hotspot')].find(b=>b.getAttribute('aria-label').startsWith('Pricing'))?.click()`);
-await sleep(1500);
-ck("an in-page anchor scrolls the panel",
-  (await ev(`document.querySelector('.demo-scroll').scrollTop`)) > before + 500);
 
 console.log("Redi AI, the walkthrough");
 await go("/projects?p=Redi%20AI");
@@ -170,6 +167,17 @@ ck("one row is the one to work on first",
   (await ev(`document.querySelectorAll('.ra-skill-eyebrow').length`)) === 1);
 ck("the figures are marked as fixed",
   (await ev(`document.querySelector('.rw-note')?.textContent`))?.includes("scores are fixed"));
+
+/* The report is the last stop, so the forward control has to become the way
+   back to the top rather than a dead button. */
+ck("the last step offers a restart",
+  (await ev(`document.querySelector('.rw-nav.is-primary')?.textContent`)) === "Start again");
+await ev(`document.querySelector('.rw-nav.is-primary').click()`);
+await sleep(700);
+ck("restarting returns to Home",
+  (await ev(`document.querySelector('.rp-app')?.dataset.screen`)) === "home");
+ck("the role typed earlier survives the restart",
+  (await ev(`document.querySelector('.ra-role-name')?.textContent`)) === "Registered nurse");
 
 console.log("Phantom, recording and the live embed");
 await go("/projects?p=Phantom");

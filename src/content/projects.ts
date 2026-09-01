@@ -1,5 +1,4 @@
 import type { Hotspot } from "@/components/project-demo";
-import riloHotspots from "./rilo-page-hotspots.json";
 
 export type ProjectLink = {
   label: string;
@@ -48,8 +47,9 @@ export type Project = {
     defaultMode?: "play" | "video" | "live" | "scroll";
   };
   /* An interactive component rendered in place of a recording.
-     "redi" is a mockup of a flow with nothing public to record.
-     "rilo" is the real demo, ported out of the Rilo repo. */
+     "redi" is the app's screens rebuilt in the browser, since there is no
+     public build to capture. "rilo" is the real demo, ported out of the
+     Rilo repo. */
   mockup?: { component: "redi" | "rilo"; label: string };
 };
 
@@ -81,20 +81,22 @@ export const projects: Project[] = [
       src: "/media/rilo-demo.mp4",
       poster: "/media/rilo-demo-poster.webp",
       label: "Screen recording of riloai.app",
-      /* riloai.app sends X-Frame-Options: SAMEORIGIN, so it cannot be
-         embedded live. The full page is captured instead and scrolls
-         in place. */
-      scrollImage: "/media/rilo-page.webp",
-      scrollImageWidth: 2560,
-      scrollImageHeight: 11692,
-      scrollLabel: "riloai.app in full, the buttons work",
+      /* riloai.app now allows this origin to frame its marketing page,
+         so the whole real front page runs here: hero, the interactive
+         demo, pricing, FAQ, contact. Must be the www host, since the
+         apex 301s to it and a redirect would break the frame.
+
+         The flat capture in public/media/rilo-page.webp and its
+         hotspots are kept as a fallback if framing is ever withdrawn;
+         re-add scrollImage here to switch back. */
+      liveUrl: "https://www.riloai.app/",
+      liveLabel: "riloai.app itself, running here",
       playable: {
         component: "rilo",
         label: "Rilo’s own demo, running here",
       },
-      /* Opens on the playable flow: it is instant and it is the point. */
-      defaultMode: "play",
-      hotspots: riloHotspots as Hotspot[],
+      /* Opens on the real page, which is the point. */
+      defaultMode: "live",
     },
   },
   {
