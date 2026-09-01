@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 
 /* The Filament, the one memorable thing in Redi.
 
@@ -51,9 +51,15 @@ export function RediFilament({
   const wave = useRef<SVGPathElement>(null);
   const segment = useRef<SVGRectElement>(null);
   const point = useRef<SVGCircleElement>(null);
+  /* Per instance: two travelling Filaments on one page would otherwise share
+     a gradient id. */
+  const travelId = `redi-travel${useId()}`;
 
+  /* Seeded with the first props, written only here, read by the loop below. */
   const live = useRef({ state, amplitude });
-  live.current = { state, amplitude };
+  useEffect(() => {
+    live.current = { state, amplitude };
+  }, [state, amplitude]);
 
   useEffect(() => {
     const reduced =
@@ -128,7 +134,7 @@ export function RediFilament({
         {state === "travel" ? (
           <>
             <defs>
-              <linearGradient id="redi-travel" x1="0" x2="1" y1="0" y2="0">
+              <linearGradient id={travelId} x1="0" x2="1" y1="0" y2="0">
                 <stop offset="0%" stopColor={GOLD} stopOpacity="0" />
                 <stop offset="100%" stopColor={GOLD} stopOpacity="1" />
               </linearGradient>
@@ -140,7 +146,7 @@ export function RediFilament({
               y="5"
               width={TRAVEL_SEGMENT * 100}
               height="2"
-              fill="url(#redi-travel)"
+              fill={`url(#${travelId})`}
               opacity={opacity}
               rx="1"
             />

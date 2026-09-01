@@ -119,8 +119,10 @@ function readRole(input: string): { role: Role; guessed: boolean } {
 const QUESTION =
   "Tell me about something you were responsible for where the outcome was entirely down to you.";
 
-const ANSWER =
-  "Last spring I took over the payments migration after the lead left. There were about forty thousand stored cards and no rollback plan, so the first thing I did was write one, because I was not willing to cut over without it. I split the work into three stages, moved ten percent of traffic first, and watched the failure rate for a week. It sat at nought point two percent, which was lower than the old system. We finished two weeks ahead and nobody outside the team noticed it had happened, which was the goal.";
+/* The two sentences the follow up is a response to. The full answer runs to
+   about a hundred words; this is the half of it with a figure in. */
+const SAID =
+  "I split the work into three stages, moved ten percent of traffic first, and watched the failure rate for a week. It sat at nought point two percent, which was lower than the old system.";
 
 const FOLLOW_UP = "How did you measure that?";
 
@@ -251,7 +253,7 @@ const STEPS: Step[] = [
     id: "report",
     stop: "The report",
     caption:
-      "Six skills, each a range rather than a point, because the width of the range is how sure it is. There is no overall score anywhere in Redi.",
+      "Six skills, each a range rather than a point, because the width of the range is how sure it is. Redi never totals them into one number.",
   },
 ];
 
@@ -267,7 +269,7 @@ export function RediDemo() {
   const [index, setIndex] = useState(0);
   const [draft, setDraft] = useState(EXAMPLE);
   const [applied, setApplied] = useState(EXAMPLE);
-  const [openSkill, setOpenSkill] = useState<number | null>(3);
+  const [openSkill, setOpenSkill] = useState<number | null>(null);
 
   const step = STEPS[index];
   const { role, guessed } = useMemo(() => readRole(applied), [applied]);
@@ -289,6 +291,13 @@ export function RediDemo() {
   const advance = () => {
     if (step.id === "compose") setApplied(draft);
     setIndex((i) => Math.min(i + 1, STEPS.length - 1));
+  };
+
+  const atEnd = index === STEPS.length - 1;
+
+  const restart = () => {
+    setIndex(0);
+    setOpenSkill(null);
   };
 
   return (
@@ -334,9 +343,21 @@ export function RediDemo() {
           })}
         </ol>
 
-        <p className="rw-caption" key={step.id}>
-          {step.caption}
-        </p>
+        <div className="rw-say">
+          <p className="rw-caption" key={step.id}>
+            {step.caption}
+          </p>
+
+          {/* The run screen shows a waveform and nothing else while somebody
+              talks, so the words go here rather than on the phone. This is the
+              part of the answer the follow up is about. */}
+          {step.id === "answering" || step.id === "followup" ? (
+            <blockquote className="rw-said">
+              <span className="rw-said-label">What was said</span>
+              {SAID}
+            </blockquote>
+          ) : null}
+        </div>
 
         <div className="rw-controls">
           <button
@@ -347,13 +368,16 @@ export function RediDemo() {
           >
             Back
           </button>
+          {/* The report is the end of the loop, so the forward control stops
+              being Next and becomes the way back to the top. The role you
+              typed is kept: the second run through is worth more with your own
+              words in it than with the example back. */}
           <button
             type="button"
             className="rw-nav is-primary"
-            onClick={advance}
-            disabled={index === STEPS.length - 1}
+            onClick={atEnd ? restart : advance}
           >
-            Next
+            {atEnd ? "Start again" : "Next"}
           </button>
         </div>
 
@@ -404,11 +428,38 @@ function Phone({
             rather than as the panel's. */}
         <div className="rp-status" aria-hidden="true">
           <span className="rp-clock">9:41</span>
-          <span className="rp-signal" />
+          <svg className="rp-signal" viewBox="0 0 66 14" width="66" height="14">
+            <path
+              d="M1 10.5v2.5M5.5 8v5M10 5.5v7.5M14.5 3v10"
+              stroke="#F4F1EA"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+            <path
+              d="M23 5.5a9 9 0 0 1 11 0M25.5 9a5.5 5.5 0 0 1 6 0"
+              fill="none"
+              stroke="#F4F1EA"
+              strokeWidth="2.1"
+              strokeLinecap="round"
+            />
+            <circle cx="28.5" cy="12" r="1.5" fill="#F4F1EA" />
+            <rect
+              x="42"
+              y="3"
+              width="21"
+              height="10"
+              rx="3"
+              fill="none"
+              stroke="#F4F1EA"
+              strokeOpacity="0.5"
+            />
+            <rect x="44" y="5" width="15" height="6" rx="1.5" fill="#F4F1EA" />
+            <path d="M64.5 6.5v3" stroke="#F4F1EA" strokeOpacity="0.5" strokeWidth="1.6" />
+          </svg>
         </div>
 
         <div className="rp-app" data-screen={step.id}>
-          {step.id === "home" ? <Home role={role} onGo={onGo} onAdvance={onAdvance} /> : null}
+          {step.id === "home" ? <Home role={role} onGo={onGo} /> : null}
           {step.id === "compose" ? (
             <Compose draft={draft} onDraft={onDraft} onAdvance={onAdvance} onGo={onGo} />
           ) : null}
@@ -590,7 +641,7 @@ const TAB_ICONS = [
 /* Home                                                                */
 /* ------------------------------------------------------------------ */
 
-function Home({ role, onGo, onAdvance }: { role: Role; onGo: (id: StepId) => void; onAdvance: () => void }) {
+function Home({ role, onGo }: { role: Role; onGo: (id: StepId) => void }) {
   return (
     <div className="ra-scroll">
       <Chrome mark />
@@ -602,7 +653,10 @@ function Home({ role, onGo, onAdvance }: { role: Role; onGo: (id: StepId) => voi
           can never be pushed down the screen after the screen is live. */}
       <div className="ra-passslot" />
 
-      <Primary label="Start a session" onClick={onAdvance} />
+      {/* The phone's own controls do what they do in the app, which is why
+          this one goes to a question rather than to the next slide. The rail
+          beside it is the walkthrough. */}
+      <Primary label="Start a session" onClick={() => onGo("asking")} />
 
       <SectionHead label="Your roles" action="All roles" />
       <div className="ra-roles">
@@ -611,14 +665,14 @@ function Home({ role, onGo, onAdvance }: { role: Role; onGo: (id: StepId) => voi
           org={role.organisation}
           progress={0.34}
           band="GETTING STARTED"
-          onClick={onAdvance}
+          onClick={() => onGo("asking")}
         />
         <RoleCard
           title="Schulich Leader Scholarship"
           org={null}
           progress={0}
           band="NOT STARTED"
-          onClick={onAdvance}
+          onClick={() => onGo("asking")}
         />
       </div>
 
@@ -714,7 +768,10 @@ function Compose({
         />
       </label>
 
-      <button type="button" className="ra-ghost" onClick={onAdvance}>
+      {/* Part of the screen rather than part of the walkthrough: the app opens
+          a file picker here and this does not attach anything, so it is drawn
+          and not wired. */}
+      <span className="ra-ghost">
         <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
           <path
             d="M20 11 11.5 19.5a4.6 4.6 0 0 1-6.5-6.5L13 5a3 3 0 0 1 4.3 4.3l-8 8a1.4 1.4 0 0 1-2-2l7.6-7.6"
@@ -726,7 +783,7 @@ function Compose({
           />
         </svg>
         Attach a document
-      </button>
+      </span>
 
       <div className="ra-footer">
         <Primary label="Continue" onClick={onAdvance} />
@@ -851,14 +908,23 @@ function Run({
   /* Redi's mouth is driven by the words as they land, so the face moves with
      the line rather than to a loop. The app feeds the same input from the
      playing clip's amplitude. */
-  const { revealed, amplitude } = useSpokenWords(text, asking || followup);
+  const { revealed, amplitude, done } = useSpokenWords(text, asking || followup);
   const level = useVoiceLevel(answering);
+
+  /* Speaking and grace are two phases of one screen, and the app draws them
+     differently: while he is talking there is no mic at all, only the line and
+     the words. The mic arrives when he stops, which is what makes tapping it
+     feel like answering a person rather than starting a recording. */
+  const speaking = (asking || followup) && !done;
+  const grace = (asking || followup) && done;
 
   const rediState: RediState = thinking
     ? "thinking"
     : answering
       ? "listening"
-      : "speaking";
+      : speaking
+        ? "speaking"
+        : "idle";
 
   return (
     <div className="ra-run">
@@ -939,15 +1005,10 @@ function Run({
           </div>
           <p className="ra-turn-line">Thinking about that</p>
         </div>
-      ) : (
+      ) : grace ? (
         <div className="ra-mic-area">
-          <p className="ra-answer-timer ra-answer-timer-empty" />
-          <button
-            type="button"
-            className="ra-mic"
-            onClick={onAdvance}
-            aria-label="Tap to answer"
-          >
+          <p className="ra-answer-timer ra-answer-timer-empty">0:00</p>
+          <button type="button" className="ra-mic" onClick={onAdvance} aria-label="Tap to answer">
             <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
               <rect x="9" y="2.5" width="6" height="11" rx="3" fill="#E9B33B" />
               <path
@@ -963,8 +1024,17 @@ function Run({
           <div className="ra-turn-filament">
             <RediFilament state="hairline" progress={1} height={24} dim />
           </div>
-          <p className="ra-turn-line ra-turn-line-inline">Redi is speaking</p>
+          <div className="ra-lifeline" />
           <div className="ra-run-bottom" />
+        </div>
+      ) : (
+        /* While he is talking there is no control at all: the line and the
+           words are the whole screen. */
+        <div className="ra-turn-status">
+          <div className="ra-turn-filament">
+            <RediFilament state="hairline" progress={1} height={24} dim />
+          </div>
+          <p className="ra-turn-line">Redi is speaking</p>
         </div>
       )}
 
@@ -981,24 +1051,26 @@ function Run({
    the app is the bug this shape exists to prevent. */
 function useSpokenWords(text: string, active: boolean) {
   const words = useMemo(() => text.split(" "), [text]);
-  const [count, setCount] = useState(active ? 0 : words.length);
-  const [amplitude, setAmplitude] = useState(0);
+
+  /* One state object, written only from inside the frame callback. Nothing
+     resets it on the way in: the line it belongs to is part of the value, so
+     a line that has not started yet is read as not started rather than being
+     set back to zero by an effect. */
+  const [frame, setFrame] = useState({ line: "", count: 0, amplitude: 0, done: false });
   const raf = useRef(0);
 
   useEffect(() => {
-    if (!active) {
-      setCount(words.length);
-      setAmplitude(0);
-      return;
-    }
+    if (!active) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
-      setCount(words.length);
-      return;
+      /* One frame, straight to the rest pose. Every loop is skipped. */
+      raf.current = requestAnimationFrame(() =>
+        setFrame({ line: text, count: words.length, amplitude: 0, done: true }),
+      );
+      return () => cancelAnimationFrame(raf.current);
     }
 
-    setCount(0);
     const start = performance.now();
     /* About three words a second, which is close to Redi's own pace. */
     const perWord = 340;
@@ -1006,10 +1078,9 @@ function useSpokenWords(text: string, active: boolean) {
     const tick = (now: number) => {
       const t = now - start;
       const spoken = Math.min(words.length, Math.floor(t / perWord) + 1);
-      setCount(spoken);
 
       if (spoken >= words.length && t > words.length * perWord + 500) {
-        setAmplitude(0);
+        setFrame({ line: text, count: words.length, amplitude: 0, done: true });
         return;
       }
 
@@ -1018,8 +1089,8 @@ function useSpokenWords(text: string, active: boolean) {
       const phase = (t % perWord) / perWord;
       const shape = Math.sin(phase * Math.PI) ** 0.7;
       const wobble = 0.72 + 0.28 * Math.sin(t / 47);
-      setAmplitude(shape * wobble);
 
+      setFrame({ line: text, count: spoken, amplitude: shape * wobble, done: false });
       raf.current = requestAnimationFrame(tick);
     };
 
@@ -1027,7 +1098,11 @@ function useSpokenWords(text: string, active: boolean) {
     return () => cancelAnimationFrame(raf.current);
   }, [text, active, words.length]);
 
-  return { revealed: words.slice(0, count), amplitude };
+  const started = frame.line === text;
+
+  if (!active) return { revealed: words, amplitude: 0, done: true };
+  if (!started) return { revealed: [] as string[], amplitude: 0, done: false };
+  return { revealed: words.slice(0, frame.count), amplitude: frame.amplitude, done: frame.done };
 }
 
 /* A stand in for the microphone's output level, which is what drives the
@@ -1037,14 +1112,13 @@ function useVoiceLevel(active: boolean) {
   const raf = useRef(0);
 
   useEffect(() => {
-    if (!active) {
-      setLevel(0);
-      return;
-    }
+    if (!active) return;
+
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
-      setLevel(0.4);
-      return;
+      /* The waveform holds a still reading rather than running. */
+      raf.current = requestAnimationFrame(() => setLevel(0.4));
+      return () => cancelAnimationFrame(raf.current);
     }
 
     const start = performance.now();
@@ -1061,7 +1135,7 @@ function useVoiceLevel(active: boolean) {
     return () => cancelAnimationFrame(raf.current);
   }, [active]);
 
-  return level;
+  return active ? level : 0;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1091,11 +1165,10 @@ function Report({
         <RediFilament state="hairline" progress={1} height={8} dim />
       </div>
 
-      <p className="ra-evidence">8 answers, 9:41 of talking, across 6 skills.</p>
+      <p className="ra-evidence">8 answers, 10:22 of talking, across 6 skills.</p>
       <p className="ra-summary">
-        The migration answer was the strongest thing here: a situation, a decision that was yours,
-        and a number at the end of it. Nothing you told me went wrong, so there is very little for
-        me to read on failure.
+        The migration answer was the strongest thing here. Nothing you told me went wrong, so there
+        was very little for me to read on failure.
       </p>
 
       <hr className="ra-rule" />

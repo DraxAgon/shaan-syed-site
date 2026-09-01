@@ -123,7 +123,7 @@ Every project has something hands-on:
 | Project | Recording | Hands-on |
 |---|---|---|
 | Rilo | 14s scroll-through | Scroll the real page, buttons work |
-| Redi AI | none, nothing public yet | Interactive mockup of the flow |
+| Redi AI | none, nothing public yet | Walk the app, screen by screen |
 | Phantom | 17.5s Kariba walkthrough | Open the live app, fully clickable |
 
 The Rilo capture is flat, so `capture-fullpage.mjs` also records where
@@ -137,10 +137,44 @@ the page sharp when the panel draws it smaller than its natural width.
 If you re-capture, copy the printed `scrollImageWidth` and
 `scrollImageHeight` into `projects.ts`.
 
-Redi AI has no public build, so its panel is an interactive mockup of
-the flow rather than a capture. It is labelled as one on the page, and
-its scores carry an "illustrative" badge. If you want it replaced with
-real screens, an Expo build or a TestFlight link is all it takes.
+Redi AI has no public build, so its panel is the app's own screens
+rebuilt in the browser rather than a capture: Home, both steps of adding
+a role, the question, the follow up and the report, walked in order.
+
+Three files, all under `src/components`:
+
+| File | Holds |
+|---|---|
+| `redi-demo.tsx` | The screens, the walkthrough rail, and the role parser |
+| `redi-orb.tsx` | Redi's face, from the ratios in the app's `rediConfig.ts` |
+| `redi-filament.tsx` | The gold line, in its hairline, travel, wave and pulse states |
+
+The values come from the RediAI repo and the comments name the file each
+one came from: the palette from `src/theme/color.ts`, the type ramp from
+`type.ts`, the spacing and radii from `layout.ts`, the six skills and
+their hues from `src/shared/skills.ts` plus `SKILL_HUE_NAMES`, and the
+question, the answer and the follow up verbatim from the QA log in
+`QUESTIONS.md`. If a screen changes in the app, those are the places to
+re-read.
+
+The phone is drawn at the app's own 393x844 and scaled as one piece by
+`--zoom`, so every number in the CSS is the number in the app rather
+than a guess at what it would be at some other width. The panel sizes
+off `@container redi`, not the window: the projects browser goes two
+column at 900px and the panel is about 560px wide there, so a viewport
+breakpoint would put the phone and the rail side by side in a box too
+narrow for both.
+
+Two things are true and the panel says both: nothing calls a model, and
+the scores are fixed. What you type in the role box is read by a few
+lines of regex in `readRole` and carried through the rest of the
+walkthrough, so the title, the organisation and the blurb follow your
+own words. Redi's three faces (Bricolage Grotesque, Instrument Sans,
+JetBrains Mono) are loaded in `src/app/layout.tsx` with `preload: false`,
+because they are drawn on one panel of one page.
+
+If you want it replaced with real screens, an Expo build or a TestFlight
+link is all it takes.
 
 Phantom's demo deliberately runs the **Kariba case** rather than the
 Amazon list. Kariba is a real project with real buyers on public

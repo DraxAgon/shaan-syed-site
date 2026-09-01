@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 
 /* Redi's face, drawn from the app's own numbers.
 
@@ -153,11 +153,15 @@ export function RediOrb({
   const rightEye = useRef<SVGEllipseElement>(null);
   const body = useRef<SVGGElement>(null);
 
-  /* The animated inputs live in refs, not state: this runs at frame rate and
+  /* The animated inputs live in a ref, not state: this runs at frame rate and
      re-rendering React sixty times a second to move a mouth is the wrong
-     trade. The refs are read by one loop and written by the effects. */
+     trade. One loop reads it; this effect is the only thing that writes it,
+     and the ref is seeded with the first props so the loop is never a frame
+     behind on mount. */
   const target = useRef({ state, amplitude });
-  target.current = { state, amplitude };
+  useEffect(() => {
+    target.current = { state, amplitude };
+  }, [state, amplitude]);
 
   /* Smoothed openness, so the mouth eases rather than snapping between
      frames. The app runs a five frame rolling average and then a spring; this
@@ -252,7 +256,9 @@ export function RediOrb({
   }, [g, size]);
 
   const rest = RESTING[state];
-  const gradientId = `redi-orb-${size}`;
+  /* Per instance, not per size: two orbs of the same diameter on one page
+     would otherwise share a gradient id and the second would win. */
+  const gradientId = `redi-orb${useId()}`;
 
   return (
     <span

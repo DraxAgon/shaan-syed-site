@@ -94,13 +94,14 @@
   }
   .brand:hover, .brand:focus-visible { color: var(--color-brass); }
 
-  /* The same rule the share card opens with, at header scale. */
+  /* The same rule the share card opens with, at header scale. It keeps
+     its width on hover: growing it pushed the name sideways, and the
+     colour shift the other links use says the same thing without the
+     wordmark moving under the pointer. */
   .brand-rule {
     flex: none; width: 20px; height: 2px;
     background: var(--color-brass);
-    transition: width 220ms cubic-bezier(.2,.7,.2,1);
   }
-  .brand:hover .brand-rule, .brand:focus-visible .brand-rule { width: 28px; }
 
   .site-main {
     flex: 1;
@@ -674,7 +675,13 @@
      product surface sitting inside the page. The same reasoning the Rilo
      demo below is built on. Every value here is a token out of
      `src/theme/color.ts` and `src/theme/layout.ts` in the Redi repo. */
+  /* A container, not a media query. The panel is a column inside the project
+     browser, so its width and the window's part company the moment the
+     browser goes two-column: at a 960px window this box is about 560px wide,
+     and a viewport breakpoint would put the phone and the rail side by side
+     in it. Everything below sizes off the box itself. */
   .demo-stage.is-mockup {
+    container: redi / inline-size;
     aspect-ratio: auto;
     height: auto;
     min-height: 0;
@@ -712,12 +719,18 @@
     background: var(--ink000);
   }
 
-  @media (min-width: 700px) {
+  @container redi (min-width: 620px) {
     .rw {
       grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
       justify-items: stretch;
     }
+    .rw-side { align-content: center; }
+    /* Beside the phone the rail sets the panel's height, so the block that
+       holds the caption and the quote is fixed: without it the panel grows by
+       four lines on the two steps that quote an answer. Stacked, the phone
+       sets the height and the same reserve is just a hole. */
+    .rw-say { min-height: 190px; }
   }
 
   /* ---- the device ---- */
@@ -726,18 +739,19 @@
      every number below is the number in the app rather than a guess at what
      it would be at some other width. */
   .rw-phone-holder {
-    --zoom: 0.62;
+    --zoom: 0.6;
     width: calc(393px * var(--zoom));
-    height: calc(768px * var(--zoom));
+    height: calc(844px * var(--zoom));
     flex: none;
   }
-  @media (min-width: 480px) { .rw-phone-holder { --zoom: 0.7; } }
-  @media (min-width: 700px) { .rw-phone-holder { --zoom: 0.66; } }
-  @media (min-width: 1040px) { .rw-phone-holder { --zoom: 0.74; } }
+  @container redi (min-width: 400px) { .rw-phone-holder { --zoom: 0.68; } }
+  @container redi (min-width: 620px) { .rw-phone-holder { --zoom: 0.6; } }
+  @container redi (min-width: 780px) { .rw-phone-holder { --zoom: 0.68; } }
+  @container redi (min-width: 900px) { .rw-phone-holder { --zoom: 0.74; } }
 
   .rp {
     box-sizing: border-box;
-    width: 393px; height: 768px;
+    width: 393px; height: 844px;
     padding: 9px;
     border-radius: 46px;
     background: #17171a;
@@ -761,17 +775,12 @@
   .rp-status {
     display: flex; align-items: center; justify-content: space-between;
     flex: none;
-    padding: 14px 26px 2px;
+    padding: 15px 24px 9px;
     font-family: var(--body);
     font-size: 15px; font-weight: 600;
     color: var(--bone);
   }
-  .rp-signal {
-    width: 42px; height: 11px; border-radius: 2px;
-    background:
-      linear-gradient(to right, var(--bone) 0 22px, transparent 22px 26px, var(--bone) 26px 42px);
-    opacity: 0.85;
-  }
+  .rp-signal { display: block; opacity: 0.9; }
 
   .rp-app { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
@@ -908,9 +917,9 @@
   /* Three glow layers in the app; one here, because the ambient is drawn at
      twice his diameter and as an SVG viewport that is a 4x box of nothing. */
   .redi-orb::before {
-    content: ""; position: absolute; inset: -85%;
+    content: ""; position: absolute; inset: -55%;
     border-radius: 50%;
-    background: radial-gradient(circle at 50% 42%, rgba(255, 184, 77, 0.3), transparent 62%);
+    background: radial-gradient(circle at 50% 42%, rgba(255, 184, 77, 0.26), transparent 60%);
     pointer-events: none;
   }
 
@@ -1171,7 +1180,7 @@
     font-size: 17px; line-height: 26px; color: var(--bone-dim);
   }
 
-  .ra-skills { display: grid; gap: 20px; flex: none; }
+  .ra-skills { display: grid; gap: 18px; flex: none; }
   .ra-skill { display: grid; gap: 8px; }
   .ra-skill.is-emphasis {
     padding: 16px; border: 1px solid var(--ink300); border-top-width: 1px;
@@ -1249,7 +1258,7 @@
   .rw-side {
     display: grid;
     gap: 14px;
-    align-content: center;
+    align-content: start;
     min-width: 0;
     max-width: 420px;
     font-family: var(--font-serif);
@@ -1287,9 +1296,21 @@
   .rw-stop.is-here .rw-stop-mark { width: 22px; background: var(--gold); }
 
   .rw-caption {
-    min-height: 4.5em;
     font-size: 0.9375rem; line-height: 1.55; color: var(--bone-dim);
     animation: fade 300ms ease both;
+  }
+
+  .rw-said {
+    margin: 14px 0 0; padding-left: 14px;
+    border-left: 2px solid var(--ink400);
+    font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.6;
+    color: var(--bone-faint);
+    animation: fade 300ms ease both;
+  }
+  .rw-said-label {
+    display: block; margin-bottom: 4px;
+    font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--gold);
   }
 
   .rw-controls { display: flex; gap: 8px; }
