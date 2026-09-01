@@ -104,8 +104,8 @@ a failed deploy.
 
 ## 5. Attach a custom domain
 
-The site currently answers on , and that value is
-already set as `siteUrl` in `src/content/profile.ts`.
+The site currently answers on `shaan-syed.vercel.app`, and that value
+is already set as `siteUrl` in `src/content/profile.ts`.
 
 `shaansyed.com` and `shaansyed.dev` are the natural choices.
 
