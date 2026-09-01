@@ -411,6 +411,16 @@
     margin-top: 40px;
   }
 
+  /* Ledger lists: small type, tight spacing, so the section reads as
+     a record rather than a shelf. */
+  .section-compact > .rail-main {
+    margin-bottom: 9px;
+  }
+
+  .section-compact > .rail-side {
+    margin-bottom: 0;
+  }
+
   .hero {
     margin-bottom: 72px;
   }

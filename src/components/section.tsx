@@ -14,14 +14,20 @@ import type { ElementType, ReactNode } from "react";
 export function Section({
   heading,
   id,
+  compact = false,
   children,
 }: {
   heading: string;
   id: string;
+  /* Tightens row spacing for ledger-style lists. */
+  compact?: boolean;
   children: ReactNode;
 }) {
   return (
-    <section className="section rail" aria-labelledby={id}>
+    <section
+      className={`section rail${compact ? " section-compact" : ""}`}
+      aria-labelledby={id}
+    >
       <h2 id={id} className="rail-side section-heading">
         {heading}
       </h2>

@@ -87,7 +87,7 @@ export default function HomePage() {
 
       {/* A dated ledger. The year hangs in the rail, the citation sits
           in the measure as one line. */}
-      <Section heading="Awards & honours" id="awards">
+      <Section heading="Awards & honours" id="awards" compact>
         {awards.map((award) => (
           <Row
             key={award.title}
