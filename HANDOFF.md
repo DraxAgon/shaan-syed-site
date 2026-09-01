@@ -2,7 +2,7 @@
 
 Everything you need to change this site yourself.
 
-- **Live site:** see the URL at the top of the delivery message
+- **Live site:** https://shaan-syed.vercel.app
 - **Repo:** https://github.com/DraxAgon/shaan-syed-site
 - **Local path:** `C:\Users\shaan\Projects\shaan-syed-site`
 
@@ -103,6 +103,9 @@ Always run `npm run build` locally first. A broken build on `main` means
 a failed deploy.
 
 ## 5. Attach a custom domain
+
+The site currently answers on , and that value is
+already set as `siteUrl` in `src/content/profile.ts`.
 
 `shaansyed.com` and `shaansyed.dev` are the natural choices.
 
