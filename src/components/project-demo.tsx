@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-type Mode = "video" | "live" | "scroll";
+import { RiloDemo } from "./rilo-demo";
+
+type Mode = "play" | "video" | "live" | "scroll";
 
 export type Hotspot = {
   label: string;
@@ -18,17 +20,16 @@ export type Hotspot = {
   height: number;
 };
 
-/* A recorded run of the live product, plus a hands-on mode.
+/* One panel, several ways to look at a project.
 
-   The recording always loads first: it starts instantly, costs one
-   small file, and never shows a cold start. The hands-on mode is only
-   fetched when someone asks for it, which matters when the app is on a
-   free tier that sleeps.
+   play    the product's real flow, ported and running here
+   video   a recording, instant and never a cold start
+   live    the real app in an iframe, for apps that allow framing
+   scroll  a full-page capture with the page's own buttons on top,
+           for sites that refuse to be framed
 
-   Which hands-on mode a project gets depends on whether it can be
-   framed. Phantom sends no X-Frame-Options, so it embeds live and is
-   fully clickable. riloai.app sends X-Frame-Options: SAMEORIGIN, so it
-   gets a scrollable capture of the whole page instead. */
+   Which modes exist depends on the project, and the switcher only
+   shows the ones it has. */
 export function ProjectDemo({
   src,
   poster,
@@ -40,10 +41,12 @@ export function ProjectDemo({
   scrollImageHeight,
   scrollLabel,
   hotspots,
+  playable,
+  defaultMode,
 }: {
-  src: string;
-  poster: string;
-  label: string;
+  src?: string;
+  poster?: string;
+  label?: string;
   liveUrl?: string;
   liveLabel?: string;
   scrollImage?: string;
@@ -51,19 +54,25 @@ export function ProjectDemo({
   scrollImageHeight?: number;
   scrollLabel?: string;
   hotspots?: Hotspot[];
+  playable?: { component: "rilo"; label: string };
+  defaultMode?: Mode;
 }) {
   const video = useRef<HTMLVideoElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
-  const [mode, setMode] = useState<Mode>("video");
+
+  const modes: { id: Mode; tab: string; caption: string }[] = [];
+  if (playable) modes.push({ id: "play", tab: "Try it", caption: playable.label });
+  if (src) modes.push({ id: "video", tab: "Recording", caption: label ?? "Screen recording" });
+  if (liveUrl) modes.push({ id: "live", tab: "Live app", caption: liveLabel ?? "Live app" });
+  if (scrollImage) modes.push({ id: "scroll", tab: "The page", caption: scrollLabel ?? "The full page" });
+
+  const [mode, setMode] = useState<Mode>(defaultMode ?? modes[0]?.id ?? "video");
   const [playing, setPlaying] = useState(false);
   const [frameLoaded, setFrameLoaded] = useState(false);
-
-  const altMode: Mode | null = liveUrl ? "live" : scrollImage ? "scroll" : null;
 
   useEffect(() => {
     const el = video.current;
     if (!el || mode !== "video") return;
-
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     /* Play only while on screen, so an off-screen demo is not decoding
@@ -79,19 +88,7 @@ export function ProjectDemo({
     return () => io.disconnect();
   }, [mode]);
 
-  const toggleLabel =
-    mode !== "video"
-      ? "Back to the recording"
-      : altMode === "live"
-        ? "Open the live app"
-        : "Scroll the real page";
-
-  const captionText =
-    mode === "live"
-      ? (liveLabel ?? "Live app")
-      : mode === "scroll"
-        ? (scrollLabel ?? "The real page, scroll inside it")
-        : label;
+  const current = modes.find((m) => m.id === mode) ?? modes[0];
 
   return (
     <figure className="demo">
@@ -99,10 +96,13 @@ export function ProjectDemo({
         className={
           "demo-stage" +
           (mode === "scroll" ? " is-scroll" : "") +
-          (mode === "live" ? " is-live" : "")
+          (mode === "live" ? " is-live" : "") +
+          (mode === "play" ? " is-play" : "")
         }
       >
-        {mode === "live" && liveUrl ? (
+        {mode === "play" && playable ? (
+          <RiloDemo />
+        ) : mode === "live" && liveUrl ? (
           <>
             {!frameLoaded ? (
               <p className="demo-waking">Waking the app, this can take a moment</p>
@@ -175,13 +175,13 @@ export function ProjectDemo({
                     href={spot.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`${spot.label}, opens riloai.app in a new tab`}
+                    aria-label={`${spot.label}, opens in a new tab`}
                   />
                 );
               })}
             </div>
           </div>
-        ) : (
+        ) : src ? (
           <video
             ref={video}
             className="demo-video"
@@ -196,7 +196,7 @@ export function ProjectDemo({
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
           />
-        )}
+        ) : null}
       </div>
 
       <figcaption className="demo-caption">
@@ -205,24 +205,30 @@ export function ProjectDemo({
             className={
               "demo-dot" +
               (mode === "video" && playing ? " is-live" : "") +
-              (mode !== "video" ? " is-real" : "")
+              (mode === "live" || mode === "scroll" || mode === "play" ? " is-real" : "")
             }
             aria-hidden="true"
           />
-          {captionText}
+          {current?.caption}
         </span>
 
-        {altMode ? (
-          <button
-            type="button"
-            className="demo-toggle"
-            onClick={() => {
-              setMode((m) => (m === "video" ? altMode : "video"));
-              setFrameLoaded(false);
-            }}
-          >
-            {toggleLabel}
-          </button>
+        {modes.length > 1 ? (
+          <span className="demo-modes" role="group" aria-label="How to view this project">
+            {modes.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                className={`demo-mode${m.id === mode ? " is-on" : ""}`}
+                aria-pressed={m.id === mode}
+                onClick={() => {
+                  setMode(m.id);
+                  setFrameLoaded(false);
+                }}
+              >
+                {m.tab}
+              </button>
+            ))}
+          </span>
         ) : null}
       </figcaption>
     </figure>

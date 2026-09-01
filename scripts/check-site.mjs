@@ -80,13 +80,43 @@ await ev(`document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape'}))`);
 await sleep(400);
 ck("Escape closes it", await ev(`!document.querySelector('.nav-menu').classList.contains('is-open')`));
 
-console.log("Rilo, recording and the scrollable page");
+console.log("Rilo, the ported demo, the recording and the page");
 await go("/projects?p=Rilo");
-ck("recording is playing",
+
+/* Rilo has three modes now, so the panel opens on a switcher rather
+   than a single toggle. */
+const mode = (tab) =>
+  `[...document.querySelectorAll('.demo-mode')].find(b => b.textContent.trim() === ${JSON.stringify(tab)})`;
+
+ck("three modes are offered",
+  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 3,
+  await ev(`[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent).join('|')`));
+ck("it opens on the playable demo", await ev(`!!document.querySelector('.rd')`));
+
+/* The flow is the whole point, so walk it end to end. */
+await ev(`document.querySelector('.rd-row-unread').click()`);
+await sleep(500);
+await ev(`document.querySelector('.rd-reply').click()`);
+await sleep(500);
+await ev(`document.querySelector('.rd-rilo').click()`);
+await sleep(3200);
+ck("asking Rilo reaches the option step", await ev(`!!document.querySelector('.rd-options')`));
+await ev(`[...document.querySelectorAll('.rd-option')].find(x=>x.textContent.includes('Say yes')).click()`);
+await sleep(600);
+await ev(`[...document.querySelectorAll('.rd-option')].find(x=>x.textContent.includes('Confirm')).click()`);
+await sleep(600);
+ck("two choices unlock generate", await ev(`!document.querySelector('.rd-go').disabled`));
+await ev(`document.querySelector('.rd-go').click()`);
+await sleep(2600);
+ck("a draft comes back on the path taken",
+  (await ev(`document.querySelector('.rd-draft')?.textContent`))?.includes("Count me in"));
+
+await ev(`${mode("Recording")}.click()`);
+await sleep(2500);
+ck("the recording plays",
   await ev(`(()=>{const v=document.querySelector('.demo-video');return !!v&&!v.paused&&v.currentTime>0})()`));
-ck("offers the scroll mode",
-  (await ev(`document.querySelector('.demo-toggle')?.textContent`))?.includes("Scroll the real page"));
-await ev(`document.querySelector('.demo-toggle').click()`);
+
+await ev(`${mode("The page")}.click()`);
 await sleep(2200);
 ck("full page capture loads",
   await ev(`(()=>{const i=document.querySelector('.demo-scroll-img');return !!i&&i.naturalHeight>4000})()`));
@@ -104,21 +134,42 @@ await sleep(1500);
 ck("an in-page anchor scrolls the panel",
   (await ev(`document.querySelector('.demo-scroll').scrollTop`)) > before + 500);
 
-console.log("Redi AI, the mockup");
+console.log("Redi AI, the walkthrough");
 await go("/projects?p=Redi%20AI");
-ck("mockup renders", await ev(`!!document.querySelector('.redi')`));
-ck("it is labelled a mockup",
-  (await ev(`document.querySelector('.demo-caption-text')?.textContent`))?.toLowerCase().includes("mockup"));
-const first = await ev(`document.querySelector('.redi-text')?.textContent`);
-await ev(`[...document.querySelectorAll('.redi-chip')].find(c=>c.textContent.includes('Scholarship')).click()`);
+ck("the walkthrough renders", await ev(`!!document.querySelector('.rw')`));
+ck("it says the screens are rebuilt, not recorded",
+  (await ev(`document.querySelector('.demo-caption-text')?.textContent`))?.toLowerCase().includes("rebuilt"));
+ck("it opens on Home", await ev(`document.querySelector('.rp-app')?.dataset.screen`) === "home");
+
+/* Typing a role has to carry through the whole walkthrough, because that is
+   the one thing the panel claims: these are your questions, not a fixed set. */
+await ev(`[...document.querySelectorAll('.rw-stop')].find(b=>b.textContent.includes('Add a role')).click()`);
+await sleep(400);
+await ev(`(()=>{const t=document.querySelector('.ra-input');
+  const set=Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set;
+  set.call(t,'Registered nurse at Toronto General');
+  t.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+await sleep(200);
+await ev(`document.querySelector('.ra-primary').click()`);
+await sleep(2600);
+ck("what it worked out follows what was typed",
+  (await ev(`document.querySelector('.ra-title')?.textContent`)) === "Registered nurse" &&
+  (await ev(`document.querySelector('.ra-org')?.textContent`)) === "Toronto General");
+ck("a brand new role reads NOT STARTED",
+  (await ev(`document.querySelector('.ra-cov-label')?.textContent`)) === "NOT STARTED");
+ck("the 24 question promise is on the confirm screen",
+  (await ev(`document.querySelector('.ra-promise')?.textContent`))?.includes("24 questions"));
+
+await ev(`[...document.querySelectorAll('.rw-stop')].find(b=>b.textContent.includes('The report')).click()`);
 await sleep(600);
-ck("changing the role regenerates the set",
-  (await ev(`document.querySelector('.redi-text')?.textContent`)) !== first);
-await ev(`document.querySelectorAll('.redi-question')[0].click()`);
-await sleep(600);
-ck("a question opens the scoring view", await ev(`!!document.querySelector('.redi-score')`));
-ck("scores are marked illustrative",
-  (await ev(`document.querySelector('.redi-illustrative')?.textContent`)) === "illustrative");
+ck("the report scores six skills",
+  (await ev(`document.querySelectorAll('.ra-skill').length`)) === 6);
+ck("scores are ranges, never a point",
+  /^\d+ to \d+$/.test(await ev(`document.querySelector('.ra-skill-range')?.textContent`)));
+ck("one row is the one to work on first",
+  (await ev(`document.querySelectorAll('.ra-skill-eyebrow').length`)) === 1);
+ck("the figures are marked as fixed",
+  (await ev(`document.querySelector('.rw-note')?.textContent`))?.includes("scores are fixed"));
 
 console.log("Phantom, recording and the live embed");
 await go("/projects?p=Phantom");
@@ -129,7 +180,7 @@ ck("award wording is exact",
     "3rd Place, Best Use of Base44, Ignition Hacks 2026");
 ck("the Render link is present",
   await ev(`[...document.querySelectorAll('.browser-links a')].some(x=>x.href.includes('onrender.com'))`));
-await ev(`document.querySelector('.demo-toggle').click()`);
+await ev(`[...document.querySelectorAll('.demo-mode')].find(b => b.textContent.trim() === "Live app").click()`);
 await sleep(8000);
 ck("the live app embeds", await ev(`!!document.querySelector('.demo-frame')`));
 
