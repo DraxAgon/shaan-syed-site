@@ -79,7 +79,7 @@
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 1080px;
+    max-width: 1260px;
     margin-inline: auto;
     padding: 24px 28px 64px;
   }
@@ -87,7 +87,7 @@
   .site-footer {
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px;
     justify-content: flex-end;
-    max-width: 1080px; margin-inline: auto; width: 100%;
+    max-width: 1260px; margin-inline: auto; width: 100%;
     padding: 0 28px 26px;
   }
 
@@ -196,13 +196,13 @@
 
   .subtitle {
     margin-top: 8px;
-    font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.012em;
+    font-size: 1.1875rem; font-weight: 600; letter-spacing: -0.012em;
     color: var(--color-ink);
   }
 
   .summary {
-    margin-top: 12px; max-width: 34ch;
-    font-size: 0.9375rem; line-height: 1.55;
+    margin-top: 12px; max-width: 36ch;
+    font-size: 1.0625rem; line-height: 1.6;
     color: var(--color-ink-muted);
   }
 
@@ -223,7 +223,7 @@
     gap: 16px; margin-bottom: 10px;
   }
   .record-head h2 {
-    font-size: 1.5rem; font-weight: 700; letter-spacing: -0.022em;
+    font-size: 1.75rem; font-weight: 700; letter-spacing: -0.022em;
   }
   .record-more {
     font-family: var(--font-mono); font-size: 0.75rem;
@@ -264,12 +264,12 @@
   }
 
   .disclosure-title {
-    font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.008em;
+    font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.008em;
     color: var(--color-ink);
   }
   .disclosure-aside {
     margin-left: auto; text-align: right;
-    font-family: var(--font-mono); font-size: 0.75rem;
+    font-family: var(--font-mono); font-size: 0.8125rem;
     color: var(--color-ink-muted);
   }
 
@@ -310,12 +310,12 @@
     color: var(--color-ink-muted);
   }
 
-  .panel-prose { font-size: 0.9375rem; line-height: 1.6; color: var(--color-ink); text-wrap: pretty; }
+  .panel-prose { font-size: 1.0625rem; line-height: 1.68; color: var(--color-ink); text-wrap: pretty; }
 
   .panel-bullets { display: grid; gap: 5px; }
   .panel-bullets li {
     position: relative; padding-left: 15px;
-    font-size: 0.9375rem; line-height: 1.55;
+    font-size: 1.0625rem; line-height: 1.6;
   }
   .panel-bullets li::before {
     content: ""; position: absolute; left: 2px; top: 0.68em;
@@ -336,14 +336,14 @@
     padding: 3px 8px; border-radius: 999px;
     border: 1px solid var(--color-hairline);
     background: var(--color-lift);
-    font-family: var(--font-mono); font-size: 0.6875rem;
+    font-family: var(--font-mono); font-size: 0.75rem;
     color: var(--color-ink-muted);
     white-space: nowrap;
   }
 
   /* ---------------- skills ---------------- */
   .skills-block { display: grid; gap: 8px; padding-top: 4px; }
-  .skill-run { font-size: 0.8125rem; line-height: 1.85; color: var(--color-ink-muted); }
+  .skill-run { font-size: 0.9375rem; line-height: 1.9; color: var(--color-ink-muted); }
   .skill-label { font-weight: 700; color: var(--color-ink); }
   .skill-item {
     display: inline-flex; align-items: center; gap: 4px;
@@ -444,7 +444,7 @@
     font-variant-numeric: tabular-nums; color: var(--color-ink-muted);
   }
   .browser-item.is-active .browser-num { color: var(--color-brass); }
-  .browser-name { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.008em; }
+  .browser-name { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.008em; }
 
   .browser-detail {
     min-width: 0; display: grid; gap: 12px; justify-items: start;
@@ -461,6 +461,10 @@
   .demo-stage {
     position: relative;
     width: 100%;
+    /* The recordings are 16:10, so the video stage keeps that and is
+       never cropped. The panels you actually read or click get real
+       height instead, because a short window makes a long page
+       tedious to scroll. */
     aspect-ratio: 16 / 10;
     border-radius: 10px;
     border: 1px solid var(--color-hairline);
@@ -495,6 +499,19 @@
 
   .demo-scroll-img { display: block; width: 100%; height: auto; }
 
+  .demo-stage.is-scroll,
+  .demo-stage.is-live {
+    aspect-ratio: auto;
+    height: clamp(460px, 76vh, 900px);
+  }
+
+  .demo-stage.is-mockup {
+    aspect-ratio: auto;
+    height: auto;
+    min-height: 420px;
+    max-height: clamp(460px, 76vh, 900px);
+  }
+
   .demo-stage.is-scroll { background: #fff; }
 
   .demo-waking {
@@ -509,7 +526,7 @@
   .demo-caption {
     display: flex; flex-wrap: wrap; align-items: center;
     justify-content: space-between; gap: 8px 16px;
-    font-family: var(--font-mono); font-size: 0.6875rem;
+    font-family: var(--font-mono); font-size: 0.75rem;
     color: var(--color-ink-muted);
   }
 
@@ -545,17 +562,17 @@
     border-color: var(--color-brass);
     background: color-mix(in srgb, var(--color-brass) 10%, transparent);
   }
-  .browser-title { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.022em; }
-  .browser-descriptor { font-size: 1rem; color: var(--color-ink); margin-top: -6px; }
+  .browser-title { font-size: 2rem; font-weight: 700; letter-spacing: -0.022em; }
+  .browser-descriptor { font-size: 1.1875rem; color: var(--color-ink); margin-top: -6px; }
   .browser-status,
   .browser-award {
-    font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-ink-muted);
+    font-family: var(--font-mono); font-size: 0.8125rem; color: var(--color-ink-muted);
   }
   .browser-award { color: var(--color-brass); }
-  .browser-prose { font-size: 0.9375rem; line-height: 1.65; max-width: 62ch; text-wrap: pretty; }
+  .browser-prose { font-size: 1.0625rem; line-height: 1.7; max-width: 62ch; text-wrap: pretty; }
   .browser-links { display: flex; flex-wrap: wrap; gap: 16px; }
   .browser-link {
-    font-family: var(--font-mono); font-size: 0.75rem;
+    font-family: var(--font-mono); font-size: 0.8125rem;
     color: var(--color-brass); text-decoration: none;
     border-bottom: 1px solid color-mix(in srgb, var(--color-brass) 40%, transparent);
     transition: border-color 150ms ease;
@@ -611,9 +628,9 @@
   .demo-dot.is-mock { background: var(--color-ink-muted); }
 
   .redi {
-    display: grid; gap: 10px;
-    padding: 14px 16px 18px;
-    font-size: 0.8125rem;
+    display: grid; gap: 12px;
+    padding: 14px 18px 20px;
+    font-size: 0.9375rem;
   }
 
   /* Pinned, so the mockup label stays visible however far the panel
@@ -622,15 +639,15 @@
     position: sticky; top: 0; z-index: 2;
     display: flex; align-items: baseline; justify-content: space-between;
     gap: 12px;
-    margin: -14px -16px 0; padding: 12px 16px 8px;
+    margin: -14px -18px 0; padding: 14px 18px 10px;
     background: #14100c;
   }
   .redi-mark {
-    font-family: var(--font-serif); font-size: 1.0625rem; font-weight: 700;
+    font-family: var(--font-serif); font-size: 1.25rem; font-weight: 700;
     letter-spacing: -0.02em; color: var(--color-ink);
   }
   .redi-tag {
-    font-family: var(--font-mono); font-size: 0.625rem;
+    font-family: var(--font-mono); font-size: 0.75rem;
     color: var(--color-ink-muted);
     border: 1px solid var(--color-hairline);
     border-radius: 999px; padding: 2px 8px;
@@ -640,7 +657,7 @@
 
   .redi-input {
     flex: 1; min-width: 0;
-    font-family: var(--font-mono); font-size: 0.75rem;
+    font-family: var(--font-mono); font-size: 0.875rem;
     color: var(--color-ink);
     background: #1c1610;
     border: 1px solid var(--color-hairline);
@@ -650,7 +667,7 @@
   .redi-input:focus-visible { border-color: var(--color-brass); outline: none; }
 
   .redi-go {
-    font-family: var(--font-mono); font-size: 0.75rem;
+    font-family: var(--font-mono); font-size: 0.875rem;
     color: var(--color-plate); background: var(--color-brass);
     border: 0; border-radius: 7px; padding: 7px 13px;
     cursor: pointer; white-space: nowrap;
@@ -660,7 +677,7 @@
 
   .redi-chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .redi-chip {
-    font-family: var(--font-mono); font-size: 0.6875rem;
+    font-family: var(--font-mono); font-size: 0.8125rem;
     color: var(--color-ink-muted);
     background: transparent;
     border: 1px solid var(--color-hairline);
@@ -671,7 +688,7 @@
   .redi-chip.is-on { color: var(--color-brass); border-color: var(--color-brass); }
 
   .redi-meta {
-    font-family: var(--font-mono); font-size: 0.6875rem;
+    font-family: var(--font-mono); font-size: 0.8125rem;
     color: var(--color-ink-muted);
   }
   .redi-meta strong { color: var(--color-ink); font-weight: 500; }
@@ -690,7 +707,7 @@
   .redi-question.is-open { border-color: var(--color-brass); background: #1f1811; }
 
   .redi-num {
-    font-family: var(--font-mono); font-size: 0.625rem;
+    font-family: var(--font-mono); font-size: 0.75rem;
     color: var(--color-ink-muted); padding-top: 2px;
   }
   .redi-text { line-height: 1.45; }
@@ -701,7 +718,7 @@
   }
   .redi-score-head {
     display: flex; align-items: center; gap: 8px;
-    font-family: var(--font-mono); font-size: 0.625rem;
+    font-family: var(--font-mono); font-size: 0.75rem;
     color: var(--color-ink-muted);
   }
   .redi-illustrative {
@@ -711,15 +728,17 @@
   }
 
   .redi-row {
-    display: grid; grid-template-columns: 66px 1fr; gap: 3px 9px;
+    display: grid; grid-template-columns: 78px 1fr; gap: 3px 9px;
     align-items: center;
   }
   .redi-row-name {
-    font-family: var(--font-mono); font-size: 0.6875rem;
+    font-family: var(--font-mono); font-size: 0.8125rem;
     color: var(--color-ink);
   }
-  .redi-bar {
-    height: 5px; border-radius: 3px;
+  /* Named apart from .redi-bar, the sticky header: a shared class name
+     let the track's 5px height collapse the header. */
+  .redi-track {
+    height: 6px; border-radius: 3px;
     background: var(--color-hairline); overflow: hidden;
   }
   .redi-fill {
@@ -729,7 +748,7 @@
   }
   .redi-row-note {
     grid-column: 2;
-    font-size: 0.6875rem; line-height: 1.4;
+    font-size: 0.8125rem; line-height: 1.45;
     color: var(--color-ink-muted);
   }
 }

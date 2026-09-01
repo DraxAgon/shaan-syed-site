@@ -95,7 +95,13 @@ export function ProjectDemo({
 
   return (
     <figure className="demo">
-      <div className={`demo-stage${mode === "scroll" ? " is-scroll" : ""}`}>
+      <div
+        className={
+          "demo-stage" +
+          (mode === "scroll" ? " is-scroll" : "") +
+          (mode === "live" ? " is-live" : "")
+        }
+      >
         {mode === "live" && liveUrl ? (
           <>
             {!frameLoaded ? (

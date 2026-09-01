@@ -1,8 +1,8 @@
 /**
  * Captures a whole page as one tall WebP.
  *
- *   node scripts/capture-fullpage.mjs <url> <name> [width]
- *   node scripts/capture-fullpage.mjs https://riloai.app rilo-page 1280
+ *   node scripts/capture-fullpage.mjs <url> <name> [width] [scale]
+ *   node scripts/capture-fullpage.mjs https://riloai.app rilo-page 1280 2
  *
  * Used for sites that refuse to be framed. riloai.app sends
  * X-Frame-Options: SAMEORIGIN, so it cannot be embedded live, but the
@@ -18,15 +18,18 @@ import path from "node:path";
 import { tmpdir } from "node:os";
 import sharp from "sharp";
 
-const [, , URL_ARG, NAME, WIDTH] = process.argv;
+const [, , URL_ARG, NAME, WIDTH, SCALE] = process.argv;
 if (!URL_ARG || !NAME) {
-  console.error("usage: node scripts/capture-fullpage.mjs <url> <name> [width]");
+  console.error("usage: node scripts/capture-fullpage.mjs <url> <name> [width] [scale]");
   process.exit(1);
 }
 
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const PORT = 9481;
 const W = Number(WIDTH ?? 1280);
+/* Capture above 1x so the image stays sharp when the panel renders it
+   smaller than its natural width. */
+const DPR = Number(SCALE ?? 2);
 
 const chrome = spawn(CHROME, [
   `--remote-debugging-port=${PORT}`, "--headless", "--disable-gpu",
@@ -57,7 +60,7 @@ const { result: t } = await send("Target.createTarget", { url: "about:blank" });
 const { result: a } = await send("Target.attachToTarget", { targetId: t.targetId, flatten: true });
 const s = a.sessionId;
 await send("Page.enable", {}, s);
-await send("Emulation.setDeviceMetricsOverride", { width: W, height: 900, deviceScaleFactor: 1, mobile: false }, s);
+await send("Emulation.setDeviceMetricsOverride", { width: W, height: 900, deviceScaleFactor: DPR, mobile: false }, s);
 await send("Page.navigate", { url: URL_ARG }, s);
 await sleep(7000);
 
@@ -141,15 +144,17 @@ await sharp(buf).webp({ quality: 78 }).toFile(out);
 
 /* Positions are stored as percentages so the overlay scales with
    whatever width the panel ends up at. */
+const cssWidth = meta.width / DPR;
+const cssHeight = meta.height / DPR;
 const scaled = hotspots.map((h) => ({
   label: h.label,
   kind: h.kind,
   href: h.href ?? undefined,
-  scrollPct: h.scrollTo == null ? undefined : +((h.scrollTo / meta.height) * 100).toFixed(4),
-  left: +((h.x / meta.width) * 100).toFixed(4),
-  top: +((h.y / meta.height) * 100).toFixed(4),
-  width: +((h.w / meta.width) * 100).toFixed(4),
-  height: +((h.h / meta.height) * 100).toFixed(4),
+  scrollPct: h.scrollTo == null ? undefined : +((h.scrollTo / cssHeight) * 100).toFixed(4),
+  left: +((h.x / cssWidth) * 100).toFixed(4),
+  top: +((h.y / cssHeight) * 100).toFixed(4),
+  width: +((h.w / cssWidth) * 100).toFixed(4),
+  height: +((h.h / cssHeight) * 100).toFixed(4),
 }));
 
 const jsonPath = `src/content/${NAME}-hotspots.json`;
@@ -157,7 +162,7 @@ writeFileSync(jsonPath, JSON.stringify(scaled, null, 1) + "\n");
 
 console.log(`wrote ${out}`);
 console.log(`  ${meta.width}x${meta.height}px, ${(statSync(out).size / 1024 / 1024).toFixed(2)} MB`);
-console.log(`  set scrollImageHeight: ${meta.height} in projects.ts`);
+console.log(`  set scrollImageWidth: ${meta.width}, scrollImageHeight: ${meta.height} in projects.ts`);
 console.log(`wrote ${jsonPath}`);
 for (const k of ["external", "site", "anchor"]) {
   console.log(`  ${k}: ${scaled.filter((h) => h.kind === k).length}`);

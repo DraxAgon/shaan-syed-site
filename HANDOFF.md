@@ -101,7 +101,7 @@ node scripts/generate-placeholders.mjs # the two portrait placeholders
 ```
 node scripts/record-demo.mjs https://riloai.app rilo-demo 14
 node scripts/record-interaction.mjs scripts/demos/phantom.json
-node scripts/capture-fullpage.mjs https://riloai.app rilo-page 1280
+node scripts/capture-fullpage.mjs https://riloai.app rilo-page 1280 2
 ```
 
 `record-demo.mjs` pans down a page. `record-interaction.mjs` drives an
@@ -132,6 +132,10 @@ every button sits and where it points, into
 Add to Chrome opens the Web Store, Get Started opens the login page, and
 the in-page links scroll the panel instead of leaving the site.
 Re-running the capture regenerates the hotspots, so the two never drift.
+The trailing `2` captures at twice the pixel density, which is what keeps
+the page sharp when the panel draws it smaller than its natural width.
+If you re-capture, copy the printed `scrollImageWidth` and
+`scrollImageHeight` into `projects.ts`.
 
 Redi AI has no public build, so its panel is an interactive mockup of
 the flow rather than a capture. It is labelled as one on the page, and

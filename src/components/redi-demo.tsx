@@ -142,7 +142,7 @@ export function RediDemo() {
                 {RUBRIC.map((row) => (
                   <div key={row.name} className="redi-row">
                     <span className="redi-row-name">{row.name}</span>
-                    <span className="redi-bar">
+                    <span className="redi-track">
                       <span className="redi-fill" style={{ width: `${row.score}%` }} />
                     </span>
                     <span className="redi-row-note">{row.note}</span>

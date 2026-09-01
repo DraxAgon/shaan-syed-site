@@ -80,8 +80,8 @@ export const projects: Project[] = [
          embedded live. The full page is captured instead and scrolls
          in place. */
       scrollImage: "/media/rilo-page.webp",
-      scrollImageWidth: 1280,
-      scrollImageHeight: 5846,
+      scrollImageWidth: 2560,
+      scrollImageHeight: 11692,
       scrollLabel: "riloai.app in full, the buttons work",
       hotspots: riloHotspots as Hotspot[],
     },
