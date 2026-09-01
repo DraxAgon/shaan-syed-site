@@ -2,7 +2,8 @@
 
 Everything you need to change this site yourself.
 
-- **Live site:** https://shaan-syed.vercel.app
+- **Live site:** https://shaan-syed-git-main-shaan21.vercel.app
+- **Canonical URL (see note below):** https://shaan-syed.vercel.app
 - **Repo:** https://github.com/DraxAgon/shaan-syed-site
 - **Local path:** `C:\Users\shaan\Projects\shaan-syed-site`
 
@@ -101,6 +102,34 @@ https://vercel.com/dashboard.
 
 Always run `npm run build` locally first. A broken build on `main` means
 a failed deploy.
+
+## 4a. A note on the two URLs
+
+Both hostnames serve the same build and both update on every push to
+`main`.
+
+While the site was being deployed, automated checks hit
+`shaan-syed.vercel.app` often enough that Vercel's edge turned on
+automatic bot mitigation for that one hostname. It answers with a
+"Vercel Security Checkpoint" page instead of the site. Nothing is wrong
+with the project: deployment protection is off, and the same build
+serves fine on the branch alias.
+
+These mitigations expire on their own, usually within the hour. To check:
+
+```
+curl -o /dev/null -w "%{http_code}
+" https://shaan-syed.vercel.app/
+```
+
+`200` means it has cleared. If it has not cleared after a few hours,
+open the project on vercel.com, go to Firewall, and confirm Attack
+Challenge Mode is off.
+
+`siteUrl` in `src/content/profile.ts` is deliberately still set to
+`https://shaan-syed.vercel.app`, because that is the permanent
+canonical address and the checkpoint is temporary. Share the branch
+alias in the meantime.
 
 ## 5. Attach a custom domain
 
