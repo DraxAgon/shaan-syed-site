@@ -4,9 +4,14 @@
  * Provenance matters here, so it is recorded per project rather than
  * left for a reader to guess:
  *
- *   Redi AI  REAL, fetched. The app ships favicon.svg, which is the
- *            Filament from its own design system. Vector, so the shape
- *            comes across exactly; see LIFT below for the one change.
+ *   Redi AI  REAL, redrawn. The app ships favicon.svg, which is the
+ *            Filament, a hairline with a dot on one end. That is the
+ *            app's second object, and at 20px on cream it read as a
+ *            scratch beside three solid marks. The mark here is Redi
+ *            himself, the face the app opens on and the thing anyone
+ *            who has used it recognises, drawn from the same ratios in
+ *            rediConfig.ts that src/components/redi-orb.tsx draws from:
+ *            same gradient, same rim, same eyes, same resting mouth.
  *   Rilo     REAL, redrawn. riloai.app ships only a 32x32 icon, too
  *            soft once a 26px tile is drawn on a 2x screen. The mark
  *            here is that icon's own geometry, measured off it and
@@ -60,18 +65,28 @@ const LOXBOX = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
     stroke-linecap="round" stroke-dasharray="34 12.5" transform="rotate(-90 16 16)"/>
 </svg>`;
 
-const REDI_SRC = "https://redi-ai.vercel.app/favicon.svg";
-
-/* The Filament is drawn for a browser tab: a 32px tile on the browser's
-   own dark chrome, where a tail at 0.25 and a source dot at 0.28 still
-   register. Here the same tile is drawn at 20px on cream, and both drop
-   out, leaving a mark that reads as a faint scratch beside three solid
-   ones. The floor is lifted so it holds at that size. Same shape, same
-   golds, still dimming along its length, just not to nothing. */
-const LIFT = [
-  ['stop-opacity="0.25"', 'stop-opacity="0.6"'],
-  ['opacity="0.28"', 'opacity="0.5"'],
-];
+/* Redi's resting face, at the app's own ratios scaled to a 32 unit tile.
+   Every number is FACE and ORB in src/components/redi-orb.tsx multiplied
+   by 32: eyes at 0.066 x 0.094 radius, 0.19 either side of centre and
+   0.095 above it; mouth centred 0.17 below, 0.34 wide. The path is the
+   same two quadratic lens mouthPath() builds, evaluated once at the idle
+   pose of openness 0.06 and curve 0.5 rather than animated. No tile and
+   no plate behind him: he is a circle, and the ground he sits on is
+   whichever page is drawing him. */
+const REDI = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <radialGradient id="orb" cx="0.4" cy="0.35" r="0.72">
+      <stop offset="0%" stop-color="#FFE066"/>
+      <stop offset="55%" stop-color="#FFC933"/>
+      <stop offset="100%" stop-color="#F5A623"/>
+    </radialGradient>
+  </defs>
+  <circle cx="16" cy="16" r="15.76" fill="url(#orb)"/>
+  <circle cx="16" cy="16" r="15.76" fill="none" stroke="#FFF0A0" stroke-opacity="0.4" stroke-width="0.48"/>
+  <ellipse cx="9.92" cy="12.96" rx="2.11" ry="3.01" fill="#2A1F05"/>
+  <ellipse cx="22.08" cy="12.96" rx="2.11" ry="3.01" fill="#2A1F05"/>
+  <path d="M10.56 20.3Q16 24.87 21.44 20.3Q16 27.04 10.56 20.3Z" fill="#2A1F05"/>
+</svg>`;
 
 async function write(name, svg) {
   await sharp(Buffer.from(svg), { density: 600 })
@@ -81,26 +96,7 @@ async function write(name, svg) {
   console.log(`OK   ${name.padEnd(14)} ${svg.length}B of SVG`);
 }
 
-/* Fetched rather than inlined, so a change upstream is picked up on the
-   next run instead of silently drifting from the real mark. */
-let redi;
-try {
-  const res = await fetch(REDI_SRC, { signal: AbortSignal.timeout(12000) });
-  if (!res.ok) throw new Error(String(res.status));
-  redi = await res.text();
-  if (!redi.includes("<svg")) throw new Error("not an svg");
-  for (const [from, to] of LIFT) {
-    /* If upstream restyles the Filament these stop matching, and the
-       mark should be re-checked at 20px rather than silently shipped. */
-    if (!redi.includes(from)) console.log(`WARN logo-redi       upstream dropped ${from}, recheck at 20px`);
-    redi = redi.replaceAll(from, to);
-  }
-  console.log(`FETCH logo-redi      <- ${REDI_SRC}`);
-} catch (err) {
-  console.log(`FAIL logo-redi       ${REDI_SRC} unreachable (${err.message}), left as is`);
-}
-
 await write("logo-rilo", RILO);
-if (redi) await write("logo-redi", redi);
+await write("logo-redi", REDI);
 await write("logo-phantom", PHANTOM);
 await write("logo-loxbox", LOXBOX);
