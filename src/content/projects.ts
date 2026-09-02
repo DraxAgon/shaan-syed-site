@@ -18,6 +18,12 @@ export type Stage =
 export type Project = {
   name: string;
   descriptor: string;
+  /* The project’s own mark, 256x256 in public/images. Built by
+     scripts/build-project-logos.mjs, which records where each one came
+     from: Rilo and Redi carry the marks they actually ship, while
+     Phantom and Loxbox carry ones derived from their own design tokens,
+     because neither has shipped an icon yet. */
+  logo: string;
   /* Short enough to sit in the 112px rail. */
   railStatus: string;
   status: string;
@@ -79,6 +85,7 @@ export const projects: Project[] = [
   {
     name: "Rilo",
     descriptor: "AI reply assistant for Gmail",
+    logo: "/images/logo-rilo.webp",
     railStatus: "Live",
     status: "On the Chrome Web Store since July 2026",
     stage: "Published",
@@ -115,8 +122,10 @@ export const projects: Project[] = [
       liveUrl: "https://www.riloai.app/#demo",
       liveLabel: "riloai.app itself, running here",
       /* The demo section is taller than the panel, so the frame is drawn wider
-         and scaled down to fit it in one view. */
-      liveZoom: 0.62,
+         and scaled down. Pulled back in from 0.62, which fit more of the
+         section but shrank its body text past reading size; 0.78 keeps the
+         type legible and lets the frame scroll for the rest. */
+      liveZoom: 0.78,
       /* The framed page carries Rilo’s own demo, so there is nothing left
          to port in beside it. All that is worth offering is the page
          itself, unframed. */
@@ -127,16 +136,16 @@ export const projects: Project[] = [
   {
     name: "Redi AI",
     descriptor: "Interview prep, generated per role",
-    railStatus: "In development",
-    status: "Mobile, and what I spend most of my time on now",
+    logo: "/images/logo-redi.webp",
+    railStatus: "Mobile",
+    status: "Mobile, spoken answers scored per skill",
     stage: "Not published yet",
-    tags: ["Six skills per session"],
     prose: [
       "You describe a role, whether that's a job, a scholarship, or a program, and Redi generates a question set for it. Answer out loud and it scores what you said.",
       /* The app's own coverage matrix records the questions NOT following a
-         role edit (AI-7, filed, confirmed at depth), while the blurb does
+         role edit (AI-7, filed, confirmed at depth), while the brief does
          rebuild around what you add. This says only the half that holds. */
-      "Update the role and Redi rebuilds it around what you added. Getting the questions themselves to follow that is the piece I am on now.",
+      "The score comes back broken out by skill rather than as one number, and each skill is a range rather than a point, so the width of the range is how much the session actually showed. Update the role and the brief rebuilds around what you added.",
     ],
     stack: [
       "React Native",
@@ -154,6 +163,7 @@ export const projects: Project[] = [
   {
     name: "Phantom",
     descriptor: "Independent check on forest carbon credits",
+    logo: "/images/logo-phantom.webp",
     railStatus: "Team build",
     status: "Environmental track",
     stage: "Published",
@@ -193,18 +203,18 @@ export const projects: Project[] = [
   {
     name: "Loxbox",
     descriptor: "Group photos, locked until reveal day",
-    railStatus: "Early build",
-    status: "Mobile, and early",
-    /* The earliest thing on the page, and the chip has to say so plainly.
-       "Preparing release" read as though it were a checklist away from the
-       App Store. Nobody can install it, so the stage, the status line, the
-       tag and the closing paragraph each say unfinished rather than leaving
-       a visitor to infer it. */
+    logo: "/images/logo-loxbox.webp",
+    railStatus: "Mobile",
+    status: "Mobile, one shared album per group",
+    /* Nobody can install it, so the stage chip and the tag still carry that
+       plainly. Those two hold the state, which leaves the prose free to
+       describe the product and stay true without edits rather than reading
+       as a progress report that goes stale the moment anything moves. */
     stage: "Early development",
     tags: ["No public build yet"],
     prose: [
       "A group makes a box and picks a reveal date. Everyone adds photos to it and nobody sees a single one until the timer hits zero, when the whole box opens at once.",
-      "This one is early. The idea and the shape of the app are there, the rest is half built, and none of it is settled, so there is nothing to try yet and no date I would put on it.",
+      "The wait is the whole point. Nobody swaps their pick after seeing what everyone else put in, nobody curates the box down to the best shot in it, and the reveal lands for the whole group at the same moment.",
     ],
     stack: ["React Native", "Expo", "TypeScript", "Firebase"],
     links: [],
