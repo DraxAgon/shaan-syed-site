@@ -136,10 +136,13 @@ function readRole(input: string): { role: Role; guessed: boolean } {
 const QUESTION =
   "Tell me about something you were responsible for where the outcome was entirely down to you.";
 
-/* The two sentences the follow up is a response to. The full answer runs to
-   about a hundred words; this is the half of it with a figure in. */
+/* The answer the follow up is a response to, in full: a minute and fifty two
+   seconds of talking, which is what a good answer to a question like this
+   actually costs. It runs situation, three stages, a figure, then the part the
+   candidate will actually claim, and that last part is what the report's "what
+   worked" row is quoting. */
 const SAID =
-  "I split the work into three stages, moved ten percent of traffic first, and watched the failure rate for a week. It sat at nought point two percent, which was lower than the old system.";
+  "We were moving billing off a message queue that had been dropping things under load, and I was the only person who had read the old consumer end to end, so the plan was mine to write. I split the work into three stages. First I ran a shadow consumer alongside the live one for a fortnight without acting on anything, just to get a baseline. Then I moved ten percent of traffic and watched the failure rate for a week. It sat at nought point two percent, which was lower than the old system, so I took it to a hundred over the next four days. The part I would actually claim is the rollback plan. Nobody had asked for one, and if the new consumer had started double charging people we would have had no way back, so I wrote it and tested it against a copy of production on a Friday afternoon. We never needed it. The whole thing shipped a week later than I had said it would, and that week was the shadow run.";
 
 const FOLLOW_UP = "How did you measure that?";
 
@@ -155,45 +158,45 @@ const SKILLS = [
   {
     name: "Storytelling and Structure",
     hue: "#C667BC",
-    low: 58,
-    high: 74,
-    note: "3 answers, 3:41. The migration answer opened on the situation and closed on the number.",
+    low: 81,
+    high: 93,
+    note: "3 answers, 4:47. The migration answer opened on the situation, held the three stages in order, and closed on the number.",
   },
   {
     name: "Ownership and Impact",
     hue: "#A986CB",
-    low: 64,
-    high: 80,
-    note: "2 answers, 2:33. You said what you did rather than what the team did.",
+    low: 82,
+    high: 96,
+    note: "2 answers, 3:26. You said what you did rather than what the team did, including the part nobody asked you for.",
   },
   {
     name: "Conflict and Interpersonal",
     hue: "#4E9AD9",
-    low: 41,
-    high: 63,
-    note: "1 answer, 1:01. Enough to point at, not enough to bank.",
+    low: 63,
+    high: 83,
+    note: "1 answer, 1:44. Enough to point at, not yet enough to bank.",
   },
   {
     name: "Failure and Growth",
     hue: "#D4708F",
-    low: 24,
-    high: 44,
-    note: "1 answer, 0:52. Nothing went wrong in any of these, so there was little to read.",
+    low: 48,
+    high: 70,
+    note: "1 answer, 1:19. The week you slipped is the closest you came, and you told it as a decision rather than a mistake.",
     emphasis: true,
   },
   {
     name: "Motivation and Fit",
     hue: "#7B87E0",
-    low: 55,
-    high: 71,
-    note: "1 answer, 0:48. You named the queue rewrite post, which is specific to them.",
+    low: 73,
+    high: 91,
+    note: "1 answer, 1:07. You named the queue rewrite post, which is specific to them.",
   },
   {
     name: "Delivery and Presence",
     hue: "#3FAAA4",
-    low: 62,
-    high: 78,
-    note: "You held your volume all the way through, including the ends of sentences.",
+    low: 82,
+    high: 94,
+    note: "You held your volume all the way through, including the ends of sentences, and you did not rush the number.",
     measured: true,
   },
 ] as const;
@@ -1105,19 +1108,20 @@ function Run({
   const grace = (asking || followup) && done;
 
   /* The clock belongs to the session rather than to the screen, so it runs on
-     across the four of them. Where it lands is where the report's own "10:22
-     of talking" has to have come from. */
-  /* The session clock is the distance from startedAt, so it only ever goes
+     across the four of them. Where it lands is where the report's own "12:23
+     of talking" has to have come from: seven answers and Redi's own eight
+     questions before this one, then this answer on top.
+
+     The session clock is the distance from startedAt, so it only ever goes
      forward, and the answering reading has to sit a full answer after the
-     asking one: 13:18 plus the 0:47 the answer timer shows. It read 13:42,
-     which put the start of the answer 23 seconds before the question. */
+     asking one: 16:24 plus the 1:52 the answer timer shows. */
   const elapsed = thinking
-    ? "15:06"
+    ? "19:17"
     : followup
-      ? "14:31"
+      ? "18:42"
       : answering
-        ? "14:05"
-        : "13:18";
+        ? "18:16"
+        : "16:24";
 
   const rediState: RediState = thinking
     ? "thinking"
@@ -1176,7 +1180,7 @@ function Run({
 
       {answering ? (
         <div className="ra-mic-area">
-          <p className="ra-answer-timer">0:47</p>
+          <p className="ra-answer-timer">1:52</p>
           <button
             type="button"
             className="ra-mic is-live"
@@ -1401,14 +1405,15 @@ function Report({
       </div>
 
       {/* The app sums the five content skills and leaves Delivery out, since it
-          is a second reading of the same answers. 3:41 + 2:33 + 1:01 + 0:52 +
-          0:48 is 8:55, so that is what the headline says. */}
+          is a second reading of the same answers. 4:47 + 3:26 + 1:44 + 1:19 +
+          1:07 is 12:23, so that is what the headline says. */}
       <p className="ra-evidence">
-        8 answers, 8:55 of talking, across 6 skills.
+        8 answers, 12:23 of talking, across 6 skills.
       </p>
       <p className="ra-summary">
-        The migration answer was the strongest thing here. Nothing you told me
-        went wrong, so there was very little for me to read on failure.
+        The migration answer was the strongest thing here, and the rollback
+        plan was the best of it. Almost nothing went wrong, so failure is still
+        the thinnest part.
       </p>
 
       <hr className="ra-rule" />
