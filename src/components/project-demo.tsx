@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { useRef, useState, type CSSProperties } from "react";
 
-type Mode = "live" | "scroll";
+import { RiloDemo } from "@/components/rilo-demo";
+
+type Mode = "play" | "live" | "scroll";
 
 export type Hotspot = {
   label: string;
@@ -20,6 +22,7 @@ export type Hotspot = {
 
 /* One panel, several ways to look at a project.
 
+   play    the product's own flow, rebuilt and playable in place
    live    the real app in an iframe, for apps that allow framing
    scroll  a full-page capture with the page's own buttons on top,
            for sites that refuse to be framed
@@ -32,6 +35,7 @@ export type Hotspot = {
    shows the ones it has. Beside them, pageUrl is the way out to the real
    page at full size, for a visitor who wants it in its own tab. */
 export function ProjectDemo({
+  playable,
   liveUrl,
   liveLabel,
   liveZoom,
@@ -45,6 +49,7 @@ export function ProjectDemo({
   pageLabel,
   defaultMode,
 }: {
+  playable?: { component: "rilo"; label: string };
   liveUrl?: string;
   liveLabel?: string;
   liveZoom?: number;
@@ -61,6 +66,12 @@ export function ProjectDemo({
   const scroller = useRef<HTMLDivElement>(null);
 
   const modes: { id: Mode; tab: string; caption: string }[] = [];
+  if (playable)
+    modes.push({
+      id: "play",
+      tab: "The demo",
+      caption: playable.label,
+    });
   if (liveUrl)
     modes.push({
       id: "live",
@@ -88,10 +99,13 @@ export function ProjectDemo({
           className={
             "demo-stage" +
             (mode === "scroll" ? " is-scroll" : "") +
-            (mode === "live" ? " is-live" : "")
+            (mode === "live" ? " is-live" : "") +
+            (mode === "play" ? " is-play" : "")
           }
         >
-          {mode === "live" && liveUrl ? (
+          {mode === "play" && playable ? (
+            <RiloDemo />
+          ) : mode === "live" && liveUrl ? (
             <>
               {!frameLoaded ? (
                 <p className="demo-waking">

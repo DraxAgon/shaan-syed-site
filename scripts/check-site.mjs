@@ -100,20 +100,79 @@ await ev(`document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape'}))`);
 await sleep(400);
 ck("Escape closes it", await ev(`!document.querySelector('.nav-menu').classList.contains('is-open')`));
 
-console.log("Rilo, the live page and the ported demo");
+console.log("Rilo, the rebuilt demo and the live page");
 await go("/projects?p=Rilo");
 
 const mode = (tab) =>
   `[...document.querySelectorAll('.demo-mode')].find(b => b.textContent.trim() === ${JSON.stringify(tab)})`;
 
-ck("two ways in are offered, and neither is a recording",
-  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 2 &&
+ck("three ways in are offered, and none is a recording",
+  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 3 &&
     !(await ev(`[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent).join('|')`))
       .toLowerCase().includes("recording"),
   await ev(`[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent).join('|')`));
 ck("no video element is left anywhere on the page",
   (await ev(`document.querySelectorAll('video').length`)) === 0);
-ck("it opens on the live page", await ev(`!!document.querySelector('.demo-frame')`));
+
+/* The panel opens on Rilo's own demo section, rebuilt in place from the
+   bundle riloai.app serves rather than framed. These assert the things
+   that would quietly drift if the rebuild were ever restyled from memory
+   instead of from the source: Rilo's heading, Rilo's accent, the browser
+   chrome it draws around the flow, and every step reachable by its dot. */
+ck("it opens on the rebuilt demo", await ev(`!!document.querySelector('.rl-demo')`));
+ck("the section keeps Rilo's own heading",
+  (await ev(`document.querySelector('.rl-heading')?.textContent`)) === "Try it yourself");
+ck("it is drawn in Rilo's accent, not this site's",
+  (await ev(`getComputedStyle(document.querySelector('.rl-eyebrow')).color`)) ===
+    "rgb(255, 106, 43)");
+ck("the flow sits in browser chrome, on Gmail",
+  (await ev(`document.querySelector('.rl-frame-url')?.textContent`))?.includes("mail.google.com"));
+ck("all nine steps are reachable by dot",
+  (await ev(`document.querySelectorAll('.rl-tab').length`)) === 9);
+
+/* The whole flow, clicked the way a visitor clicks it. Rilo moves on the
+   caption button rather than on the mail itself, so this follows that,
+   then asks Rilo from inside the compose box the way the product does. */
+ck("it starts in the inbox, on Priya's note",
+  (await ev(`document.querySelector('.rl-row-lead .rl-row-name')?.textContent`)) ===
+    "Priya Nair");
+await ev(`document.querySelector('.rl-btn').click()`);
+await sleep(500);
+ck("opening the note shows the thread",
+  await ev(`!!document.querySelector('.rl-thread-body')`));
+await ev(`document.querySelector('.rl-btn').click()`);
+await sleep(500);
+ck("replying opens the compose box, with Rilo beside Send",
+  (await ev(`!!document.querySelector('.rl-compose')`)) &&
+    (await ev(`!!document.querySelector('.rl-ask')`)));
+await ev(`document.querySelector('.rl-ask').click()`);
+/* 700ms opening, then 1200ms scanning, both Rilo's own timings. */
+await sleep(2600);
+ck("asking Rilo reaches the option step",
+  await ev(`!!document.querySelector('.demo-option-card')`));
+await ev(`[...document.querySelectorAll('.demo-option-card')]
+  .find(x=>x.textContent.includes('Say yes')).click()`);
+await sleep(600);
+ck("the second round follows the goal picked in the first",
+  (await ev(`[...document.querySelectorAll('.demo-option-card')]
+    .map(x=>x.textContent).join('|')`))?.includes("Confirm I'll be there"));
+await ev(`[...document.querySelectorAll('.demo-option-card')]
+  .find(x=>x.textContent.includes('Confirm')).click()`);
+await sleep(600);
+ck("two choices unlock generate",
+  await ev(`!document.querySelector('.demo-generate-node button').disabled`));
+await ev(`document.querySelector('.demo-generate-node button').click()`);
+await sleep(1900);
+/* riloai.app writes the one draft whatever path was walked, so this asserts
+   that draft rather than a draft that follows the path. */
+ck("the draft is the one riloai.app writes",
+  (await ev(`document.querySelector('.demo-preview-body')?.textContent`))
+    ?.startsWith("Priya! Congratulations"));
+
+/* The real page is still there, one tab over. */
+await ev(`${mode("Live app")}.click()`);
+await sleep(700);
+ck("the live page is one tab away", await ev(`!!document.querySelector('.demo-frame')`));
 ck("the frame targets the canonical host",
   (await ev(`document.querySelector('.demo-frame')?.src`))?.includes("www.riloai.app"));
 ck("the frame opens on the demo section, not the hero",
@@ -146,26 +205,6 @@ if (BASE.startsWith("https://")) {
 } else {
   console.log("  SKIP  frame load (localhost is not on riloai.app's allowlist)");
 }
-
-await ev(`${mode("Try it")}.click()`);
-await sleep(900);
-ck("the ported demo starts in the inbox", await ev(`!!document.querySelector('.rd-row-unread')`));
-await ev(`document.querySelector('.rd-row-unread').click()`);
-await sleep(500);
-await ev(`document.querySelector('.rd-reply').click()`);
-await sleep(500);
-await ev(`document.querySelector('.rd-rilo').click()`);
-await sleep(3200);
-ck("asking Rilo reaches the option step", await ev(`!!document.querySelector('.rd-options')`));
-await ev(`[...document.querySelectorAll('.rd-option')].find(x=>x.textContent.includes('Say yes')).click()`);
-await sleep(600);
-await ev(`[...document.querySelectorAll('.rd-option')].find(x=>x.textContent.includes('Confirm')).click()`);
-await sleep(600);
-ck("two choices unlock generate", await ev(`!document.querySelector('.rd-go').disabled`));
-await ev(`document.querySelector('.rd-go').click()`);
-await sleep(2600);
-ck("the draft matches the path taken",
-  (await ev(`document.querySelector('.rd-draft')?.textContent`))?.includes("Count me in"));
 
 
 console.log("Redi AI, the walkthrough");
@@ -218,25 +257,37 @@ ck("the role typed earlier survives the restart",
 
 console.log("Phantom, the guided Kariba case and the live embed");
 await go("/projects?p=Phantom");
-/* Phantom's case cannot be reached by URL, so the panel guides rather than
-   deep links. These assert the guide exists and leads with the Kariba case,
-   which is the real registered project; the app's own default list is the
-   illustrative one. */
+/* Phantom's case cannot be reached by URL: the app routes on #companies and
+   #explorer only, and the region is a hard-coded default. So the panel walks
+   the visitor there instead, off the app's illustrative Amazon list and onto
+   the real registered project. These assert the walkthrough still starts at
+   the region switch, runs the verification, and ends on the public record
+   that the verification is checked against. */
+const steps = await ev(
+  `[...document.querySelectorAll('.demo-guide-steps li')].map(x=>x.textContent).join(' | ')`);
 ck("the panel guides the visitor through the Kariba case",
   (await ev(`document.querySelector('.demo-guide-title')?.textContent`))?.includes("Kariba"));
-ck("the guide's first step opens the Kariba case",
-  (await ev(`document.querySelector('.demo-guide-steps li')?.textContent`))?.includes("Kariba case"));
+ck("the guide's first step switches the region to Zimbabwe",
+  (await ev(`document.querySelector('.demo-guide-steps li')?.textContent`))?.includes("Zimbabwe"));
+ck("the guide opens the real registered project",
+  steps?.includes("Kariba REDD+ Project"));
+ck("the guide runs the verification",
+  steps?.includes("Run independent verification"));
+ck("the guide checks the result against the public record",
+  steps?.includes("Verra"));
 ck("the guide has every step",
-  (await ev(`document.querySelectorAll('.demo-guide-steps li').length`)) === 5);
+  (await ev(`document.querySelectorAll('.demo-guide-steps li').length`)) === 8);
 ck("award wording is exact",
   (await ev(`document.querySelector('.browser-award')?.textContent`)) ===
     "3rd Place, Best Use of Base44, Ignition Hacks 2026");
 ck("the Render link is present",
   await ev(`[...document.querySelectorAll('.browser-links a')].some(x=>x.href.includes('onrender.com'))`));
-/* One mode now, so there is no switcher to click. */
+/* One view mode now, so there is no switcher to click. The one chip in
+   the caption is not another view of the app, it is the way out to it. */
 ck("the live app embeds", await ev(`!!document.querySelector('.demo-frame')`));
-ck("a single mode offers no switcher",
-  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 0);
+ck("a single mode offers no switcher, only the way out",
+  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 1 &&
+    (await ev(`document.querySelector('.demo-mode')?.textContent`))?.includes("Open Phantom"));
 
 console.log("Stage and tags");
 await go("/projects?p=Rilo");

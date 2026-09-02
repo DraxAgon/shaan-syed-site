@@ -37,6 +37,12 @@ export type Project = {
   award?: string;
   awardEvent?: string;
   prose: string[];
+  /* One line on why the thing exists at all. Kept out of prose and rendered
+     last, quietest, because it is the least load-bearing thing on the page:
+     a visitor who stops before it has still read everything that matters.
+     Detail panel only. The home page carries prose alone and would be
+     longer without being clearer. */
+  why?: string;
   stack: string[];
   links: ProjectLink[];
   /* Optional still. Left unset, the entry renders as prose with no
@@ -72,8 +78,12 @@ export type Project = {
        second copy of it. */
     pageUrl?: string;
     pageLabel?: string;
+    /* The product's own flow, rebuilt and playable in the panel. For a
+       product whose demo is the thing worth showing, and which a frame
+       around the real page only makes smaller. */
+    playable?: { component: "rilo"; label: string };
     /* Which mode the panel opens on. */
-    defaultMode?: "live" | "scroll";
+    defaultMode?: "play" | "live" | "scroll";
   };
   /* An interactive component rendered in place of a recording.
      "redi" is the app's screens rebuilt in the browser, since there is no
@@ -94,6 +104,8 @@ export const projects: Project[] = [
       "Most AI email tools ask for full OAuth inbox access to read, send, and store your mail. Rilo reads only the email currently open on screen, never touches the rest of the inbox, never sends anything, and never stores your email.",
       "Each reply comes back as a few drafts across different tones and intents rather than one generic answer. Rilo was the first product I built and shipped end to end.",
     ],
+    why:
+      "Every AI email tool I tried wrote in its own voice, so you either sent something that didn’t sound like you or rewrote the whole thing anyway. I wanted control over how the reply actually comes out, without handing over full access to my inbox to get it.",
     stack: [
       "Next.js",
       "TypeScript",
@@ -109,8 +121,18 @@ export const projects: Project[] = [
     links: [{ label: "riloai.app", href: "https://riloai.app" }],
     image: "/images/project-rilo.webp",
     demo: {
+      /* Rilo's demo section, rebuilt in place rather than framed. Framing
+         the real page meant scaling a cross-origin document down far
+         enough to fit, which left its body text too soft to read; the
+         rebuild is the same demo at its own size and sharpness. It is
+         reconstructed from the bundle riloai.app serves, so the type,
+         colour, spacing, copy, motion and mascot art are Rilo's own. */
+      playable: {
+        component: "rilo",
+        label: "Rilo's own demo, running here",
+      },
       /* riloai.app now allows this origin to frame its marketing page,
-         so the whole real front page runs here: hero, the interactive
+         so the whole real front page runs here too: hero, the interactive
          demo, pricing, FAQ, contact. Must be the www host, since the
          apex 301s to it and a redirect would break the frame.
 
@@ -118,19 +140,18 @@ export const projects: Project[] = [
          hotspots are kept as a fallback if framing is ever withdrawn;
          re-add scrollImage here to switch back. */
       /* The fragment lands the frame on the page's own demo section rather
-         than the hero, so the panel opens on the thing worth showing. */
+         than the hero, so the tab opens on the thing worth showing. */
       liveUrl: "https://www.riloai.app/#demo",
       liveLabel: "riloai.app itself, running here",
       /* The demo section is taller than the panel, so the frame is drawn wider
-         and scaled down. Pulled back in from 0.62, which fit more of the
-         section but shrank its body text past reading size; 0.78 keeps the
-         type legible and lets the frame scroll for the rest. */
-      liveZoom: 0.78,
-      /* The framed page carries Rilo’s own demo, so there is nothing left
-         to port in beside it. All that is worth offering is the page
-         itself, unframed. */
+         and scaled down to fit it in one view. */
+      liveZoom: 0.62,
+      /* The way out to the real thing at full size, beside the rebuild
+         and the frame. */
       pageUrl: "https://riloai.app",
       pageLabel: "Open riloai.app",
+      /* Opens on the demo, which is the thing worth showing. */
+      defaultMode: "play",
     },
   },
   {
@@ -147,6 +168,8 @@ export const projects: Project[] = [
          rebuild around what you add. This says only the half that holds. */
       "The score comes back broken out by skill rather than as one number, and each skill is a range rather than a point, so the width of the range is how much the session actually showed. Update the role and the brief rebuilds around what you added.",
     ],
+    why:
+      "I’ve always been worse in interviews than I am at the thing I’m being interviewed for, and I never found a reliable way to practise. Reading question lists and answering in my head wasn’t preparation, so I built something that generates real questions for the exact role and makes you say the answers out loud.",
     stack: [
       "React Native",
       "Expo",
@@ -173,6 +196,8 @@ export const projects: Project[] = [
       "Carbon credit projects claim they prevented deforestation that would otherwise have happened. Phantom checks that claim against free public satellite data by comparing the protected land to similar unprotected land nearby. If both cleared at the same rate, the credit is not buying anything.",
       "It outputs a year-by-year clearing view inside the project boundary, the project's auditor and the buyers holding its credits, and a PDF export.",
     ],
+    why:
+      "Carbon credits are sold on a claim that trees would have been cut down and weren’t, and almost nobody checks whether that’s true. The satellite data to check it has been free and public this whole time, which felt like the kind of gap worth closing.",
     stack: ["Public satellite forest-loss datasets", "Base44"],
     links: [
       {
@@ -183,19 +208,30 @@ export const projects: Project[] = [
     demo: {
       liveUrl: "https://ignitionhackv7.onrender.com/",
       liveLabel: "Phantom, running live",
-      /* Phantom routes on #companies and #explorer only: which case is open is
-         internal state, so it cannot be deep linked and the app opens on the
-         Amazon list. Those entries are marked "Illustrative project" in the
-         app itself, so the guide sends people to the Kariba case first, which
-         is the real registered project with buyers on public record. */
+      /* The way out to the app at full size, as on Rilo. Named rather than
+         given as the host, since the deploy URL says nothing. */
+      pageUrl: "https://ignitionhackv7.onrender.com/",
+      pageLabel: "Open Phantom",
+      /* Phantom keeps which case is open in React state. The only routes
+         are #companies and #explorer, the region is a hard-coded useState
+         default of "amazon", and nothing reads a query param, storage or a
+         postMessage, so the Kariba view cannot be deep linked and the frame
+         always lands on the Amazon list. Those entries carry an
+         "Illustrative project" badge in the app itself, so rather than leave
+         a visitor there, the guide walks the real one: switch region, open
+         Kariba, run the verification, then check its number against what
+         Verra found. */
       guide: {
         title: "Walking the Kariba case",
         steps: [
-          "Open Kariba case, top right. The app starts on the Amazon list, and those entries are illustrative rather than real.",
-          "The map is the project boundary. The orange outline is the land the credits are sold against, and red is forest already cleared inside it.",
-          "Scrub 2016 to 19 under the map to watch the clearing happen year by year.",
-          "Run independent verification. Phantom rebuilds the baseline from unprotected forest that looked the same before the project started.",
-          "Read the result against Credits issued: 26.8M. If the comparable land cleared at the same rate, the credits bought nothing.",
+          "Region switch, top right: Zimbabwe. The app opens on the Amazon list, and every project there is marked illustrative.",
+          "Open Kariba REDD+ Project. Real registered project, VCS 902, 758K ha, 26.8M credits issued since 2011.",
+          "Orange is the boundary the credits are sold against, red is forest already cleared inside it.",
+          "Scrub 2016 to 19 under the map to watch that clearing arrive year by year.",
+          "Run independent verification. Phantom matches the parcel to unprotected land that looked the same before 2016, then reads what that land did.",
+          "The headline is how much of the 26.8M the satellite record cannot support.",
+          "Case study, below it, checks that against the real record: Verra’s own review found 15.2M unsupported, and Kariba left the registry in May 2024.",
+          "Kariba case, beside that switch, is the same project from the buyer side.",
         ],
       },
     },
@@ -216,6 +252,8 @@ export const projects: Project[] = [
       "A group makes a box and picks a reveal date. Everyone adds photos to it and nobody sees a single one until the timer hits zero, when the whole box opens at once.",
       "The wait is the whole point. Nobody swaps their pick after seeing what everyone else put in, nobody curates the box down to the best shot in it, and the reveal lands for the whole group at the same moment.",
     ],
+    why:
+      "The best nights end with everyone holding a different piece of them, and those pieces mostly stay on separate phones forever. I wanted a way to put them back together, and for the photos to stay hidden long enough that people are actually present instead of performing for a feed.",
     stack: ["React Native", "Expo", "TypeScript", "Firebase"],
     links: [],
   },

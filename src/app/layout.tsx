@@ -5,6 +5,7 @@ import {
   Bricolage_Grotesque,
   Instrument_Sans,
   JetBrains_Mono,
+  Geist,
 } from "next/font/google";
 import Link from "next/link";
 
@@ -58,6 +59,18 @@ const rediMeta = JetBrains_Mono({
   display: "swap",
   preload: false,
   variable: "--font-meta-src",
+});
+
+/* Rilo's face, for the rebuilt Rilo demo on /projects and nowhere else.
+   riloai.app is set in Geist, and a demo rebuilt down to its spacing and
+   colour would still read as a copy in someone else's type. Not
+   preloaded, for the same reason Redi's three are not. */
+const riloSans = Geist({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800", "900"],
+  display: "swap",
+  preload: false,
+  variable: "--font-geist-src",
 });
 
 export const metadata: Metadata = {
@@ -115,7 +128,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${serif.variable} ${mono.variable} ${rediDisplay.variable} ${rediBody.variable} ${rediMeta.variable}`}
+      className={`${serif.variable} ${mono.variable} ${rediDisplay.variable} ${rediBody.variable} ${rediMeta.variable} ${riloSans.variable}`}
     >
       <body>
         <a href="#main" className="skip-link">

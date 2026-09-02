@@ -114,6 +114,7 @@ export function ProjectsBrowser() {
           </figure>
         ) : project.demo ? (
           <ProjectDemo
+            playable={project.demo.playable}
             liveUrl={project.demo.liveUrl}
             liveLabel={project.demo.liveLabel}
             liveZoom={project.demo.liveZoom}
@@ -170,6 +171,16 @@ export function ProjectsBrowser() {
               </li>
             ))}
           </ul>
+        ) : null}
+
+        {/* Last in the panel by design. Anyone who came for the work has
+            already had it above; this is here for whoever wants the reason
+            behind it. */}
+        {project.why ? (
+          <section className="browser-why">
+            <h3 className="browser-why-label">Why I built it</h3>
+            <p className="browser-why-text">{project.why}</p>
+          </section>
         ) : null}
       </div>
     </div>
