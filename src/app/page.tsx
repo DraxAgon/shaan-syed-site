@@ -69,6 +69,8 @@ export default function HomePage() {
           {projects.map((project) => (
             <DisclosureRow
               key={project.name}
+              logo={project.logo}
+              logoPlate={false}
               title={project.name}
               aside={project.descriptor}
               meta={project.status}

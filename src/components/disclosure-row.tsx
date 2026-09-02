@@ -10,6 +10,7 @@ import { OrgLogo } from "./logo";
    works without measuring anything. */
 export function DisclosureRow({
   logo,
+  logoPlate = true,
   title,
   aside,
   meta,
@@ -17,6 +18,7 @@ export function DisclosureRow({
   defaultOpen = false,
 }: {
   logo?: string | null;
+  logoPlate?: boolean;
   title: string;
   aside?: string;
   meta?: string;
@@ -37,7 +39,7 @@ export function DisclosureRow({
       >
         {logo !== undefined ? (
           <span className="disclosure-mark">
-            <OrgLogo src={logo} name={title} size={20} />
+            <OrgLogo src={logo} name={title} size={20} plate={logoPlate} />
           </span>
         ) : null}
 

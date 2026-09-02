@@ -58,6 +58,14 @@ export function ProjectsBrowser() {
               <span className="browser-num">
                 {String(i + 1).padStart(2, "0")}
               </span>
+              <Image
+                src={p.logo}
+                alt=""
+                width={256}
+                height={256}
+                className="browser-logo"
+                style={{ width: 18, height: 18 }}
+              />
               <span className="browser-name">{p.name}</span>
             </button>
           </li>

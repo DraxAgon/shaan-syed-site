@@ -301,6 +301,11 @@
     background: #efe9e0;
     padding: 2px;
   }
+  /* A mark that ships its own ground and its own corner radius. It gets
+     neither the plate nor the padding, so it reads as the tile it is
+     rather than as a picture of one sitting on a paler square. */
+  .org-logo.is-bare { background: none; padding: 0; border-radius: 5px; }
+
   .org-monogram {
     display: grid; place-items: center;
     font-family: var(--font-mono); font-size: 0.5625rem; font-weight: 500;
@@ -493,8 +498,15 @@
   }
   .bio-caption-index { color: var(--color-brass); font-variant-numeric: tabular-nums; }
 
-  .bio-prose { display: grid; gap: 15px; max-width: 70ch; }
-  .bio-prose p { font-size: 1rem; line-height: 1.68; text-wrap: pretty; }
+  /* Set a step above body copy: at 1rem the column ran out about 200px
+     short of the last frame in the rail, leaving the photos hanging on
+     their own. The measure is held near the old one so only the type
+     grows, not the column. */
+  .bio-prose { display: grid; gap: 16px; max-width: 68ch; }
+  .bio-prose p {
+    font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.125rem);
+    line-height: 1.7; text-wrap: pretty;
+  }
 
   .edu-list { display: grid; gap: 12px; }
   .edu-row {
@@ -546,6 +558,16 @@
   }
   .browser-item.is-active .browser-num { color: var(--color-brass); }
   .browser-name { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.008em; }
+  /* The row is baseline aligned so the number and the name sit on one
+     line, which would hang a square mark too low. It centres against
+     the name instead. */
+  .browser-logo {
+    align-self: center; border-radius: 4px; object-fit: contain;
+    display: block; flex: none;
+    opacity: 0.82; transition: opacity 160ms ease;
+  }
+  .browser-item:hover .browser-logo,
+  .browser-item.is-active .browser-logo { opacity: 1; }
 
   .browser-detail {
     min-width: 0; display: grid; gap: 12px; justify-items: start;
