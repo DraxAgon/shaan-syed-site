@@ -3,9 +3,7 @@
 import Image from "next/image";
 import { useRef, useState, type CSSProperties } from "react";
 
-import { RiloDemo } from "./rilo-demo";
-
-type Mode = "play" | "live" | "scroll";
+type Mode = "live" | "scroll";
 
 export type Hotspot = {
   label: string;
@@ -22,7 +20,6 @@ export type Hotspot = {
 
 /* One panel, several ways to look at a project.
 
-   play    the product's real flow, ported and running here
    live    the real app in an iframe, for apps that allow framing
    scroll  a full-page capture with the page's own buttons on top,
            for sites that refuse to be framed
@@ -32,7 +29,8 @@ export type Hotspot = {
    visitor could be clicking is the worse version of it.
 
    Which modes exist depends on the project, and the switcher only
-   shows the ones it has. */
+   shows the ones it has. Beside them, pageUrl is the way out to the real
+   page at full size, for a visitor who wants it in its own tab. */
 export function ProjectDemo({
   liveUrl,
   liveLabel,
@@ -43,7 +41,8 @@ export function ProjectDemo({
   scrollImageHeight,
   scrollLabel,
   hotspots,
-  playable,
+  pageUrl,
+  pageLabel,
   defaultMode,
 }: {
   liveUrl?: string;
@@ -55,14 +54,13 @@ export function ProjectDemo({
   scrollImageHeight?: number;
   scrollLabel?: string;
   hotspots?: Hotspot[];
-  playable?: { component: "rilo"; label: string };
+  pageUrl?: string;
+  pageLabel?: string;
   defaultMode?: Mode;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
 
   const modes: { id: Mode; tab: string; caption: string }[] = [];
-  if (playable)
-    modes.push({ id: "play", tab: "Try it", caption: playable.label });
   if (liveUrl)
     modes.push({
       id: "live",
@@ -90,13 +88,10 @@ export function ProjectDemo({
           className={
             "demo-stage" +
             (mode === "scroll" ? " is-scroll" : "") +
-            (mode === "live" ? " is-live" : "") +
-            (mode === "play" ? " is-play" : "")
+            (mode === "live" ? " is-live" : "")
           }
         >
-          {mode === "play" && playable ? (
-            <RiloDemo />
-          ) : mode === "live" && liveUrl ? (
+          {mode === "live" && liveUrl ? (
             <>
               {!frameLoaded ? (
                 <p className="demo-waking">
@@ -217,26 +212,42 @@ export function ProjectDemo({
           {current?.caption}
         </span>
 
-        {modes.length > 1 ? (
+        {modes.length > 1 || pageUrl ? (
           <span
             className="demo-modes"
             role="group"
             aria-label="How to view this project"
           >
-            {modes.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                className={`demo-mode${m.id === mode ? " is-on" : ""}`}
-                aria-pressed={m.id === mode}
-                onClick={() => {
-                  setMode(m.id);
-                  setFrameLoaded(false);
-                }}
+            {modes.length > 1
+              ? modes.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    className={`demo-mode${m.id === mode ? " is-on" : ""}`}
+                    aria-pressed={m.id === mode}
+                    onClick={() => {
+                      setMode(m.id);
+                      setFrameLoaded(false);
+                    }}
+                  >
+                    {m.tab}
+                  </button>
+                ))
+              : null}
+
+            {/* The panel already is the real page, so this is not another
+                view of it: it is the way out to the page itself. */}
+            {pageUrl ? (
+              <a
+                className="demo-mode demo-open"
+                href={pageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {m.tab}
-              </button>
-            ))}
+                {pageLabel ?? "View the page"}
+                <span aria-hidden="true"> ↗</span>
+              </a>
+            ) : null}
           </span>
         ) : null}
       </figcaption>

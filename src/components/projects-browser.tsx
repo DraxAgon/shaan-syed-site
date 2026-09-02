@@ -115,7 +115,8 @@ export function ProjectsBrowser() {
             scrollImageHeight={project.demo.scrollImageHeight}
             scrollLabel={project.demo.scrollLabel}
             hotspots={project.demo.hotspots}
-            playable={project.demo.playable}
+            pageUrl={project.demo.pageUrl}
+            pageLabel={project.demo.pageLabel}
             defaultMode={project.demo.defaultMode}
           />
         ) : project.image ? (
