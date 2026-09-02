@@ -72,10 +72,13 @@ export function ProjectDemo({
       tab: "The demo",
       caption: playable.label,
     });
+  /* The tab names what the panel is showing, so a framed app is "the
+     demo" when it is the only thing in there, and only takes a name of
+     its own beside a rebuilt one. */
   if (liveUrl)
     modes.push({
       id: "live",
-      tab: "Live app",
+      tab: playable ? "The live app" : "The demo",
       caption: liveLabel ?? "Live app",
     });
   if (scrollImage)
@@ -226,7 +229,7 @@ export function ProjectDemo({
           {current?.caption}
         </span>
 
-        {modes.length > 1 || pageUrl ? (
+        {modes.length > 0 || pageUrl ? (
           <span
             className="demo-modes"
             role="group"
@@ -247,7 +250,12 @@ export function ProjectDemo({
                     {m.tab}
                   </button>
                 ))
-              : null}
+              : current ? (
+                  /* With one view there is nothing to switch to, so the
+                     chip names the panel rather than pretending to be a
+                     control. Every project reads the same either way. */
+                  <span className="demo-mode is-on">{current.tab}</span>
+                ) : null}
 
             {/* The panel already is the real page, so this is not another
                 view of it: it is the way out to the page itself. */}

@@ -110,6 +110,13 @@ export function ProjectsBrowser() {
                 <span className="demo-dot is-mock" aria-hidden="true" />
                 {project.mockup.label}
               </span>
+
+              {/* Same shape as every other panel: what the thing is on the
+                  left, what you are looking at on the right. Redi has no
+                  page to open beside it, so the chip stands alone. */}
+              <span className="demo-modes">
+                <span className="demo-mode is-on">The demo</span>
+              </span>
             </figcaption>
           </figure>
         ) : project.demo ? (

@@ -1562,6 +1562,10 @@
     background: color-mix(in srgb, var(--color-brass) 12%, transparent);
   }
 
+  /* A panel with one view still names it, but the chip that does is a
+     label rather than a control, so it drops the pointer the tabs carry. */
+  span.demo-mode { cursor: default; }
+
   /* A link, not a view of the panel, so it stays quiet next to the tabs
      and never takes the selected state. */
   .demo-open { text-decoration: none; }

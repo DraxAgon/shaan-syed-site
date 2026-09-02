@@ -131,27 +131,10 @@ export const projects: Project[] = [
         component: "rilo",
         label: "Rilo's own demo, running here",
       },
-      /* riloai.app now allows this origin to frame its marketing page,
-         so the whole real front page runs here too: hero, the interactive
-         demo, pricing, FAQ, contact. Must be the www host, since the
-         apex 301s to it and a redirect would break the frame.
-
-         The flat capture in public/media/rilo-page.webp and its
-         hotspots are kept as a fallback if framing is ever withdrawn;
-         re-add scrollImage here to switch back. */
-      /* The fragment lands the frame on the page's own demo section rather
-         than the hero, so the tab opens on the thing worth showing. */
-      liveUrl: "https://www.riloai.app/#demo",
-      liveLabel: "riloai.app itself, running here",
-      /* The demo section is taller than the panel, so the frame is drawn wider
-         and scaled down to fit it in one view. */
-      liveZoom: 0.62,
-      /* The way out to the real thing at full size, beside the rebuild
-         and the frame. */
+      /* The way out to the real thing at full size, beside the demo
+         running here. */
       pageUrl: "https://riloai.app",
       pageLabel: "Open riloai.app",
-      /* Opens on the demo, which is the thing worth showing. */
-      defaultMode: "play",
     },
   },
   {
@@ -218,20 +201,20 @@ export const projects: Project[] = [
          postMessage, so the Kariba view cannot be deep linked and the frame
          always lands on the Amazon list. Those entries carry an
          "Illustrative project" badge in the app itself, so rather than leave
-         a visitor there, the guide walks the real one: switch region, open
-         Kariba, run the verification, then check its number against what
-         Verra found. */
+         a visitor there, the guide walks the real one in plain language:
+         switch region, open Kariba, run the verification, then check what
+         it says against what actually happened to the project. */
       guide: {
         title: "Walking the Kariba case",
         steps: [
-          "Region switch, top right: Zimbabwe. The app opens on the Amazon list, and every project there is marked illustrative.",
-          "Open Kariba REDD+ Project. Real registered project, VCS 902, 758K ha, 26.8M credits issued since 2011.",
-          "Orange is the boundary the credits are sold against, red is forest already cleared inside it.",
-          "Scrub 2016 to 19 under the map to watch that clearing arrive year by year.",
-          "Run independent verification. Phantom matches the parcel to unprotected land that looked the same before 2016, then reads what that land did.",
-          "The headline is how much of the 26.8M the satellite record cannot support.",
-          "Case study, below it, checks that against the real record: Verra’s own review found 15.2M unsupported, and Kariba left the registry in May 2024.",
-          "Kariba case, beside that switch, is the same project from the buyer side.",
+          "Region switch, top right: pick Zimbabwe. The Amazon projects the app opens on are made up examples.",
+          "Open Kariba REDD+ Project. This one is real. It sold carbon credits for years on the promise that it was keeping that forest standing.",
+          "On the map, orange is the land the credits cover. Red is forest inside it that has already been cut down.",
+          "Drag the year slider under the map to watch the red spread, year by year.",
+          "Press Run independent verification. Phantom finds unprotected land nearby that looked the same before the project started, then checks whether that land was cleared any faster.",
+          "If both cleared at the same rate, the trees were coming down anyway and the credits paid for nothing. The headline is how much of what Kariba sold the satellite record cannot back up.",
+          "Case study, underneath, checks that against the real record: the registry that certified Kariba found much of it unsupported, and the project left the registry in 2024.",
+          "Kariba case, the switch beside it, is the same project from the buyer side.",
         ],
       },
     },

@@ -100,17 +100,19 @@ await ev(`document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape'}))`);
 await sleep(400);
 ck("Escape closes it", await ev(`!document.querySelector('.nav-menu').classList.contains('is-open')`));
 
-console.log("Rilo, the rebuilt demo and the live page");
+console.log("Rilo, the rebuilt demo");
 await go("/projects?p=Rilo");
 
-const mode = (tab) =>
-  `[...document.querySelectorAll('.demo-mode')].find(b => b.textContent.trim() === ${JSON.stringify(tab)})`;
-
-ck("three ways in are offered, and none is a recording",
-  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 3 &&
-    !(await ev(`[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent).join('|')`))
-      .toLowerCase().includes("recording"),
-  await ev(`[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent).join('|')`));
+/* One view now: Rilo's own demo, rebuilt in place. The chip names it and
+   the link beside it is the way out to the real page, which is the same
+   shape every other project's panel takes. */
+const chips = await ev(
+  `[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent.trim()).join('|')`);
+ck("the panel names the demo and offers the way out, and neither is a recording",
+  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 2 &&
+    chips.includes("The demo") && chips.includes("Open riloai.app") &&
+    !chips.toLowerCase().includes("recording"),
+  chips);
 ck("no video element is left anywhere on the page",
   (await ev(`document.querySelectorAll('video').length`)) === 0);
 
@@ -169,42 +171,10 @@ ck("the draft is the one riloai.app writes",
   (await ev(`document.querySelector('.demo-preview-body')?.textContent`))
     ?.startsWith("Priya! Congratulations"));
 
-/* The real page is still there, one tab over. */
-await ev(`${mode("Live app")}.click()`);
-await sleep(700);
-ck("the live page is one tab away", await ev(`!!document.querySelector('.demo-frame')`));
-ck("the frame targets the canonical host",
-  (await ev(`document.querySelector('.demo-frame')?.src`))?.includes("www.riloai.app"));
-ck("the frame opens on the demo section, not the hero",
-  (await ev(`document.querySelector('.demo-frame')?.getAttribute('src')`))?.endsWith("#demo"));
-/* The page is drawn wider than the panel and scaled back down, so more of
-   the demo fits without a scroll. Both halves have to hold: the layout box
-   bigger than the stage, and the painted box matching it. */
-ck("the frame is zoomed out to fit the panel", await ev(`(() => {
-  const fit = document.querySelector('.demo-frame-fit.is-zoomed');
-  const stage = document.querySelector('.demo-stage');
-  if (!fit || !stage) return false;
-  const z = parseFloat(getComputedStyle(fit).getPropertyValue('--frame-zoom'));
-  const laidOut = fit.offsetWidth;
-  const painted = fit.getBoundingClientRect().width;
-  const stageW = stage.getBoundingClientRect().width;
-  return z > 0 && z < 1 && laidOut > stageW * 1.2 && Math.abs(painted - stageW) < 6;
-})()`));
-
-/* riloai.app allows framing from the deployed origins only, so the frame
-   genuinely loading can be asserted there and not against localhost.
-   A blocked frame still fires onload and still leaves an element in the
-   DOM, so the assertion has to be the served document itself. */
-if (BASE.startsWith("https://")) {
-  await sleep(6000);
-  const framed = documents.filter((d) => d.url.includes("riloai.app"));
-  const refused = docFailures.includes("net::ERR_BLOCKED_BY_RESPONSE");
-  ck("the real page loads inside the frame",
-    framed.some((d) => d.status === 200) && !refused,
-    JSON.stringify({ framed, docFailures }));
-} else {
-  console.log("  SKIP  frame load (localhost is not on riloai.app's allowlist)");
-}
+/* The framed copy of the page is gone: the panel is the rebuilt demo, and
+   the real page is a link out rather than a second view of it. */
+ck("no framed copy of the page is left in the panel",
+  (await ev(`document.querySelectorAll('.demo-frame').length`)) === 0);
 
 
 console.log("Redi AI, the walkthrough");
@@ -213,6 +183,8 @@ ck("the walkthrough renders", await ev(`!!document.querySelector('.rw')`));
 ck("it says the screens are rebuilt, not recorded",
   (await ev(`document.querySelector('.demo-caption-text')?.textContent`))?.toLowerCase().includes("rebuilt"));
 ck("it opens on Home", await ev(`document.querySelector('.rp-app')?.dataset.screen`) === "home");
+ck("the panel names itself the way the others do",
+  (await ev(`document.querySelector('.demo-mode')?.textContent`)) === "The demo");
 
 /* Typing a role has to carry through the whole walkthrough, because that is
    the one thing the panel claims: these are your questions, not a fixed set. */
@@ -274,7 +246,7 @@ ck("the guide opens the real registered project",
 ck("the guide runs the verification",
   steps?.includes("Run independent verification"));
 ck("the guide checks the result against the public record",
-  steps?.includes("Verra"));
+  steps?.includes("left the registry in 2024"));
 ck("the guide has every step",
   (await ev(`document.querySelectorAll('.demo-guide-steps li').length`)) === 8);
 ck("award wording is exact",
@@ -282,12 +254,24 @@ ck("award wording is exact",
     "3rd Place, Best Use of Base44, Ignition Hacks 2026");
 ck("the Render link is present",
   await ev(`[...document.querySelectorAll('.browser-links a')].some(x=>x.href.includes('onrender.com'))`));
-/* One view mode now, so there is no switcher to click. The one chip in
-   the caption is not another view of the app, it is the way out to it. */
+/* One view, so its chip is a label rather than a tab, and the link beside
+   it is not another view of the app: it is the way out to it. */
 ck("the live app embeds", await ev(`!!document.querySelector('.demo-frame')`));
-ck("a single mode offers no switcher, only the way out",
-  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 1 &&
-    (await ev(`document.querySelector('.demo-mode')?.textContent`))?.includes("Open Phantom"));
+const phantomChips = await ev(
+  `[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent.trim()).join('|')`);
+ck("the panel names the demo and offers the way out, as Rilo's does",
+  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 2 &&
+    phantomChips.includes("The demo") && phantomChips.includes("Open Phantom"),
+  phantomChips);
+
+/* Phantom is the only framed app left. A refused frame still fires onload
+   and still leaves an element in the DOM, so the network is what tells the
+   two apart. A cold Render instance can answer slowly, so this asserts it
+   was not refused rather than timing how fast it arrives. */
+await sleep(3000);
+ck("nothing refuses to be framed",
+  !docFailures.includes("net::ERR_BLOCKED_BY_RESPONSE"),
+  JSON.stringify({ documents, docFailures }));
 
 console.log("Stage and tags");
 await go("/projects?p=Rilo");
