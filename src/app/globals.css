@@ -231,7 +231,6 @@
     background-color: var(--color-lift);
     border: 1px solid var(--color-hairline);
   }
-  .portrait-square { aspect-ratio: 1 / 1; width: 128px; }
 
   @media (min-width: 900px) { .portrait { width: 208px; } }
 
@@ -439,8 +438,62 @@
   }
 
   /* ---------------- bio ---------------- */
-  .bio-head { display: flex; align-items: center; gap: 20px; }
-  .bio-prose { display: grid; gap: 15px; margin-top: 26px; max-width: 62ch; }
+  /* Two sides: a rail of photos on the left, the writing on the right.
+     Narrow screens get the rail as a 2x2 scatter above the prose. */
+  .bio-split { display: grid; grid-template-columns: 1fr; gap: 34px; margin-top: 26px; }
+  @media (min-width: 900px) {
+    .bio-split {
+      grid-template-columns: minmax(210px, 280px) minmax(0, 1fr);
+      gap: 56px; align-items: start;
+    }
+  }
+
+  .bio-rail {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 26px 18px; padding: 4px 8px;
+  }
+  @media (min-width: 900px) {
+    .bio-rail { grid-template-columns: minmax(0, 1fr); gap: 38px; padding: 6px 10px 0; }
+  }
+
+  /* Every frame hangs at its own angle, and hovering or tabbing to one
+     pulls it straight. The angles cycle every four frames so the rail
+     keeps working if a photo is added or dropped. */
+  .bio-frame {
+    --tilt: 0deg;
+    transform: rotate(var(--tilt));
+    transition: transform 320ms cubic-bezier(.2,.7,.2,1);
+  }
+  .bio-frame:nth-child(4n+1) { --tilt: -2.6deg; }
+  .bio-frame:nth-child(4n+2) { --tilt: 1.9deg; }
+  .bio-frame:nth-child(4n+3) { --tilt: -1.3deg; }
+  .bio-frame:nth-child(4n)   { --tilt: 2.8deg; }
+  .bio-frame:hover, .bio-frame:focus-within { transform: rotate(0deg); }
+
+  /* Alternating widths keep the rail's edge ragged against the straight
+     edge of the prose next to it. */
+  @media (min-width: 900px) {
+    .bio-frame:nth-child(odd) { width: 94%; justify-self: start; }
+    .bio-frame:nth-child(even) { width: 86%; justify-self: end; }
+  }
+
+  .bio-photo {
+    display: block; width: 100%; height: auto;
+    object-fit: cover; border-radius: 10px;
+    background-color: var(--color-lift);
+    border: 1px solid var(--color-hairline);
+    box-shadow: 0 20px 38px -26px #000;
+  }
+
+  .bio-caption {
+    display: flex; align-items: baseline; gap: 8px;
+    margin-top: 9px;
+    font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.4;
+    color: var(--color-ink-muted);
+  }
+  .bio-caption-index { color: var(--color-brass); font-variant-numeric: tabular-nums; }
+
+  .bio-prose { display: grid; gap: 15px; max-width: 70ch; }
   .bio-prose p { font-size: 1rem; line-height: 1.68; text-wrap: pretty; }
 
   .edu-list { display: grid; gap: 12px; }
@@ -504,15 +557,33 @@
   }
 
   /* ---------------- recorded demo and live embed ---------------- */
-  .demo { width: 100%; margin: 0; display: grid; gap: 9px; }
+  /* Sized off the panel it sits in rather than the window: the projects
+     browser goes two column well before the viewport is wide, so a
+     viewport breakpoint would put a guide beside a frame too narrow for
+     both. Same reasoning as the Redi panel's own container below. */
+  .demo {
+    width: 100%; margin: 0; display: grid; gap: 9px;
+    container: demo / inline-size;
+  }
+
+  .demo-body { display: grid; gap: 9px; }
+
+  /* A guide sits beside the frame once there is room for both, and above
+     it when there is not. 15rem is the narrowest the numbered steps read
+     at without every one of them wrapping to three lines. */
+  @container demo (min-width: 720px) {
+    .demo-body.has-guide {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+      align-items: stretch;
+      gap: 14px;
+    }
+  }
 
   .demo-stage {
     position: relative;
     width: 100%;
-    /* The recordings are 16:10, so the video stage keeps that and is
-       never cropped. The panels you actually read or click get real
-       height instead, because a short window makes a long page
-       tedious to scroll. */
+    /* The panels you actually read or click get real height, because a
+       short window makes a long page tedious to scroll. */
     aspect-ratio: 16 / 10;
     border-radius: 10px;
     border: 1px solid var(--color-hairline);
@@ -520,7 +591,6 @@
     overflow: hidden;
   }
 
-  .demo-video,
   .demo-frame {
     display: block;
     width: 100%; height: 100%;
@@ -528,7 +598,44 @@
     background: var(--color-lift);
   }
 
-  .demo-video { object-fit: cover; }
+  /* The framed page is drawn 1/zoom larger and scaled back down, so the
+     app still lays itself out at its own desktop width and the whole
+     section fits the panel in one view rather than needing a scroll. */
+  .demo-frame-fit { width: 100%; height: 100%; }
+  .demo-frame-fit.is-zoomed {
+    width: calc(100% / var(--frame-zoom));
+    height: calc(100% / var(--frame-zoom));
+    transform: scale(var(--frame-zoom));
+    transform-origin: 0 0;
+  }
+
+  .demo-guide {
+    display: grid; align-content: start; gap: 8px;
+    padding: 14px 15px;
+    border-radius: 10px;
+    border: 1px solid var(--color-hairline);
+    background: var(--color-lift);
+  }
+
+  .demo-guide-title {
+    margin: 0;
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-ink-muted);
+  }
+
+  .demo-guide-steps {
+    margin: 0; padding-left: 1.15rem;
+    display: grid; gap: 7px;
+    font-size: 0.8125rem; line-height: 1.5;
+    color: var(--color-ink-muted);
+  }
+
+  .demo-guide-steps li { padding-left: 2px; }
+  .demo-guide-steps li::marker {
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    color: var(--color-brass);
+  }
 
   /* Scrollable full-page capture, for sites that refuse to be framed. */
   .demo-scroll {
@@ -617,6 +724,37 @@
     font-family: var(--font-mono); font-size: 0.8125rem; color: var(--color-ink-muted);
   }
   .browser-award { color: var(--color-brass); }
+
+  .browser-tags {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+
+  .browser-stage,
+  .browser-tag {
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--color-hairline);
+    color: var(--color-ink-muted);
+  }
+
+  /* Only a thing that is actually out gets the brass. Everything else is
+     the same quiet chip, so the page cannot read as though four projects
+     had all shipped. */
+  .browser-stage[data-stage="Published"] {
+    color: var(--color-brass);
+    border-color: color-mix(in srgb, var(--color-brass) 40%, transparent);
+  }
+
+  /* The other end of the same idea: a dashed edge on the earliest stage, so
+     an unfinished thing is legible as unfinished before the words are read.
+     Dashed rather than a second colour, because a colour would compete with
+     the brass and turn the row into a key the visitor has to learn. */
+  .browser-stage[data-stage="Early development"] {
+    border-style: dashed;
+  }
   .browser-prose { font-size: 1.0625rem; line-height: 1.7; max-width: 62ch; text-wrap: pretty; }
   .browser-links { display: flex; flex-wrap: wrap; gap: 16px; }
   .browser-link {
@@ -702,6 +840,9 @@
     /* Bone, warm off-white so it does not glare at 1am. */
     --bone: #f4f1ea;
     --bone-dim: #9c9891;
+    /* 3.29:1 on ink000, under the 4.5:1 floor, so it is kept for atmosphere
+       only: the elapsed clock, the pills, the lifeline and the band words.
+       Anything carrying meaning takes --bone-dim at 6.85:1 instead. */
     --bone-faint: #66635e;
     /* Gold is the light, never decoration. One gold object per screen. */
     --gold: #e9b33b;
@@ -783,6 +924,9 @@
   .rp-signal { display: block; opacity: 0.9; }
 
   .rp-app { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  /* Focused programmatically when the screen changes, never by tabbing, so
+     :focus-visible never matches here and no keyboard affordance is lost. */
+  .rp-app:focus { outline: none; }
 
   /* ---- app furniture ---- */
 
@@ -838,7 +982,11 @@
     box-shadow: 0 0 24px rgba(233, 179, 59, 0.28);
     transition: background-color 140ms ease;
   }
-  .ra-primary:hover { background: #f2c25c; }
+  .ra-primary:hover:not(:disabled) { background: #f2c25c; }
+  .ra-primary:disabled {
+    background: var(--ink300); color: var(--bone-dim);
+    box-shadow: none; cursor: not-allowed;
+  }
 
   .ra-secondary {
     display: grid; place-items: center;
@@ -872,7 +1020,7 @@
   .ra-reason {
     margin-top: 8px; text-align: center;
     font-family: var(--body); font-size: 13px; line-height: 16px;
-    color: var(--bone-faint);
+    color: var(--bone-dim);
   }
 
   .ra-sect {
@@ -1041,7 +1189,7 @@
   }
   .ra-fact-guess {
     font-family: var(--body); font-size: 11px; font-weight: 400;
-    color: var(--bone-faint);
+    color: var(--bone-dim);
   }
   .ra-fact-value {
     display: inline-flex; align-items: center; gap: 6px;
@@ -1076,7 +1224,7 @@
   .ra-seg.is-now { opacity: 1; box-shadow: 0 0 8px rgba(233, 179, 59, 0.7); }
 
   .ra-run-chrome {
-    display: flex; align-items: center; justify-content: space-between;
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
     flex: none;
     min-height: 44px; padding-top: 8px;
   }
@@ -1086,7 +1234,7 @@
   }
   .ra-pause span { width: 4px; height: 14px; border-radius: 1px; background: var(--gold); }
   .ra-elapsed {
-    width: 44px; text-align: right;
+    justify-self: end; white-space: nowrap;
     font-family: var(--meta); font-size: 11px; letter-spacing: 1.2px;
     color: var(--bone-faint);
   }
@@ -1128,7 +1276,7 @@
     font-family: var(--meta); font-size: 11px; letter-spacing: 1.2px;
     color: var(--bone-dim);
   }
-  .ra-answer-timer-empty { color: transparent; }
+
 
   .ra-mic {
     display: grid; place-items: center;
@@ -1281,7 +1429,7 @@
     width: 100%; padding: 5px 0;
     border: 0; background: none; cursor: pointer;
     font-family: var(--font-mono); font-size: 0.8125rem;
-    color: var(--bone-faint); text-align: left;
+    color: var(--bone-dim); text-align: left;
     transition: color 150ms ease;
   }
   .rw-stop:hover { color: var(--bone-dim); }
@@ -1304,7 +1452,7 @@
     margin: 14px 0 0; padding-left: 14px;
     border-left: 2px solid var(--ink400);
     font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.6;
-    color: var(--bone-faint);
+    color: var(--bone-dim);
     animation: fade 300ms ease both;
   }
   .rw-said-label {
@@ -1329,7 +1477,7 @@
 
   .rw-note {
     font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.5;
-    color: var(--bone-faint);
+    color: var(--bone-dim);
   }
 
   @media (prefers-reduced-motion: reduce) {

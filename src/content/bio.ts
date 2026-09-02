@@ -3,11 +3,54 @@
    The site is not a resume, so the personal paragraphs carry as much
    weight here as the software ones. */
 export const bioParagraphs: string[] = [
-  "I start a double degree in the fall, Computer Science at Waterloo and Business at Lazaridis. My first co-op term starts at the same time.",
-  "Piano came before any of it and has lasted the longest, more than seven years now. Most of a practice hour goes to the same handful of bars, played again until they stop falling apart. It is the one thing I do that nobody is waiting on.",
-  "Running is the other constant. I ran cross country at Northern and qualified for OFSAA, and the long distance mileage kept going outside of the season. A good race comes down to staying uncomfortable a little longer than you planned to, and that has carried into more of my life than I expected it to.",
-  "Lifeguarding for the City of Toronto puts a good part of my week at a pool, and I swim on my own time as well. The rest of it goes to recreational soccer with North Toronto Soccer and to cooking, which began as a way to stop eating the same three meals.",
-  "Software came later. Rilo is the first thing I took end to end on my own, an AI reply assistant for Gmail that has been live on the Chrome Web Store since July. Writing it was the short part. The store review, Stripe set up as a Canadian sole proprietorship, a privacy policy, refund terms, and a hosting migration a few days before launch were the rest of it. In August I built Phantom with a team at Ignition Hacks, which tests whether a carbon credit project prevented the deforestation it claims by comparing the protected land against similar unprotected land nearby, and it took 3rd Place, Best Use of Base44.",
-  "Frontend, backend, design, and the business side have each been my job at some point, and most of what I know there is self-taught. I would rather put something in front of people early than sit on it until it is perfect.",
-  "In high school I started a Target Alpha chapter from nothing and it grew into the second largest in Canada. I tutored math for four years alongside that, mostly in groups, roughly 100 students.",
+  "I'm in first year of the Computer Science and Business Administration double degree at Waterloo and Laurier.",
+  "My mom made me start piano when I was eleven. I liked it right up until it got hard, and then I spent a couple of years dreading it. When my first teacher quit, my mom told me I could stop too, and I didn't want to. The teacher I got after him is most of the reason why. He never just fixed a section for me. He'd get me to see why it wasn't working and then I'd fix it myself, and it would stay fixed. Seven years later, most of a practice hour still goes to the same few bars, played again until they stop falling apart, and that's the part I actually like now. Piano is where I figured out that if you don't like the process you don't get to the reward, which sounds obvious and took me years to really believe.",
+  "Being taught that way is how I ended up loving teaching. I spent four years on the peer tutoring team at my high school, mostly group sessions plus about ten students one on one, close to a hundred people in total. The goal was never getting someone through that night's homework, it was that they could do the next one without me. Explaining something to a person who isn't getting it is also the fastest way to find the holes in what you thought you understood, which is a big part of why I keep doing it. I also pushed for an afterschool study hall so people could get help without booking a tutor ahead of time or getting assigned one, because the booking was what stopped most of them from coming at all.",
+  "I got called unathletic enough as a kid that it's most of why I started running. I ran cross country in high school, made it to provincials, and kept running once the season ended. After a while it stopped being about proving anything. I want to run the Toronto Marathon at some point.",
+  "Coding is the other thing I keep coming back to. I started with Python, moved to Swift for a bit, then ended up back in Python. Most of it I taught myself, which really just means building something badly and then working out why it broke. I swim, and I cook, which started as a way to stop eating the same three meals.",
+  "The projects on this site are what I've built. I'd rather show someone a rough version early and find out what's wrong with it than keep working on it alone.",
+];
+
+/* The photo rail that runs down the left of /bio, in page order.
+   Every slot ships as an on-brand placeholder at the size listed here,
+   so dropping in a real photo of the same name is the only step. The
+   sizes differ on purpose: the rail is deliberately ragged, and frames
+   of one shape would flatten it back into a column of boxes. */
+export type BioPhoto = {
+  src: string;
+  alt: string;
+  caption: string;
+  width: number;
+  height: number;
+};
+
+export const bioPhotos: BioPhoto[] = [
+  {
+    src: "/images/portrait-bio.webp",
+    alt: "Shaan Syed",
+    caption: "Portrait",
+    width: 1000,
+    height: 1000,
+  },
+  {
+    src: "/images/bio-piano.webp",
+    alt: "Shaan at the piano",
+    caption: "Seven years at the piano",
+    width: 1000,
+    height: 1250,
+  },
+  {
+    src: "/images/bio-running.webp",
+    alt: "Shaan running a cross country race",
+    caption: "Cross country, to provincials",
+    width: 1200,
+    height: 900,
+  },
+  {
+    src: "/images/bio-kitchen.webp",
+    alt: "Shaan cooking",
+    caption: "In the kitchen",
+    width: 1000,
+    height: 1000,
+  },
 ];

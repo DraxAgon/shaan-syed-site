@@ -19,9 +19,8 @@ export const doubleDegree = {
       logo: "/images/logo-waterloo.webp",
     },
     {
-      institution:
-        "Lazaridis School of Business & Economics, Wilfrid Laurier University",
-      credential: "Business Administration",
+      institution: "Wilfrid Laurier University",
+      credential: "Business Administration (BBA)",
       dates: "August 2026 to April 2031",
       logo: "/images/logo-laurier.webp",
     },

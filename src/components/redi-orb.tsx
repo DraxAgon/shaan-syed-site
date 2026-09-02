@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useMemo, useRef } from "react";
 
 /* Redi's face, drawn from the app's own numbers.
 
@@ -114,7 +114,8 @@ function mouthPath(openness: number, curve: number, g: Geometry) {
   const c = clamp(curve, 0, 1);
 
   const halfWidth = g.mouthWidth / 2;
-  const thickness = g.mouthMinThickness + (g.mouthMaxThickness - g.mouthMinThickness) * o;
+  const thickness =
+    g.mouthMinThickness + (g.mouthMaxThickness - g.mouthMinThickness) * o;
   const bow = g.mouthWidth * MOUTH.curveDepthRatio * c;
 
   const leftX = r2(g.cx - halfWidth);
@@ -146,7 +147,11 @@ export function RediOrb({
   amplitude?: number;
   className?: string;
 }) {
-  const g = geometry(size);
+  /* The session screens re-render at frame rate, and an unmemoised geometry
+     object re-ran the animation effect every one of those frames: the blink
+     timer and the breath clock were reset before either could reach its
+     first tick, so Redi held still on the three screens where he acts. */
+  const g = useMemo(() => geometry(size), [size]);
 
   const mouth = useRef<SVGPathElement>(null);
   const leftEye = useRef<SVGEllipseElement>(null);
@@ -182,7 +187,8 @@ export function RediOrb({
 
     let frame = 0;
     const start = performance.now();
-    let nextBlink = start + (BLINK.minIntervalSeconds + Math.random() * 2) * 1000;
+    let nextBlink =
+      start + (BLINK.minIntervalSeconds + Math.random() * 2) * 1000;
     let blinkStart = -1;
 
     const tick = (now: number) => {
@@ -195,7 +201,8 @@ export function RediOrb({
       const wanted =
         s === "speaking"
           ? MOUTH.speakingMinOpenness +
-            (MOUTH.speakingMaxOpenness - MOUTH.speakingMinOpenness) * clamp(amp, 0, 1)
+            (MOUTH.speakingMaxOpenness - MOUTH.speakingMinOpenness) *
+              clamp(amp, 0, 1)
           : rest.openness;
 
       eased.current += (wanted - eased.current) * 0.22;
@@ -213,7 +220,8 @@ export function RediOrb({
           nextBlink =
             now +
             (BLINK.minIntervalSeconds +
-              Math.random() * (BLINK.maxIntervalSeconds - BLINK.minIntervalSeconds)) *
+              Math.random() *
+                (BLINK.maxIntervalSeconds - BLINK.minIntervalSeconds)) *
               1000;
         } else {
           /* Close and reopen, and widen slightly on the way, which reads as
@@ -235,10 +243,15 @@ export function RediOrb({
       /* Idle breathing, plus a small bob while he talks. Transform only, never
          layout. */
       const breath =
-        1 + (MOTION.breathScale - 1) * (0.5 - 0.5 * Math.cos((t / MOTION.breathPeriodSeconds) * Math.PI * 2));
+        1 +
+        (MOTION.breathScale - 1) *
+          (0.5 -
+            0.5 * Math.cos((t / MOTION.breathPeriodSeconds) * Math.PI * 2));
       const bob =
         s === "speaking"
-          ? Math.sin((t / MOTION.speakingBobPeriodSeconds) * Math.PI * 2) * size * MOTION.speakingBobRatio
+          ? Math.sin((t / MOTION.speakingBobPeriodSeconds) * Math.PI * 2) *
+            size *
+            MOTION.speakingBobRatio
           : 0;
 
       body.current?.setAttribute(
@@ -290,7 +303,12 @@ export function RediOrb({
         </defs>
 
         <g ref={body}>
-          <circle cx={g.cx} cy={g.cy} r={g.radius - g.rimWidth / 2} fill={`url(#${gradientId})`} />
+          <circle
+            cx={g.cx}
+            cy={g.cy}
+            r={g.radius - g.rimWidth / 2}
+            fill={`url(#${gradientId})`}
+          />
           {/* The rim lifts him off the dark canvas. */}
           <circle
             cx={g.cx}
@@ -317,7 +335,11 @@ export function RediOrb({
             ry={r2(g.eyeRadiusY)}
             fill={FACE.color}
           />
-          <path ref={mouth} d={mouthPath(rest.openness, rest.curve, g)} fill={FACE.color} />
+          <path
+            ref={mouth}
+            d={mouthPath(rest.openness, rest.curve, g)}
+            fill={FACE.color}
+          />
         </g>
       </svg>
     </span>

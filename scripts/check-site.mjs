@@ -36,9 +36,23 @@ const ws = new WebSocket(wsUrl);
 await new Promise((r) => (ws.onopen = r));
 let id = 0;
 const pending = new Map();
+/* Chrome puts a cross-origin iframe in its own process, so the parent's
+   frame tree never lists it and the frame element's onload fires either
+   way. The network is what tells the two apart, and it takes both
+   halves: a refused frame is still fetched and still answers 200, then
+   the renderer drops it with ERR_BLOCKED_BY_RESPONSE. Checking only the
+   200 would pass on a frame nobody can see. */
+const documents = [];
+const docFailures = [];
 ws.onmessage = (e) => {
   const m = JSON.parse(e.data);
-  if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
+  if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); return; }
+  if (m.method === "Network.responseReceived" && m.params.type === "Document") {
+    documents.push({ url: m.params.response.url, status: m.params.response.status });
+  }
+  if (m.method === "Network.loadingFailed" && m.params.type === "Document") {
+    docFailures.push(m.params.errorText);
+  }
 };
 const send = (m, p = {}, s) =>
   new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method: m, params: p, sessionId: s })); });
@@ -47,13 +61,19 @@ const { result: t } = await send("Target.createTarget", { url: "about:blank" });
 const { result: a } = await send("Target.attachToTarget", { targetId: t.targetId, flatten: true });
 const s = a.sessionId;
 await send("Page.enable", {}, s);
+await send("Network.enable", {}, s);
 await send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 1050, deviceScaleFactor: 1, mobile: false }, s);
 
 const ev = async (expr) => {
   const r = await send("Runtime.evaluate", { expression: expr, returnByValue: true }, s);
   return r.result?.result?.value;
 };
-const go = async (path) => { await send("Page.navigate", { url: BASE + path }, s); await sleep(4200); };
+const go = async (path) => {
+  documents.length = 0;
+  docFailures.length = 0;
+  await send("Page.navigate", { url: BASE + path }, s);
+  await sleep(4200);
+};
 
 let pass = 0;
 const fails = [];
@@ -80,28 +100,49 @@ await ev(`document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape'}))`);
 await sleep(400);
 ck("Escape closes it", await ev(`!document.querySelector('.nav-menu').classList.contains('is-open')`));
 
-console.log("Rilo, the live page, the ported demo and the recording");
+console.log("Rilo, the live page and the ported demo");
 await go("/projects?p=Rilo");
 
 const mode = (tab) =>
   `[...document.querySelectorAll('.demo-mode')].find(b => b.textContent.trim() === ${JSON.stringify(tab)})`;
 
-ck("three modes are offered",
-  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 3,
+ck("two ways in are offered, and neither is a recording",
+  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 2 &&
+    !(await ev(`[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent).join('|')`))
+      .toLowerCase().includes("recording"),
   await ev(`[...document.querySelectorAll('.demo-mode')].map(b=>b.textContent).join('|')`));
+ck("no video element is left anywhere on the page",
+  (await ev(`document.querySelectorAll('video').length`)) === 0);
 ck("it opens on the live page", await ev(`!!document.querySelector('.demo-frame')`));
 ck("the frame targets the canonical host",
   (await ev(`document.querySelector('.demo-frame')?.src`))?.includes("www.riloai.app"));
+ck("the frame opens on the demo section, not the hero",
+  (await ev(`document.querySelector('.demo-frame')?.getAttribute('src')`))?.endsWith("#demo"));
+/* The page is drawn wider than the panel and scaled back down, so more of
+   the demo fits without a scroll. Both halves have to hold: the layout box
+   bigger than the stage, and the painted box matching it. */
+ck("the frame is zoomed out to fit the panel", await ev(`(() => {
+  const fit = document.querySelector('.demo-frame-fit.is-zoomed');
+  const stage = document.querySelector('.demo-stage');
+  if (!fit || !stage) return false;
+  const z = parseFloat(getComputedStyle(fit).getPropertyValue('--frame-zoom'));
+  const laidOut = fit.offsetWidth;
+  const painted = fit.getBoundingClientRect().width;
+  const stageW = stage.getBoundingClientRect().width;
+  return z > 0 && z < 1 && laidOut > stageW * 1.2 && Math.abs(painted - stageW) < 6;
+})()`));
 
 /* riloai.app allows framing from the deployed origins only, so the frame
-   genuinely loading can be asserted there and not against localhost. */
+   genuinely loading can be asserted there and not against localhost.
+   A blocked frame still fires onload and still leaves an element in the
+   DOM, so the assertion has to be the served document itself. */
 if (BASE.startsWith("https://")) {
   await sleep(6000);
-  const tree = await send("Page.getFrameTree", {}, s);
-  const kids = tree.result?.frameTree?.childFrames ?? [];
+  const framed = documents.filter((d) => d.url.includes("riloai.app"));
+  const refused = docFailures.includes("net::ERR_BLOCKED_BY_RESPONSE");
   ck("the real page loads inside the frame",
-    kids.some((f) => (f.frame.url || "").includes("riloai.app")),
-    JSON.stringify(kids.map((f) => f.frame.url)));
+    framed.some((d) => d.status === 200) && !refused,
+    JSON.stringify({ framed, docFailures }));
 } else {
   console.log("  SKIP  frame load (localhost is not on riloai.app's allowlist)");
 }
@@ -126,10 +167,6 @@ await sleep(2600);
 ck("the draft matches the path taken",
   (await ev(`document.querySelector('.rd-draft')?.textContent`))?.includes("Count me in"));
 
-await ev(`${mode("Recording")}.click()`);
-await sleep(2500);
-ck("the recording plays",
-  await ev(`(()=>{const v=document.querySelector('.demo-video');return !!v&&!v.paused&&v.currentTime>0})()`));
 
 console.log("Redi AI, the walkthrough");
 await go("/projects?p=Redi%20AI");
@@ -179,21 +216,43 @@ ck("restarting returns to Home",
 ck("the role typed earlier survives the restart",
   (await ev(`document.querySelector('.ra-role-name')?.textContent`)) === "Registered nurse");
 
-console.log("Phantom, recording and the live embed");
+console.log("Phantom, the guided Kariba case and the live embed");
 await go("/projects?p=Phantom");
-ck("the demo runs the Kariba case",
-  (await ev(`document.querySelector('.demo-caption-text')?.textContent`))?.includes("Kariba"));
+/* Phantom's case cannot be reached by URL, so the panel guides rather than
+   deep links. These assert the guide exists and leads with the Kariba case,
+   which is the real registered project; the app's own default list is the
+   illustrative one. */
+ck("the panel guides the visitor through the Kariba case",
+  (await ev(`document.querySelector('.demo-guide-title')?.textContent`))?.includes("Kariba"));
+ck("the guide's first step opens the Kariba case",
+  (await ev(`document.querySelector('.demo-guide-steps li')?.textContent`))?.includes("Kariba case"));
+ck("the guide has every step",
+  (await ev(`document.querySelectorAll('.demo-guide-steps li').length`)) === 5);
 ck("award wording is exact",
   (await ev(`document.querySelector('.browser-award')?.textContent`)) ===
     "3rd Place, Best Use of Base44, Ignition Hacks 2026");
 ck("the Render link is present",
   await ev(`[...document.querySelectorAll('.browser-links a')].some(x=>x.href.includes('onrender.com'))`));
-await ev(`[...document.querySelectorAll('.demo-mode')].find(b => b.textContent.trim() === "Live app").click()`);
-await sleep(8000);
+/* One mode now, so there is no switcher to click. */
 ck("the live app embeds", await ev(`!!document.querySelector('.demo-frame')`));
+ck("a single mode offers no switcher",
+  (await ev(`document.querySelectorAll('.demo-mode').length`)) === 0);
+
+console.log("Stage and tags");
+await go("/projects?p=Rilo");
+ck("a shipped project reads Published",
+  (await ev(`document.querySelector('.browser-stage')?.textContent`)) === "Published");
+ck("the download count is shown as a tag",
+  (await ev(`[...document.querySelectorAll('.browser-tag')].map(e=>e.textContent).join('|')`))
+    ?.includes("100+ downloads"));
+await go("/projects?p=Redi%20AI");
+ck("an unreleased project does not read as shipped",
+  (await ev(`document.querySelector('.browser-stage')?.textContent`)) === "Not published yet");
+await go("/projects?p=Loxbox");
+ck("an early project reads as early rather than as nearly out",
+  (await ev(`document.querySelector('.browser-stage')?.textContent`)) === "Early development");
 
 console.log("Deep links");
-await go("/projects?p=Loxbox");
 ck("?p= selects the right project",
   (await ev(`document.querySelector('.browser-title')?.textContent`)) === "Loxbox");
 

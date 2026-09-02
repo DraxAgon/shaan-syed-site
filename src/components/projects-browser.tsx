@@ -1,14 +1,21 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { ProjectDemo } from "./project-demo";
-import { RediDemo } from "./redi-demo";
 import { Icon } from "./icon";
 import { hasIcon } from "./icons";
 import { projects } from "@/content/projects";
+
+/* The walkthrough is one panel of one project, so it is fetched when that
+   panel is opened rather than by everyone who lands on /projects. */
+const RediDemo = dynamic(() => import("./redi-demo").then((m) => m.RediDemo), {
+  ssr: false,
+  loading: () => null,
+});
 
 /* Master and detail. The index on the left stays put; only the panel
    on the right changes, and it crossfades so the switch reads as one
@@ -60,6 +67,31 @@ export function ProjectsBrowser() {
       {/* Keyed on the active index so React remounts the panel and the
           crossfade replays on every switch. */}
       <div className="browser-detail" key={active}>
+        <h2 className="browser-title">{project.name}</h2>
+        <p className="browser-descriptor">{project.descriptor}</p>
+        <p className="browser-status">{project.status}</p>
+
+        {/* Where it has got to, kept in its own row and its own shape so it
+            reads as a state rather than as another fact about the work. The
+            facts beside it are things the prose does not already say. */}
+        <ul className="browser-tags">
+          <li className="browser-stage" data-stage={project.stage}>
+            {project.stage}
+          </li>
+          {(project.tags ?? []).map((tag) => (
+            <li key={tag} className="browser-tag">
+              {tag}
+            </li>
+          ))}
+        </ul>
+
+        {project.award ? (
+          <p className="browser-award">
+            {project.award}
+            {project.awardEvent ? `, ${project.awardEvent}` : ""}
+          </p>
+        ) : null}
+
         {project.mockup ? (
           <figure className="demo">
             <div className="demo-stage is-mockup">
@@ -74,11 +106,10 @@ export function ProjectsBrowser() {
           </figure>
         ) : project.demo ? (
           <ProjectDemo
-            src={project.demo.src}
-            poster={project.demo.poster}
-            label={project.demo.label}
             liveUrl={project.demo.liveUrl}
             liveLabel={project.demo.liveLabel}
+            liveZoom={project.demo.liveZoom}
+            guide={project.demo.guide}
             scrollImage={project.demo.scrollImage}
             scrollImageWidth={project.demo.scrollImageWidth}
             scrollImageHeight={project.demo.scrollImageHeight}
@@ -97,17 +128,6 @@ export function ProjectsBrowser() {
             className="browser-shot"
             priority={active === 0}
           />
-        ) : null}
-
-        <h2 className="browser-title">{project.name}</h2>
-        <p className="browser-descriptor">{project.descriptor}</p>
-        <p className="browser-status">{project.status}</p>
-
-        {project.award ? (
-          <p className="browser-award">
-            {project.award}
-            {project.awardEvent ? `, ${project.awardEvent}` : ""}
-          </p>
         ) : null}
 
         {project.prose.map((paragraph) => (
@@ -129,7 +149,13 @@ export function ProjectsBrowser() {
           <ul className="browser-links">
             {project.links.map((link) => (
               <li key={link.href}>
-                <a href={link.href} rel="noopener noreferrer" className="browser-link">
+                <a
+                  href={link.href}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  aria-label={`${link.label}, opens in a new tab`}
+                  className="browser-link"
+                >
                   {link.label}
                 </a>
               </li>

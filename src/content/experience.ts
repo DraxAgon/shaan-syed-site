@@ -67,7 +67,7 @@ export const experience: ExperienceEntry[] = [
     dates: "August 2024 to Present",
     meta: "Seasonal",
     location: "Toronto, ON",
-    logo: null,
+    logo: "/images/logo-sumodino.webp",
     bullets: [
       "Runs a retail booth at the Canadian National Exhibition, selling to walk-up foot traffic",
       "Handles transactions, restocking, and daily setup and teardown",

@@ -29,7 +29,14 @@ const PICKS = {
   "logo-northern": [
     "https://schoolweb.tdsb.on.ca/Portals/northernss/Banners/w_northern%20banner%203.png",
   ],
-  "logo-sumodino": ["https://sumodino.ca/apple-touch-icon.png", "https://sumodino.com/favicon.ico"],
+  /* The company site is a Square Online app shell, so the logo is not
+     in the served HTML as an <img>; both of these come out of the
+     bootstrap state the shell ships. Header mark first, the round
+     festival badge as a fallback. */
+  "logo-sumodino": [
+    "https://www.sumodinoclawcity.com/uploads/b/48c619d0b2395aebff33f490868409fa59758d7bab9ca128ed33857a15f79060/sumo_dinoC_1678440759.png",
+    "https://www.sumodinoclawcity.com/uploads/b/48c619d0b2395aebff33f490868409fa59758d7bab9ca128ed33857a15f79060/Sumodino%20Round%20Logo_1737484915.jpg",
+  ],
 };
 
 /* Per-org preprocessing, applied before the shared resize. Only orgs

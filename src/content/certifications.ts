@@ -3,6 +3,9 @@ export type Certification = {
   issuer?: string;
   date?: string;
   href?: string;
+  /* Software certifications also surface on the front page. The
+     lifeguarding and tutoring ones stay on Awards. */
+  software?: boolean;
 };
 
 export type CertificationGroup = {
@@ -20,6 +23,7 @@ export const certifications: CertificationGroup[] = [
         name: "Google Cloud Generative AI Leader",
         issuer: "Google",
         date: "August 2026",
+        software: true,
         href: "https://www.credly.com/badges/5623f722-17da-49bf-84b4-e112fccf3fde/public_url",
       },
       {
@@ -44,3 +48,10 @@ export const certifications: CertificationGroup[] = [
     ],
   },
 ];
+
+/* Earned software certifications, in the order they appear above.
+   The front page shows these; the full record lives on Awards. */
+export const softwareCertifications: Certification[] = certifications
+  .filter((group) => group.label === "Completed")
+  .flatMap((group) => group.items)
+  .filter((cert) => cert.software);

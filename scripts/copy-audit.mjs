@@ -8,8 +8,23 @@
  * titles and alt text, because those are user-facing copy too.
  */
 
-const ROUTES = ["/", "/bio", "/projects", "/awards", "/no-such-page"];
+import { spawn } from "node:child_process";
+
+/* Server-rendered routes can be read straight off the wire. */
+const FETCH_ROUTES = ["/", "/bio", "/awards", "/no-such-page"];
+
+/* /projects renders its panels on the client, so these need a browser. One
+   per project, because only the open panel is in the DOM. */
+const DOM_ROUTES = [
+  "/projects?p=Rilo",
+  "/projects?p=Redi%20AI",
+  "/projects?p=Phantom",
+  "/projects?p=Loxbox",
+];
+
 const BASE = process.env.AUDIT_BASE ?? "http://localhost:3000";
+const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
+const CDP_PORT = 9533;
 
 const BANNED_WORDS = [
   "delve", "leverage", "transformative", "game-changing", "seamless", "robust",
@@ -70,18 +85,32 @@ const findings = {
   vague: [], repeatedOpeners: [],
 };
 
-for (const route of ROUTES) {
-  const res = await fetch(BASE + route);
-  const copy = textFrom(await res.text());
+/* Both of these have to be built with ordinary strings rather than a
+   template literal. Inside a template literal `\b` is the backspace
+   character, not a word boundary, so the word check silently matched
+   nothing at all and reported every page clean. The replacement string
+   needs its own backslash for the same reason: "$&" puts the character
+   back unescaped, so a banned entry containing a regex metacharacter
+   would build the wrong pattern. */
+const META = /[-/\\^$*+?.()|[\]{}]/g;
+const escapeRe = (s) => s.replace(META, "\\$&");
+const wordRe = (w) => new RegExp("\\b" + escapeRe(w) + "\\b", "gi");
 
+/* A check that cannot fail is worse than no check, so prove both halves
+   still bite before trusting a clean run. */
+if (!"a seamless thing".match(wordRe("seamless")) || "c++".replace(META, "\\$&") !== "c\\+\\+") {
+  console.error("copy-audit: the word check is broken, so its result means nothing.");
+  process.exit(2);
+}
+
+function audit(route, copy) {
   for (const w of BANNED_WORDS) {
-    const re = new RegExp(`\b${w.replace(/[-/\^$*+?.()|[\]{}]/g, "\$&")}\b`, "gi");
-    const hits = copy.match(re);
+    const hits = copy.match(wordRe(w));
     if (hits) findings.words.set(w, (findings.words.get(w) ?? 0) + hits.length);
   }
 
   for (const p of BANNED_PHRASES) {
-    const re = new RegExp(p.replace(/[-/\^$*+?.()|[\]{}]/g, "\$&"), "gi");
+    const re = new RegExp(escapeRe(p), "gi");
     const hits = copy.match(re);
     if (hits) findings.phrases.set(p, (findings.phrases.get(p) ?? 0) + hits.length);
   }
@@ -103,6 +132,99 @@ for (const route of ROUTES) {
     if (a && a === b) findings.repeatedOpeners.push(`${route}: "${a}" opens two sentences in a row`);
   }
 }
+
+for (const route of FETCH_ROUTES) {
+  const res = await fetch(BASE + route);
+  audit(route, textFrom(await res.text()));
+}
+
+/* /projects draws its panels on the client, so the served HTML carries a few
+   hundred characters and none of the copy. Every demo caption, every guide
+   step and the whole Redi walkthrough live behind that, which is most of the
+   prose written this year. Reading it needs a browser. */
+const chrome = spawn(CHROME, [
+  `--remote-debugging-port=${CDP_PORT}`, "--headless", "--disable-gpu",
+  "--no-first-run", "--hide-scrollbars",
+  "--user-data-dir=C:/Users/shaan/AppData/Local/Temp/claude-cdp-audit", "about:blank",
+], { stdio: "ignore" });
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let wsUrl;
+for (let i = 0; i < 80 && !wsUrl; i++) {
+  try {
+    wsUrl = (await (await fetch(`http://127.0.0.1:${CDP_PORT}/json/version`)).json()).webSocketDebuggerUrl;
+  } catch {}
+  if (!wsUrl) await sleep(300);
+}
+const ws = new WebSocket(wsUrl);
+await new Promise((r) => (ws.onopen = r));
+let id = 0;
+const pending = new Map();
+ws.onmessage = (e) => {
+  const m = JSON.parse(e.data);
+  if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
+};
+const send = (m, p = {}, s) =>
+  new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method: m, params: p, sessionId: s })); });
+
+const { result: target } = await send("Target.createTarget", { url: "about:blank" });
+const { result: att } = await send("Target.attachToTarget", { targetId: target.targetId, flatten: true });
+const sess = att.sessionId;
+await send("Page.enable", {}, sess);
+await send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false }, sess);
+const ev = async (expr) =>
+  (await send("Runtime.evaluate", { expression: expr, returnByValue: true }, sess)).result?.result?.value;
+
+const visible = () => `document.body.innerText.replace(/\\s+/g," ").trim()`;
+
+for (const route of DOM_ROUTES) {
+  let copy = "";
+  let title = "";
+
+  /* A first request to a cold server can outrun the 3.2s wait, and a guard
+     that fails on a slow start is only marginally better than one that
+     cannot fail at all. Give the panel a few chances to appear before
+     calling it broken. */
+  for (let attempt = 0; attempt < 4 && !title; attempt++) {
+    await send("Page.navigate", { url: BASE + route }, sess);
+    await sleep(3200 + attempt * 2000);
+
+    copy = await ev(visible());
+
+    /* The walkthrough shows one caption at a time, so the rail has to be
+       walked before its copy has all been on screen. Accumulate rather than
+       snapshot. */
+    const stops = (await ev(`document.querySelectorAll('.rw-stop').length`)) ?? 0;
+    for (let i = 0; i < stops; i++) {
+      await ev(`document.querySelectorAll('.rw-stop')[${i}]?.click()`);
+      await sleep(700);
+      copy += " " + (await ev(visible()));
+    }
+
+    /* A pass that reads nothing reports clean, which is the failure mode this
+       whole browser pass exists to fix. So prove the panel actually rendered
+       rather than trusting a character count: its title and its prose both
+       have to be in what was read. */
+    const t = await ev(`document.querySelector('.browser-title')?.textContent ?? ""`);
+    const prose = await ev(`document.querySelector('.browser-prose')?.textContent ?? ""`);
+    if (t && prose && copy.includes(t) && copy.includes(prose.slice(0, 40))) title = t;
+  }
+
+  if (!title) {
+    console.error(
+      `copy-audit: ${route} did not render its panel, so its copy was never audited.`,
+    );
+    ws.close();
+    chrome.kill();
+    process.exit(2);
+  }
+
+  audit(route, copy);
+  console.log(`  audited ${copy.length} characters of ${title}`);
+}
+
+ws.close();
+chrome.kill();
 
 const list = (m) => (m.size ? [...m.entries()].map(([k, v]) => `${k} (${v})`).join(", ") : "none");
 

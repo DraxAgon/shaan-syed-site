@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 import { profile } from "@/content/profile";
 
-export const alt = "Shaan Syed, Computer Science at Waterloo and Business at Lazaridis";
+export const alt = "Shaan Syed, Computer Science at Waterloo and BBA at Laurier";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

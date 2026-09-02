@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { CertRow } from "@/components/cert-row";
 import { awards } from "@/content/awards";
 import { certifications } from "@/content/certifications";
 
@@ -45,27 +46,11 @@ export default function AwardsPage() {
           </h2>
           <ul className="ledger">
             {group.items.map((cert) => (
-              <li key={cert.name} className="ledger-row">
-                <span className="ledger-year">{cert.date ?? ""}</span>
-                <span
-                  className={`ledger-body${group.label === "In progress" ? " muted" : ""}`}
-                >
-                  {cert.href ? (
-                    <a
-                      className="inline-link"
-                      href={cert.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${cert.name}, opens the credential in a new tab`}
-                    >
-                      {cert.name}
-                    </a>
-                  ) : (
-                    cert.name
-                  )}
-                  {cert.issuer ? <span className="muted">, {cert.issuer}</span> : null}
-                </span>
-              </li>
+              <CertRow
+                key={cert.name}
+                cert={cert}
+                muted={group.label === "In progress"}
+              />
             ))}
           </ul>
         </section>

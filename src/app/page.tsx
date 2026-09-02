@@ -2,17 +2,19 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { CertRow } from "@/components/cert-row";
 import { DisclosureRow } from "@/components/disclosure-row";
 import { Icon } from "@/components/icon";
 import { hasIcon } from "@/components/icons";
+import { softwareCertifications } from "@/content/certifications";
 import { experience } from "@/content/experience";
-import { profile } from "@/content/profile";
+import { isMailto, profile } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { skills } from "@/content/skills";
 
 export const metadata: Metadata = {
   description:
-    "Shaan Syed builds software. Rilo, an AI reply assistant for Gmail, is on the Chrome Web Store. Computer Science at Waterloo, Business at Lazaridis.",
+    "Shaan Syed builds software. Rilo, an AI reply assistant for Gmail, is on the Chrome Web Store. Computer Science at Waterloo, BBA at Laurier.",
 };
 
 export default function HomePage() {
@@ -37,7 +39,17 @@ export default function HomePage() {
         <ul className="social-row">
           {profile.socials.map((social) => (
             <li key={social.label}>
-              <a className="social-link" href={social.href} rel="me noopener noreferrer">
+              <a
+                className="social-link"
+                href={social.href}
+                rel="me noopener noreferrer"
+                target={isMailto(social.href) ? undefined : "_blank"}
+                aria-label={
+                  isMailto(social.href)
+                    ? undefined
+                    : `${social.label}, opens in a new tab`
+                }
+              >
                 <Icon name={social.label} size={13} />
                 <span>{social.label}</span>
               </a>
@@ -91,11 +103,7 @@ export default function HomePage() {
               logo={entry.logo}
               title={entry.org}
               aside={entry.role}
-              meta={
-                entry.meta
-                  ? `${entry.dates}, ${entry.meta}`
-                  : entry.dates
-              }
+              meta={entry.meta ? `${entry.dates}, ${entry.meta}` : entry.dates}
             >
               <ul className="panel-bullets">
                 {entry.bullets.map((bullet) => (
@@ -128,6 +136,22 @@ export default function HomePage() {
               ))}
             </p>
           ))}
+        </section>
+
+        {/* Last on the page on purpose: the credential is a footnote to
+            the work above, not a headline. Links out to the issuer. */}
+        <section aria-labelledby="certs-h">
+          <div className="record-head">
+            <h2 id="certs-h">Certifications</h2>
+            <Link href="/awards" className="record-more">
+              All awards
+            </Link>
+          </div>
+          <ul className="ledger">
+            {softwareCertifications.map((cert) => (
+              <CertRow key={cert.name} cert={cert} />
+            ))}
+          </ul>
         </section>
       </div>
     </div>

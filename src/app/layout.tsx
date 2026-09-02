@@ -10,7 +10,7 @@ import Link from "next/link";
 
 import { Icon } from "@/components/icon";
 import { SiteNav } from "@/components/site-nav";
-import { profile } from "@/content/profile";
+import { isMailto, profile } from "@/content/profile";
 
 import "./globals.css";
 
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(profile.siteUrl),
   title: { default: "Shaan Syed", template: "%s, Shaan Syed" },
   description:
-    "Shaan Syed builds software. Rilo, an AI reply assistant for Gmail, is on the Chrome Web Store. Computer Science at Waterloo, Business at Lazaridis.",
+    "Shaan Syed builds software. Rilo, an AI reply assistant for Gmail, is on the Chrome Web Store. Computer Science at Waterloo, BBA at Laurier.",
   authors: [{ name: "Shaan Syed", url: profile.siteUrl }],
   creator: "Shaan Syed",
   openGraph: {
@@ -95,8 +95,16 @@ const personSchema = {
     "https://linkedin.com/in/shaan-syed-4a6a06306",
   ],
   alumniOf: [
-    { "@type": "CollegeOrUniversity", name: "University of Waterloo", sameAs: "https://uwaterloo.ca" },
-    { "@type": "CollegeOrUniversity", name: "Wilfrid Laurier University", sameAs: "https://wlu.ca" },
+    {
+      "@type": "CollegeOrUniversity",
+      name: "University of Waterloo",
+      sameAs: "https://uwaterloo.ca",
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      name: "Wilfrid Laurier University",
+      sameAs: "https://wlu.ca",
+    },
   ],
   award: "President's Scholarship of Distinction",
 };
@@ -136,14 +144,26 @@ export default function RootLayout({
           <ul className="footer-socials">
             {profile.socials.map((social) => (
               <li key={social.label}>
-                <a className="footer-link" href={social.href} rel="me noopener noreferrer">
+                <a
+                  className="footer-link"
+                  href={social.href}
+                  rel="me noopener noreferrer"
+                  target={isMailto(social.href) ? undefined : "_blank"}
+                  aria-label={
+                    isMailto(social.href)
+                      ? undefined
+                      : `${social.label}, opens in a new tab`
+                  }
+                >
                   <Icon name={social.label} size={12} />
                   <span>{social.label}</span>
                 </a>
               </li>
             ))}
           </ul>
-          <p className="footer-copy">&copy; {new Date().getFullYear()} Shaan Syed</p>
+          <p className="footer-copy">
+            &copy; {new Date().getFullYear()} Shaan Syed
+          </p>
         </footer>
 
         <script

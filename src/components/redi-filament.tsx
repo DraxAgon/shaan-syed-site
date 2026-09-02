@@ -86,7 +86,10 @@ export function RediFilament({
       if (s === "travel") {
         /* Loops across the width, tail dimming behind it. */
         const x = (t / 1.1) % 1;
-        segment.current?.setAttribute("x", String(x * 100 - TRAVEL_SEGMENT * 100));
+        segment.current?.setAttribute(
+          "x",
+          String(x * 100 - TRAVEL_SEGMENT * 100),
+        );
       } else if (s === "wave") {
         wave.current?.setAttribute("d", wavePath(amp, t));
       } else if (s === "pulse") {
@@ -105,6 +108,14 @@ export function RediFilament({
 
   const opacity = dim ? 0.4 : 1;
 
+  /* The viewBox is 12 units tall and stretched to fill `height`, so a rule
+     written as 2 user units renders 2 * height / 12 px: a third of a pixel
+     in the role card's 2px slot. Expressing it in user units keeps the one
+     continuous 2px element 2px in every slot. The wave gets the same
+     protection below from vectorEffect="non-scaling-stroke". */
+  const rule = 24 / height;
+  const ruleY = 6 - rule / 2;
+
   return (
     <span
       className={className ? `redi-filament ${className}` : "redi-filament"}
@@ -118,15 +129,24 @@ export function RediFilament({
       >
         {state === "hairline" ? (
           <>
-            <rect x="0" y="5" width="100" height="2" fill={TRACK} rx="1" />
             <rect
               x="0"
-              y="5"
+              y={ruleY}
+              width="100"
+              height={rule}
+              fill={TRACK}
+              rx="1"
+              ry={rule / 2}
+            />
+            <rect
+              x="0"
+              y={ruleY}
               width={Math.max(0, Math.min(1, progress)) * 100}
-              height="2"
+              height={rule}
               fill={GOLD}
               opacity={opacity}
               rx="1"
+              ry={rule / 2}
             />
           </>
         ) : null}
@@ -139,16 +159,25 @@ export function RediFilament({
                 <stop offset="100%" stopColor={GOLD} stopOpacity="1" />
               </linearGradient>
             </defs>
-            <rect x="0" y="5" width="100" height="2" fill={TRACK} rx="1" />
+            <rect
+              x="0"
+              y={ruleY}
+              width="100"
+              height={rule}
+              fill={TRACK}
+              rx="1"
+              ry={rule / 2}
+            />
             <rect
               ref={segment}
               x="-28"
-              y="5"
+              y={ruleY}
               width={TRAVEL_SEGMENT * 100}
-              height="2"
+              height={rule}
               fill={`url(#${travelId})`}
               opacity={opacity}
               rx="1"
+              ry={rule / 2}
             />
           </>
         ) : null}
@@ -168,7 +197,14 @@ export function RediFilament({
         ) : null}
 
         {state === "pulse" ? (
-          <circle ref={point} cx="50" cy="6" r="2" fill={GOLD} opacity={opacity} />
+          <circle
+            ref={point}
+            cx="50"
+            cy="6"
+            r="2"
+            fill={GOLD}
+            opacity={opacity}
+          />
         ) : null}
       </svg>
     </span>

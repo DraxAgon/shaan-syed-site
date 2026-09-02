@@ -5,12 +5,27 @@ export type ProjectLink = {
   href: string;
 };
 
+/* Where a project has got to, kept in its own slot so it reads as a state
+   rather than as another fact about the work. One of a fixed set, because a
+   free string drifts into marketing. */
+export type Stage =
+  | "Published"
+  | "Preparing release"
+  | "In development"
+  | "Early development"
+  | "Not published yet";
+
 export type Project = {
   name: string;
   descriptor: string;
   /* Short enough to sit in the 112px rail. */
   railStatus: string;
   status: string;
+  stage: Stage;
+  /* Facts the prose does not already carry. Kept to two or three, and
+     phrased so they stay true as the number grows rather than pinning an
+     exact count that goes stale. */
+  tags?: string[];
   /* The award name is fixed wording. "3rd Place, Best Use of Base44"
      is a sponsor track placement, not an overall hackathon result. */
   award?: string;
@@ -21,17 +36,22 @@ export type Project = {
   /* Optional still. Left unset, the entry renders as prose with no
      empty box. */
   image?: string;
-  /* Optional recorded scroll-through of the live product. Takes the
-     place of the still when present. Produced by
-     scripts/record-demo.mjs. */
+  /* The interactive panel for a project. Takes the place of the still when
+     present. There are no recordings any more: every project here is either
+     framable live or rebuilt in the browser, and a recording of a thing the
+     visitor can just use is a worse version of the thing. */
   demo?: {
-    src: string;
-    poster: string;
-    label: string;
     /* Set only when the app allows framing, giving a fully clickable
        embed. */
     liveUrl?: string;
     liveLabel?: string;
+    /* Scales the framed page down so a tall section fits the panel in one
+       view. The frame is drawn correspondingly wider and taller, so the app
+       still lays out at its own desktop width. */
+    liveZoom?: number;
+    /* For an app whose interesting state cannot be reached by URL: a short
+       numbered guide beside the frame, so a visitor knows what to click. */
+    guide?: { title: string; steps: string[] };
     /* For sites that refuse to be framed: a capture of the whole page
        the visitor can scroll through in place. */
     scrollImage?: string;
@@ -44,7 +64,7 @@ export type Project = {
     /* A third mode: the product’s real flow, ported and playable. */
     playable?: { component: "rilo"; label: string };
     /* Which mode the panel opens on. */
-    defaultMode?: "play" | "video" | "live" | "scroll";
+    defaultMode?: "play" | "live" | "scroll";
   };
   /* An interactive component rendered in place of a recording.
      "redi" is the app's screens rebuilt in the browser, since there is no
@@ -59,6 +79,8 @@ export const projects: Project[] = [
     descriptor: "AI reply assistant for Gmail",
     railStatus: "Live",
     status: "On the Chrome Web Store since July 2026",
+    stage: "Published",
+    tags: ["100+ downloads"],
     prose: [
       "Most AI email tools ask for full OAuth inbox access to read, send, and store your mail. Rilo reads only the email currently open on screen, never touches the rest of the inbox, never sends anything, and never stores your email.",
       "Each reply comes back as a few drafts across different tones and intents rather than one generic answer. Rilo was the first product I built and shipped end to end.",
@@ -78,9 +100,6 @@ export const projects: Project[] = [
     links: [{ label: "riloai.app", href: "https://riloai.app" }],
     image: "/images/project-rilo.webp",
     demo: {
-      src: "/media/rilo-demo.mp4",
-      poster: "/media/rilo-demo-poster.webp",
-      label: "Screen recording of riloai.app",
       /* riloai.app now allows this origin to frame its marketing page,
          so the whole real front page runs here: hero, the interactive
          demo, pricing, FAQ, contact. Must be the www host, since the
@@ -89,8 +108,13 @@ export const projects: Project[] = [
          The flat capture in public/media/rilo-page.webp and its
          hotspots are kept as a fallback if framing is ever withdrawn;
          re-add scrollImage here to switch back. */
-      liveUrl: "https://www.riloai.app/",
+      /* The fragment lands the frame on the page's own demo section rather
+         than the hero, so the panel opens on the thing worth showing. */
+      liveUrl: "https://www.riloai.app/#demo",
       liveLabel: "riloai.app itself, running here",
+      /* The demo section is taller than the panel, so the frame is drawn wider
+         and scaled down to fit it in one view. */
+      liveZoom: 0.62,
       playable: {
         component: "rilo",
         label: "Rilo’s own demo, running here",
@@ -104,9 +128,14 @@ export const projects: Project[] = [
     descriptor: "Interview prep, generated per role",
     railStatus: "In development",
     status: "Mobile, and what I spend most of my time on now",
+    stage: "Not published yet",
+    tags: ["Six skills per session"],
     prose: [
       "You describe a role, whether that's a job, a scholarship, or a program, and Redi generates a question set for it. Answer out loud and it scores what you said.",
-      "Update the role and the questions regenerate around it.",
+      /* The app's own coverage matrix records the questions NOT following a
+         role edit (AI-7, filed, confirmed at depth), while the blurb does
+         rebuild around what you add. This says only the half that holds. */
+      "Update the role and Redi rebuilds it around what you added. Getting the questions themselves to follow that is the piece I am on now.",
     ],
     stack: [
       "React Native",
@@ -126,6 +155,7 @@ export const projects: Project[] = [
     descriptor: "Independent check on forest carbon credits",
     railStatus: "Team build",
     status: "Environmental track",
+    stage: "Published",
     award: "3rd Place, Best Use of Base44",
     awardEvent: "Ignition Hacks 2026",
     prose: [
@@ -140,20 +170,40 @@ export const projects: Project[] = [
       },
     ],
     demo: {
-      src: "/media/phantom-demo.mp4",
-      poster: "/media/phantom-demo-poster.webp",
-      label: "Recorded run of the Kariba case",
       liveUrl: "https://ignitionhackv7.onrender.com/",
       liveLabel: "Phantom, running live",
+      /* Phantom routes on #companies and #explorer only: which case is open is
+         internal state, so it cannot be deep linked and the app opens on the
+         Amazon list. Those entries are marked "Illustrative project" in the
+         app itself, so the guide sends people to the Kariba case first, which
+         is the real registered project with buyers on public record. */
+      guide: {
+        title: "Walking the Kariba case",
+        steps: [
+          "Open Kariba case, top right. The app starts on the Amazon list, and those entries are illustrative rather than real.",
+          "The map is the project boundary. The orange outline is the land the credits are sold against, and red is forest already cleared inside it.",
+          "Scrub 2016 to 19 under the map to watch the clearing happen year by year.",
+          "Run independent verification. Phantom rebuilds the baseline from unprotected forest that looked the same before the project started.",
+          "Read the result against Credits issued: 26.8M. If the comparable land cleared at the same rate, the credits bought nothing.",
+        ],
+      },
     },
   },
   {
     name: "Loxbox",
     descriptor: "Group photos, locked until reveal day",
-    railStatus: "In development",
-    status: "Mobile",
+    railStatus: "Early build",
+    status: "Mobile, and early",
+    /* The earliest thing on the page, and the chip has to say so plainly.
+       "Preparing release" read as though it were a checklist away from the
+       App Store. Nobody can install it, so the stage, the status line, the
+       tag and the closing paragraph each say unfinished rather than leaving
+       a visitor to infer it. */
+    stage: "Early development",
+    tags: ["No public build yet"],
     prose: [
       "A group makes a box and picks a reveal date. Everyone adds photos to it and nobody sees a single one until the timer hits zero, when the whole box opens at once.",
+      "This one is early. The idea and the shape of the app are there, the rest is half built, and none of it is settled, so there is nothing to try yet and no date I would put on it.",
     ],
     stack: ["React Native", "Expo", "TypeScript", "Firebase"],
     links: [],

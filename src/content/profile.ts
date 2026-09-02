@@ -16,9 +16,13 @@ export type Profile = {
   socials: SocialLink[];
 };
 
+/* A mailto opens the visitor's mail client, so it must stay in this tab.
+   Every other social link leaves the site and gets target="_blank". */
+export const isMailto = (href: string) => href.startsWith("mailto:");
+
 export const profile: Profile = {
   name: "Shaan Syed",
-  subtitle: "Computer Science @ Waterloo, Business @ Lazaridis",
+  subtitle: "Computer Science @ Waterloo, BBA @ Laurier",
   summary:
     "I build software, usually taking it from an idea to something shipped on my own.",
   location: "Toronto, Ontario",

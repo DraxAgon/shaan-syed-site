@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Page not found",
   description:
-    "That page does not exist. Shaan Syed's site has a home page, a bio, projects, and a resume.",
+    "That page does not exist. Shaan Syed's site has a home page, a bio, projects, and awards.",
 };
 
 export default function NotFound() {
@@ -28,8 +28,8 @@ export default function NotFound() {
             Projects
           </Link>
           , or{" "}
-          <Link className="link" href="/resume">
-            Resume
+          <Link className="link" href="/awards">
+            Awards
           </Link>
           .
         </p>

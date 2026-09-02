@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 import { OrgLogo } from "@/components/logo";
-import { bioParagraphs } from "@/content/bio";
+import { bioParagraphs, bioPhotos } from "@/content/bio";
 import {
   doubleDegree,
   highSchool,
@@ -13,28 +13,46 @@ import {
 export const metadata: Metadata = {
   title: "Bio",
   description:
-    "Shaan Syed on piano and cross country, lifeguarding for the City of Toronto, shipping Rilo to the Chrome Web Store, and a Computer Science and Business double degree at Waterloo and Lazaridis.",
+    "Shaan Syed on piano and cross country, lifeguarding for the City of Toronto, shipping Rilo to the Chrome Web Store, and a Computer Science and BBA double degree at Waterloo and Laurier.",
 };
 
 export default function BioPage() {
   return (
     <div className="page">
-      <div className="bio-head">
-        <Image
-          src="/images/portrait-bio.webp"
-          alt="Shaan Syed"
-          width={1000}
-          height={1000}
-          sizes="128px"
-          className="portrait portrait-square"
-        />
-        <h1 className="page-title">Bio</h1>
-      </div>
+      <h1 className="page-title">Bio</h1>
 
-      <div className="bio-prose">
-        {bioParagraphs.map((paragraph) => (
-          <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-        ))}
+      {/* Two sides: the photos run down the left, the writing holds the
+          right. The frames are tilted and offset off each other so the
+          rail reads as prints laid out by hand rather than a stack of
+          boxes; the angles live in the CSS, not in the data. */}
+      <div className="bio-split">
+        <div className="bio-rail">
+          {bioPhotos.map((photo, index) => (
+            <figure key={photo.src} className="bio-frame">
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                width={photo.width}
+                height={photo.height}
+                sizes="(min-width: 900px) 280px, 44vw"
+                priority={index === 0}
+                className="bio-photo"
+              />
+              <figcaption className="bio-caption">
+                <span className="bio-caption-index">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                {photo.caption}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+
+        <div className="bio-prose">
+          {bioParagraphs.map((paragraph) => (
+            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+          ))}
+        </div>
       </div>
 
       <section aria-labelledby="edu-h" className="stack-section">

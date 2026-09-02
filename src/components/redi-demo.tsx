@@ -61,25 +61,38 @@ function readRole(input: string): { role: Role; guessed: boolean } {
 
   const lower = text.toLowerCase();
 
+  /* Internship is tested before Academic, and every term carries word
+     boundaries: unanchored "program" made a Program Manager a student, and
+     unanchored "college" did the same to anyone working at one. */
   const kind: Kind = /scholarship|bursary|award|grant/.test(lower)
     ? "Scholarship"
-    : /university|college|programme|program|graduate school|grad school|admission|degree|master|phd/.test(
-          lower,
-        )
-      ? "Academic"
-      : /intern|co.?op|placement|summer/.test(lower)
-        ? "Internship"
+    : /\bintern(ship)?s?\b|\bco.?op\b|\bplacement\b|\bsummer\b/.test(lower)
+      ? "Internship"
+      : /\b(university|grad(uate)? school|phd|doctorate|master'?s|admissions?|undergrad(uate)?|msc|mba)\b/.test(
+            lower,
+          )
+        ? "Academic"
         : "Job";
 
   /* "Software engineer at Shopify" and "Barista, Starbucks" are both common
      ways to write it, so both separators are read. */
   const first = text.split(/[.;]\s/)[0];
-  const at = first.match(/^(.{2,60}?)\s+(?:at|with|for)\s+(.{2,40}?)$/i);
+  /* An employer is a couple of words, not the rest of the sentence, so the
+     organisation stops at the first word that opens a new clause. Anchored to
+     the end it read "Nike for the summer" out of "Marketing internship at
+     Nike for the summer". */
+  const at = first.match(
+    /^(.{2,60}?)\s+(?:at|with|for)\s+(.{2,40}?)(?=$|,|\s+(?:on|in|for|from|during|working|starting|this|next|over)\b)/i,
+  );
   const comma = first.match(/^(.{2,60}?),\s+(.{2,40}?)$/);
   const pair = at ?? comma;
 
   const rawTitle = (pair ? pair[1] : first).replace(/[,.]$/, "").trim();
   const organisation = pair ? pair[2].replace(/[,.]$/, "").trim() : null;
+
+  /* Anything cut off the end was a clause, not the name, so this was a read
+     rather than something typed plainly. The app marks that as a guess. */
+  const trimmed = !!(at && at[0].length < first.length);
 
   const title = rawTitle
     .split(" ")
@@ -93,7 +106,11 @@ function readRole(input: string): { role: Role; guessed: boolean } {
       organisation: kind === "Scholarship" ? null : organisation,
       kind,
       setting:
-        kind === "Scholarship" ? "Nonprofit" : organisation ? "Large company" : "Not sure yet",
+        kind === "Scholarship"
+          ? "Nonprofit"
+          : organisation
+            ? "Large company"
+            : "Not sure yet",
       seniority: kind === "Job" ? "Early career" : "Student",
       blurb:
         kind === "Scholarship"
@@ -104,7 +121,7 @@ function readRole(input: string): { role: Role; guessed: boolean } {
     },
     /* The app marks any field the model was unsure of. Typed input that did not
        name an organisation is exactly that case. */
-    guessed: !organisation,
+    guessed: !organisation || trimmed,
   };
 }
 
@@ -216,7 +233,8 @@ const STEPS: Step[] = [
   {
     id: "home",
     stop: "Home",
-    caption: "One gold object per screen, and on Home it is the button that starts a session.",
+    caption:
+      "One gold object per screen, and on Home it is the button that starts a session.",
   },
   {
     id: "compose",
@@ -224,7 +242,10 @@ const STEPS: Step[] = [
     caption:
       "One box. Type your own and the rest of the walkthrough follows it. The size of the field is the instruction.",
   },
-  { id: "reading", caption: "No spinner anywhere in Redi. The line travels while it reads." },
+  {
+    id: "reading",
+    caption: "No spinner anywhere in Redi. The line travels while it reads.",
+  },
   {
     id: "confirm",
     stop: "What it worked out",
@@ -248,7 +269,11 @@ const STEPS: Step[] = [
     caption:
       "The answer named a figure, so the follow up asks about the figure. A thin answer gets a different probe, and a strong one gets none.",
   },
-  { id: "thinking", caption: "Redi thinking is the loading state. There is nothing else to watch." },
+  {
+    id: "thinking",
+    caption:
+      "Redi thinking is the loading state. There is nothing else to watch. That was the eighth question, so what he is writing is the report.",
+  },
   {
     id: "report",
     stop: "The report",
@@ -265,6 +290,8 @@ const AUTO: Partial<Record<StepId, number>> = {
   thinking: 1700,
 };
 
+const COMPOSE = STEPS.findIndex((s) => s.id === "compose");
+
 export function RediDemo() {
   const [index, setIndex] = useState(0);
   const [draft, setDraft] = useState(EXAMPLE);
@@ -274,24 +301,40 @@ export function RediDemo() {
   const step = STEPS[index];
   const { role, guessed } = useMemo(() => readRole(applied), [applied]);
 
-  const go = useCallback((id: StepId) => {
-    const next = STEPS.findIndex((s) => s.id === id);
-    if (next >= 0) setIndex(next);
-  }, []);
+  /* Every move past the compose screen commits the box, not just the phone's
+     own Continue. Jumping through the rail used to leave `applied` at the
+     example, so the confirm screen disagreed with the words still sitting in
+     the textarea behind it. */
+  const jump = useCallback(
+    (next: number) => {
+      const to = Math.max(0, Math.min(next, STEPS.length - 1));
+      if (to > COMPOSE) setApplied(draft);
+      setIndex(to);
+    },
+    [draft],
+  );
+
+  const go = useCallback(
+    (id: StepId) => {
+      const next = STEPS.findIndex((s) => s.id === id);
+      if (next >= 0) jump(next);
+    },
+    [jump],
+  );
 
   /* The two transition screens move themselves on, so the walkthrough reads as
      a flow rather than as nine slides. */
   useEffect(() => {
     const hold = AUTO[step.id];
     if (!hold) return;
-    const timer = window.setTimeout(() => setIndex((i) => Math.min(i + 1, STEPS.length - 1)), hold);
+    const timer = window.setTimeout(
+      () => setIndex((i) => Math.min(i + 1, STEPS.length - 1)),
+      hold,
+    );
     return () => window.clearTimeout(timer);
   }, [step.id]);
 
-  const advance = () => {
-    if (step.id === "compose") setApplied(draft);
-    setIndex((i) => Math.min(i + 1, STEPS.length - 1));
-  };
+  const advance = () => jump(index + 1);
 
   const atEnd = index === STEPS.length - 1;
 
@@ -333,7 +376,7 @@ export function RediDemo() {
                   type="button"
                   className={`rw-stop${here ? " is-here" : ""}${on ? " is-done" : ""}`}
                   aria-current={here ? "step" : undefined}
-                  onClick={() => setIndex(at)}
+                  onClick={() => jump(at)}
                 >
                   <span className="rw-stop-mark" aria-hidden="true" />
                   <span className="rw-stop-name">{stop.stop}</span>
@@ -344,6 +387,13 @@ export function RediDemo() {
         </ol>
 
         <div className="rw-say">
+          {/* A stable region, deliberately not the caption below: that one
+              carries key={step.id} to replay its animation, and a region that
+              remounts announces nothing. This is also the only thing that
+              speaks on the two screens that advance themselves. */}
+          <p className="sr-only" aria-live="polite">
+            {step.stop ?? "Transition"}. {step.caption}
+          </p>
           <p className="rw-caption" key={step.id}>
             {step.caption}
           </p>
@@ -363,7 +413,14 @@ export function RediDemo() {
           <button
             type="button"
             className="rw-nav"
-            onClick={() => setIndex((i) => Math.max(i - 1, 0))}
+            onClick={() => {
+              /* The transitions move themselves on, so stepping back into one
+                 just throws you forward again. Back walks past them to the
+                 last screen the visitor actually chose. */
+              let next = index - 1;
+              while (next > 0 && AUTO[STEPS[next].id]) next -= 1;
+              jump(next);
+            }}
             disabled={index === 0}
           >
             Back
@@ -382,8 +439,8 @@ export function RediDemo() {
         </div>
 
         <p className="rw-note">
-          The screens, the copy and the colours are the app&rsquo;s own. The scores are fixed and
-          nothing here calls a model.
+          The screens, the copy and the colours are the app&rsquo;s own. The
+          scores are fixed and nothing here calls a model.
         </p>
       </div>
     </div>
@@ -421,8 +478,27 @@ function Phone({
     step.id === "followup" ||
     step.id === "thinking";
 
+  /* The phone's own controls replace the screen under whoever pressed them, so
+     the screen that arrives takes the focus the old one lost. Skipping the
+     first mount keeps the panel from stealing focus on page load, and
+     preventScroll matters because .rp is transform-scaled. */
+  const screen = useRef<HTMLDivElement>(null);
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    screen.current?.focus({ preventScroll: true });
+  }, [step.id]);
+
   return (
-    <div className="rp" role="group" aria-label={`Redi AI, ${step.stop ?? step.id}`}>
+    <div
+      className="rp"
+      role="group"
+      aria-label={`Redi AI, ${step.stop ?? step.id}`}
+    >
       <div className="rp-screen">
         {/* The device status bar, so the app's own chrome reads as app chrome
             rather than as the panel's. */}
@@ -454,22 +530,49 @@ function Phone({
               strokeOpacity="0.5"
             />
             <rect x="44" y="5" width="15" height="6" rx="1.5" fill="#F4F1EA" />
-            <path d="M64.5 6.5v3" stroke="#F4F1EA" strokeOpacity="0.5" strokeWidth="1.6" />
+            <path
+              d="M64.5 6.5v3"
+              stroke="#F4F1EA"
+              strokeOpacity="0.5"
+              strokeWidth="1.6"
+            />
           </svg>
         </div>
 
-        <div className="rp-app" data-screen={step.id}>
+        <div
+          className="rp-app"
+          data-screen={step.id}
+          ref={screen}
+          tabIndex={-1}
+        >
           {step.id === "home" ? <Home role={role} onGo={onGo} /> : null}
           {step.id === "compose" ? (
-            <Compose draft={draft} onDraft={onDraft} onAdvance={onAdvance} onGo={onGo} />
+            <Compose
+              draft={draft}
+              onDraft={onDraft}
+              onAdvance={onAdvance}
+              onGo={onGo}
+            />
           ) : null}
           {step.id === "reading" ? <Reading /> : null}
           {step.id === "confirm" ? (
-            <Confirm role={role} guessed={guessed} onAdvance={onAdvance} onGo={onGo} />
+            <Confirm
+              role={role}
+              guessed={guessed}
+              onAdvance={onAdvance}
+              onGo={onGo}
+            />
           ) : null}
-          {session ? <Run step={step.id} role={role} onAdvance={onAdvance} /> : null}
+          {session ? (
+            <Run step={step.id} role={role} onAdvance={onAdvance} />
+          ) : null}
           {step.id === "report" ? (
-            <Report role={role} openSkill={openSkill} onOpenSkill={onOpenSkill} onGo={onGo} />
+            <Report
+              role={role}
+              openSkill={openSkill}
+              onOpenSkill={onOpenSkill}
+              onGo={onGo}
+            />
           ) : null}
         </div>
 
@@ -497,7 +600,12 @@ function Chrome({
   return (
     <div className="ra-chrome">
       {onBack ? (
-        <button type="button" className="ra-back" onClick={onBack} aria-label="Back">
+        <button
+          type="button"
+          className="ra-back"
+          onClick={onBack}
+          aria-label="Back"
+        >
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
             <path
               d="M15 5 8 12l7 7"
@@ -519,7 +627,13 @@ function Chrome({
   );
 }
 
-function Header({ eyebrow, title }: { eyebrow: string; title: React.ReactNode }) {
+function Header({
+  eyebrow,
+  title,
+}: {
+  eyebrow: string;
+  title: React.ReactNode;
+}) {
   return (
     <div className="ra-header">
       <p className="ra-eyebrow">{eyebrow}</p>
@@ -555,26 +669,61 @@ function SectionHead({ label, action }: { label: string; action?: string }) {
 /* The coverage gauge on a role card. 96dp of track, gold to the band's
    fraction, and the band's name beside it. A brand new role draws no gold at
    all rather than a stub, because a stub is progress that is not there. */
-function Coverage({ progress, label, dim = true }: { progress: number; label: string; dim?: boolean }) {
+function Coverage({
+  progress,
+  label,
+  dim = true,
+}: {
+  progress: number;
+  label: string;
+  dim?: boolean;
+}) {
   return (
     <div className="ra-cov">
       <span className="ra-cov-gauge">
-        <RediFilament state="hairline" progress={progress} height={2} dim={dim} />
+        <RediFilament
+          state="hairline"
+          progress={progress}
+          height={2}
+          dim={dim}
+        />
       </span>
       <span className="ra-cov-label">{label}</span>
     </div>
   );
 }
 
-function Primary({ label, onClick }: { label: string; onClick?: () => void }) {
+function Primary({
+  label,
+  onClick,
+  disabled,
+  describedBy,
+}: {
+  label: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  describedBy?: string;
+}) {
   return (
-    <button type="button" className="ra-primary" onClick={onClick}>
+    <button
+      type="button"
+      className="ra-primary"
+      onClick={onClick}
+      disabled={disabled}
+      aria-describedby={describedBy}
+    >
       {label}
     </button>
   );
 }
 
-function Secondary({ label, onClick }: { label: string; onClick?: () => void }) {
+function Secondary({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick?: () => void;
+}) {
   return (
     <button type="button" className="ra-secondary" onClick={onClick}>
       {label}
@@ -626,7 +775,14 @@ const TAB_ICONS = [
     />
   </svg>,
   <svg key="g" viewBox="0 0 24 24" width="20" height="20">
-    <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
+    <circle
+      cx="12"
+      cy="12"
+      r="3.2"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    />
     <path
       d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6"
       fill="none"
@@ -691,7 +847,9 @@ function Home({ role, onGo }: { role: Role; onGo: (id: StepId) => void }) {
         </span>
         <span className="ra-drill-body">
           <span className="ra-drill-name">Start drill</span>
-          <span className="ra-drill-sub">One question. Unlimited, free forever.</span>
+          <span className="ra-drill-sub">
+            One question. Unlimited, free forever.
+          </span>
         </span>
       </button>
     </div>
@@ -752,19 +910,22 @@ function Compose({
       />
 
       <p className="ra-lead">
-        The role, the company, what they said the round would cover. As much or as little as you
-        like. The more you tell me, the better the questions get.
+        The role, the company, what they said the round would cover. As much or
+        as little as you like. The more you tell me, the better the questions
+        get.
       </p>
 
       <label className="ra-field">
         <span className="ra-field-label">What you are interviewing for</span>
         <textarea
+          id="ra-role-input"
           className="ra-input"
           value={draft}
           onChange={(e) => onDraft(e.target.value)}
           rows={6}
           maxLength={4000}
           spellCheck={false}
+          aria-describedby={ready ? undefined : "ra-role-reason"}
         />
       </label>
 
@@ -786,11 +947,20 @@ function Compose({
       </span>
 
       <div className="ra-footer">
-        <Primary label="Continue" onClick={onAdvance} />
+        <Primary
+          label="Continue"
+          onClick={onAdvance}
+          disabled={!ready}
+          describedBy={ready ? undefined : "ra-role-reason"}
+        />
         {/* The app prints the reason a disabled button is disabled, rather than
-            leaving somebody to work it out. */}
+            leaving somebody to work it out. The button is genuinely disabled:
+            an empty box used to advance and quietly reinstate the example role
+            as though it were what the visitor had typed. */}
         {ready ? null : (
-          <p className="ra-reason">Say what you are interviewing for to continue.</p>
+          <p className="ra-reason" id="ra-role-reason" role="status">
+            Say what you are interviewing for to continue.
+          </p>
         )}
       </div>
     </div>
@@ -848,11 +1018,18 @@ function Confirm({
           <div key={label} className="ra-fact">
             <span className="ra-fact-name">
               {label}
-              {isGuess ? <span className="ra-fact-guess">Best guess</span> : null}
+              {isGuess ? (
+                <span className="ra-fact-guess">Best guess</span>
+              ) : null}
             </span>
             <span className="ra-fact-value">
               {value}
-              <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                width="13"
+                height="13"
+                aria-hidden="true"
+              >
                 <path
                   d="m9 5 7 7-7 7"
                   fill="none"
@@ -870,12 +1047,15 @@ function Confirm({
       <hr className="ra-rule" />
       {/* Tense matters here: nothing has been written yet. */}
       <p className="ra-promise">
-        Adding this starts 24 questions being written around it. You will not see them until a
-        session starts.
+        Adding this starts 24 questions being written around it. You will not
+        see them until a session starts.
       </p>
 
       <div className="ra-escape">
-        <Secondary label="Tell Redi more first" onClick={() => onGo("compose")} />
+        <Secondary
+          label="Tell Redi more first"
+          onClick={() => onGo("compose")}
+        />
       </div>
 
       <div className="ra-footer">
@@ -903,12 +1083,18 @@ function Run({
   const followup = step === "followup";
   const thinking = step === "thinking";
 
-  const text = followup ? FOLLOW_UP : QUESTION;
+  /* The thinking screen is what follows the follow up, and the app holds the
+     last spoken line on screen while Redi works. Reverting to the original
+     question here would re-mount the paragraph and replay its fade. */
+  const text = followup || thinking ? FOLLOW_UP : QUESTION;
 
   /* Redi's mouth is driven by the words as they land, so the face moves with
      the line rather than to a loop. The app feeds the same input from the
      playing clip's amplitude. */
-  const { revealed, amplitude, done } = useSpokenWords(text, asking || followup);
+  const { revealed, amplitude, done } = useSpokenWords(
+    text,
+    asking || followup,
+  );
   const level = useVoiceLevel(answering);
 
   /* Speaking and grace are two phases of one screen, and the app draws them
@@ -917,6 +1103,21 @@ function Run({
      feel like answering a person rather than starting a recording. */
   const speaking = (asking || followup) && !done;
   const grace = (asking || followup) && done;
+
+  /* The clock belongs to the session rather than to the screen, so it runs on
+     across the four of them. Where it lands is where the report's own "10:22
+     of talking" has to have come from. */
+  /* The session clock is the distance from startedAt, so it only ever goes
+     forward, and the answering reading has to sit a full answer after the
+     asking one: 13:18 plus the 0:47 the answer timer shows. It read 13:42,
+     which put the start of the answer 23 seconds before the question. */
+  const elapsed = thinking
+    ? "15:06"
+    : followup
+      ? "14:31"
+      : answering
+        ? "14:05"
+        : "13:18";
 
   const rediState: RediState = thinking
     ? "thinking"
@@ -929,13 +1130,12 @@ function Run({
   return (
     <div className="ra-run">
       {/* One segment per question, at the very top. A follow up never takes a
-          segment: it belongs to the question that earned it. */}
+          segment: it belongs to the question that earned it. The walkthrough
+          stands on the last of the eight, so the report is the next screen
+          rather than something it skips five questions to reach. */}
       <div className="ra-progress" aria-hidden="true">
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-          <span
-            key={i}
-            className={`ra-seg${i < 2 ? " is-done" : i === 2 ? " is-now" : ""}`}
-          />
+          <span key={i} className={`ra-seg${i < 7 ? " is-done" : " is-now"}`} />
         ))}
       </div>
 
@@ -944,8 +1144,13 @@ function Run({
           <span />
           <span />
         </span>
-        <RediOrb size={44} state={rediState} amplitude={amplitude} className="ra-run-mark" />
-        <span className="ra-elapsed">{answering ? "6:12" : "5:48"}</span>
+        <RediOrb
+          size={44}
+          state={rediState}
+          amplitude={amplitude}
+          className="ra-run-mark"
+        />
+        <span className="ra-elapsed">{elapsed}</span>
       </div>
 
       <div className="ra-pill-slot">
@@ -993,7 +1198,10 @@ function Run({
           <div className="ra-turn-filament">
             <RediFilament state="wave" amplitude={level} height={24} />
           </div>
-          <div className="ra-lifeline">Take your time.</div>
+          {/* The app puts "Take your time." in this row after twelve seconds
+              of silence. The waveform here is moving, so the row is reserved
+              and left empty rather than saying it. */}
+          <div className="ra-lifeline" />
           <div className="ra-run-bottom">
             <Secondary label="Done" onClick={onAdvance} />
           </div>
@@ -1007,8 +1215,16 @@ function Run({
         </div>
       ) : grace ? (
         <div className="ra-mic-area">
-          <p className="ra-answer-timer ra-answer-timer-empty">0:00</p>
-          <button type="button" className="ra-mic" onClick={onAdvance} aria-label="Tap to answer">
+          {/* Reserved, like the caption row and the lifeline beneath it. It
+              held a transparent "0:00" that no sighted visitor could see and
+              every screen reader read out as a running timer. */}
+          <p className="ra-answer-timer" />
+          <button
+            type="button"
+            className="ra-mic"
+            onClick={onAdvance}
+            aria-label="Tap to answer"
+          >
             <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
               <rect x="9" y="2.5" width="6" height="11" rx="3" fill="#E9B33B" />
               <path
@@ -1040,7 +1256,8 @@ function Run({
 
       <span className="sr-only">
         Practising {role.title}
-        {role.organisation ? ` at ${role.organisation}` : ""}. Question three of eight.
+        {role.organisation ? ` at ${role.organisation}` : ""}. Question eight of
+        eight, the last one.
       </span>
     </div>
   );
@@ -1056,13 +1273,20 @@ function useSpokenWords(text: string, active: boolean) {
      resets it on the way in: the line it belongs to is part of the value, so
      a line that has not started yet is read as not started rather than being
      set back to zero by an effect. */
-  const [frame, setFrame] = useState({ line: "", count: 0, amplitude: 0, done: false });
+  const [frame, setFrame] = useState({
+    line: "",
+    count: 0,
+    amplitude: 0,
+    done: false,
+  });
   const raf = useRef(0);
 
   useEffect(() => {
     if (!active) return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (reduced) {
       /* One frame, straight to the rest pose. Every loop is skipped. */
       raf.current = requestAnimationFrame(() =>
@@ -1090,7 +1314,12 @@ function useSpokenWords(text: string, active: boolean) {
       const shape = Math.sin(phase * Math.PI) ** 0.7;
       const wobble = 0.72 + 0.28 * Math.sin(t / 47);
 
-      setFrame({ line: text, count: spoken, amplitude: shape * wobble, done: false });
+      setFrame({
+        line: text,
+        count: spoken,
+        amplitude: shape * wobble,
+        done: false,
+      });
       raf.current = requestAnimationFrame(tick);
     };
 
@@ -1102,7 +1331,11 @@ function useSpokenWords(text: string, active: boolean) {
 
   if (!active) return { revealed: words, amplitude: 0, done: true };
   if (!started) return { revealed: [] as string[], amplitude: 0, done: false };
-  return { revealed: words.slice(0, frame.count), amplitude: frame.amplitude, done: frame.done };
+  return {
+    revealed: words.slice(0, frame.count),
+    amplitude: frame.amplitude,
+    done: frame.done,
+  };
 }
 
 /* A stand in for the microphone's output level, which is what drives the
@@ -1114,7 +1347,9 @@ function useVoiceLevel(active: boolean) {
   useEffect(() => {
     if (!active) return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (reduced) {
       /* The waveform holds a still reading rather than running. */
       raf.current = requestAnimationFrame(() => setLevel(0.4));
@@ -1165,10 +1400,15 @@ function Report({
         <RediFilament state="hairline" progress={1} height={8} dim />
       </div>
 
-      <p className="ra-evidence">8 answers, 10:22 of talking, across 6 skills.</p>
+      {/* The app sums the five content skills and leaves Delivery out, since it
+          is a second reading of the same answers. 3:41 + 2:33 + 1:01 + 0:52 +
+          0:48 is 8:55, so that is what the headline says. */}
+      <p className="ra-evidence">
+        8 answers, 8:55 of talking, across 6 skills.
+      </p>
       <p className="ra-summary">
-        The migration answer was the strongest thing here. Nothing you told me went wrong, so there
-        was very little for me to read on failure.
+        The migration answer was the strongest thing here. Nothing you told me
+        went wrong, so there was very little for me to read on failure.
       </p>
 
       <hr className="ra-rule" />
@@ -1196,7 +1436,10 @@ function Report({
                 aria-expanded={open}
                 onClick={() => onOpenSkill(open ? null : i)}
               >
-                <span className="ra-skill-dot" style={{ background: skill.hue }} />
+                <span
+                  className="ra-skill-dot"
+                  style={{ background: skill.hue }}
+                />
                 <span className="ra-skill-name">{skill.name}</span>
                 <span className="ra-skill-range">
                   {skill.low} to {skill.high}
@@ -1237,15 +1480,18 @@ function Report({
               OWNERSHIP AND IMPACT
             </span>
             <span className="ra-worked-text">
-              You wrote the rollback plan because nobody had, and you said so without dressing it
-              up.
+              You wrote the rollback plan because nobody had, and you said so
+              without dressing it up.
             </span>
           </span>
         </div>
       </div>
 
       <div className="ra-footer">
-        <Primary label="Run this interview again" onClick={() => onGo("asking")} />
+        <Primary
+          label="Run this interview again"
+          onClick={() => onGo("asking")}
+        />
       </div>
     </div>
   );
