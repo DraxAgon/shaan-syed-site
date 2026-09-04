@@ -490,14 +490,6 @@
     box-shadow: 0 20px 38px -26px #000;
   }
 
-  .bio-caption {
-    display: flex; align-items: baseline; gap: 8px;
-    margin-top: 9px;
-    font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.4;
-    color: var(--color-ink-muted);
-  }
-  .bio-caption-index { color: var(--color-brass); font-variant-numeric: tabular-nums; }
-
   /* Set a step above body copy: at 1rem the column ran out about 200px
      short of the last frame in the rail, leaving the photos hanging on
      their own. The measure is held near the old one so only the type

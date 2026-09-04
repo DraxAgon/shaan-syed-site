@@ -22,11 +22,11 @@ const HAIRLINE = { r: 0x2e, g: 0x26, b: 0x20 };
 
 const slots = [
   { file: "portrait-hero.webp", w: 1200, h: 1500, tone: HAIRLINE },
-  { file: "portrait-bio.webp", w: 1000, h: 1000, tone: HAIRLINE },
   // The /bio photo rail, in the order the frames run down the page.
-  { file: "bio-piano.webp", w: 1000, h: 1250, tone: HAIRLINE },
-  { file: "bio-running.webp", w: 1200, h: 900, tone: HAIRLINE },
-  { file: "bio-kitchen.webp", w: 1000, h: 1000, tone: HAIRLINE },
+  { file: "bio-grad.webp", w: 1000, h: 1333, tone: HAIRLINE },
+  { file: "bio-piano.webp", w: 1000, h: 1704, tone: HAIRLINE },
+  { file: "bio-noodles.webp", w: 1000, h: 750, tone: HAIRLINE },
+  { file: "bio-city.webp", w: 1000, h: 1333, tone: HAIRLINE },
   { file: "logo-toronto.webp", w: 256, h: 256, tone: LIFT },
   { file: "logo-strello.webp", w: 256, h: 256, tone: LIFT },
   { file: "logo-sumodino.webp", w: 256, h: 256, tone: LIFT },

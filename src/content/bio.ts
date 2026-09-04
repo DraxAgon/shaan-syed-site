@@ -12,45 +12,41 @@ export const bioParagraphs: string[] = [
 ];
 
 /* The photo rail that runs down the left of /bio, in page order.
-   Every slot ships as an on-brand placeholder at the size listed here,
-   so dropping in a real photo of the same name is the only step. The
-   sizes differ on purpose: the rail is deliberately ragged, and frames
-   of one shape would flatten it back into a column of boxes. */
+   The frames carry no captions on purpose: the writing next to them
+   already says what they are, and a line of type under each print
+   turned the rail into a list. The sizes differ because the rail is
+   deliberately ragged, and frames of one shape would flatten it back
+   into a column of boxes. */
 export type BioPhoto = {
   src: string;
   alt: string;
-  caption: string;
   width: number;
   height: number;
 };
 
 export const bioPhotos: BioPhoto[] = [
   {
-    src: "/images/portrait-bio.webp",
-    alt: "Shaan Syed",
-    caption: "Portrait",
+    src: "/images/bio-grad.webp",
+    alt: "Shaan in cap and gown on a lawn with the Toronto skyline behind him",
     width: 1000,
-    height: 1000,
+    height: 1333,
   },
   {
     src: "/images/bio-piano.webp",
-    alt: "Shaan at the piano",
-    caption: "Seven years at the piano",
+    alt: "Shaan at a grand piano on a darkened stage",
     width: 1000,
-    height: 1250,
+    height: 1704,
   },
   {
-    src: "/images/bio-running.webp",
-    alt: "Shaan running a cross country race",
-    caption: "Cross country, to provincials",
-    width: 1200,
-    height: 900,
+    src: "/images/bio-noodles.webp",
+    alt: "Shaan grinning over a cup of instant noodles at a table of friends",
+    width: 1000,
+    height: 750,
   },
   {
-    src: "/images/bio-kitchen.webp",
-    alt: "Shaan cooking",
-    caption: "In the kitchen",
+    src: "/images/bio-city.webp",
+    alt: "Shaan downtown in front of an ice sculpture, towers behind him",
     width: 1000,
-    height: 1000,
+    height: 1333,
   },
 ];

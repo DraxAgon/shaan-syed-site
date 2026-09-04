@@ -24,7 +24,9 @@ export default function BioPage() {
       {/* Two sides: the photos run down the left, the writing holds the
           right. The frames are tilted and offset off each other so the
           rail reads as prints laid out by hand rather than a stack of
-          boxes; the angles live in the CSS, not in the data. */}
+          boxes; the angles live in the CSS, not in the data. No captions
+          under them on purpose — the prose beside the rail already says
+          what they are. */}
       <div className="bio-split">
         <div className="bio-rail">
           {bioPhotos.map((photo, index) => (
@@ -38,12 +40,6 @@ export default function BioPage() {
                 priority={index === 0}
                 className="bio-photo"
               />
-              <figcaption className="bio-caption">
-                <span className="bio-caption-index">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                {photo.caption}
-              </figcaption>
             </figure>
           ))}
         </div>
