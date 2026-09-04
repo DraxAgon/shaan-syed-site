@@ -8,6 +8,7 @@ import { useState } from "react";
 import { ProjectDemo } from "./project-demo";
 import { Icon } from "./icon";
 import { hasIcon } from "./icons";
+import { Photo } from "./photo";
 import { projects } from "@/content/projects";
 
 /* The walkthrough is one panel of one project, so it is fetched when that
@@ -136,7 +137,7 @@ export function ProjectsBrowser() {
             defaultMode={project.demo.defaultMode}
           />
         ) : project.image ? (
-          <Image
+          <Photo
             src={project.image}
             alt={`${project.name}, ${project.descriptor}`}
             width={1600}

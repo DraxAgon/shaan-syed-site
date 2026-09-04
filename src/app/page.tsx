@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 
 import { CertRow } from "@/components/cert-row";
 import { DisclosureRow } from "@/components/disclosure-row";
 import { Icon } from "@/components/icon";
+import { Photo } from "@/components/photo";
 import { hasIcon } from "@/components/icons";
 import { softwareCertifications } from "@/content/certifications";
 import { experience } from "@/content/experience";
@@ -22,7 +22,7 @@ export default function HomePage() {
     <div className="home">
       {/* Left: who. Right: what. */}
       <div className="home-identity">
-        <Image
+        <Photo
           src="/images/portrait-hero.webp"
           alt="Shaan Syed"
           width={960}

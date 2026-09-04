@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 
 import { OrgLogo } from "@/components/logo";
+import { Photo } from "@/components/photo";
 import { bioParagraphs, bioPhotos } from "@/content/bio";
 import {
   doubleDegree,
@@ -31,7 +31,7 @@ export default function BioPage() {
         <div className="bio-rail">
           {bioPhotos.map((photo, index) => (
             <figure key={photo.src} className="bio-frame">
-              <Image
+              <Photo
                 src={photo.src}
                 alt={photo.alt}
                 width={photo.width}

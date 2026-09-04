@@ -203,6 +203,14 @@
     .brand { font-size: 1rem; gap: 0; }
     .brand-rule { display: none; }
     .nav-list { gap: 16px; }
+
+    /* 28px a side is a fifth of a phone, and it comes off the one thing
+       on the page that needs the width: the demo panels. The gutter the
+       header, the column and the footer share drops with it, so nothing
+       falls out of line. */
+    .site-header-inner,
+    .site-main,
+    .site-footer { padding-inline: 16px; }
   }
 
   @media (max-width: 420px) {
@@ -329,9 +337,14 @@
      line and stack instead, so neither has to wrap mid-phrase. */
   @media (max-width: 560px) {
     .disclosure-head { flex-wrap: wrap; row-gap: 2px; }
-    .disclosure-title { flex: 1 1 auto; }
+    .disclosure-title { flex: 1 1 auto; min-width: 0; }
+    /* The aside takes the whole second line, indented past the mark. A
+       basis of 100% is the line on its own, so the indent has to come
+       back off it or the row runs 30px wider than the column it is in:
+       shrink does that without the basis having to know the margin. */
     .disclosure-aside {
-      flex: 1 0 100%; margin-left: 30px; text-align: left;
+      flex: 1 1 100%; min-width: 0;
+      margin-left: 30px; text-align: left;
     }
   }
   .disclosure-chevron {
@@ -404,6 +417,16 @@
   .sep {
     margin-left: 4px;
     color: color-mix(in srgb, var(--color-ink-muted) 55%, transparent);
+  }
+
+  /* Phone widths. A couple of these runs longer than the column is
+     wide: "Firebase (Auth, Firestore, Cloud Functions)" in the skills,
+     "Chrome Extension APIs (Manifest V3)" in the chips. The nowrap is
+     there to keep an icon with its label, not to promise one line, and
+     the flex row holds that on its own, so the label is allowed to wrap
+     beside the mark rather than push the whole page sideways. */
+  @media (max-width: 560px) {
+    .skill-item, .chip-run li { white-space: normal; max-width: 100%; }
   }
 
   /* ---------------- generic pages ---------------- */
@@ -813,6 +836,111 @@
     color: var(--color-ink-muted); text-wrap: pretty;
   }
 
+  /* ---------------- photos, and opening one ----------------
+     Every still on the site is small where it sits, so each one is a
+     button that puts the photo up at full size over the page. The
+     button is shrink to fit, so it takes the width the photo inside it
+     was already given rather than imposing one of its own: 160px for
+     the home portrait, the frame's width in the bio rail. */
+  .photo-open {
+    position: relative;
+    display: inline-block; vertical-align: top;
+    max-width: 100%;
+    padding: 0; border: 0; background: none;
+    font: inherit; color: inherit; line-height: 0;
+    border-radius: 10px;
+    cursor: zoom-in;
+  }
+  .photo-open img { transition: filter 200ms ease; }
+  .photo-open:hover img, .photo-open:focus-visible img { filter: brightness(1.08); }
+
+  /* The one thing that says a photo does something. It stays out of the
+     way until the pointer is on the print, and it never shows on a
+     touch screen, where there is no hover to reveal it and every photo
+     is worth a tap anyway. */
+  .photo-cue {
+    position: absolute; right: 8px; bottom: 8px;
+    display: grid; place-items: center;
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    border: 1px solid var(--color-hairline);
+    background: color-mix(in srgb, var(--color-plate) 76%, transparent);
+    backdrop-filter: blur(4px);
+    color: var(--color-ink);
+    opacity: 0;
+    transition: opacity 180ms ease;
+    pointer-events: none;
+  }
+  .photo-open:hover .photo-cue, .photo-open:focus-visible .photo-cue { opacity: 1; }
+  @media (hover: none) { .photo-cue { display: none; } }
+
+  /* The figure is stretched to the overlay and centred by its own auto
+     margins rather than by justify-items, so it has a definite width for
+     the photo's own percentage to resolve against. Centred by
+     justify-items it was shrink to fit, which makes that percentage
+     circular and left the photo at about a third of the room it had. */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    display: grid; align-content: center;
+    padding: 56px 16px 20px;
+    background: color-mix(in srgb, #0b0906 88%, transparent);
+    backdrop-filter: blur(8px);
+    animation: fade 180ms ease both;
+    cursor: zoom-out;
+  }
+
+  .lightbox-figure {
+    display: grid; gap: 12px; justify-items: center;
+    width: 100%; max-width: 1100px; min-height: 0;
+    margin: 0 auto;
+    cursor: default;
+  }
+
+  /* Sized off the file's own pixel dimensions, carried in on the two
+     custom properties, rather than off the image's intrinsic size. A
+     srcset with a sizes attribute reports its intrinsic size divided by
+     the chosen candidate's density, and on a 2x screen that put a
+     1000px print on the page at 286px wide. The ratio is held either
+     way, so a tall photo and a wide one each land inside the window
+     without being cropped. */
+  .lightbox-img {
+    display: block;
+    aspect-ratio: var(--photo-w) / var(--photo-h);
+    width: min(100%, (100dvh - 130px) * var(--photo-ratio));
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px;
+    border: 1px solid var(--color-hairline);
+    background: var(--color-lift);
+    box-shadow: 0 30px 80px -34px #000;
+  }
+
+  .lightbox-caption {
+    max-width: 62ch; text-align: center; text-wrap: pretty;
+    font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5;
+    color: var(--color-ink-muted);
+  }
+
+  .lightbox-close {
+    position: absolute; top: 14px; right: 14px;
+    display: grid; place-items: center;
+    width: 40px; height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--color-hairline);
+    background: var(--color-lift);
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .lightbox-close:hover, .lightbox-close:focus-visible {
+    color: var(--color-brass); border-color: var(--color-brass);
+  }
+
+  @media (max-width: 560px) {
+    .lightbox { padding: 52px 12px 16px; }
+    .lightbox-img { width: min(100%, (100dvh - 120px) * var(--photo-ratio)); }
+  }
+
   /* ---------------- motion ---------------- */
   @keyframes rise {
     from { opacity: 0; transform: translateY(10px); }
@@ -933,7 +1061,17 @@
     height: calc(844px * var(--zoom));
     flex: none;
   }
-  @container redi (min-width: 400px) { .rw-phone-holder { --zoom: 0.68; } }
+  /* Stacked, the phone has the panel to itself, so it grows into the
+     width instead of sitting at the size it is drawn beside the rail: on
+     a 330px panel a fixed 0.6 left a 236px phone with 11px type in it
+     and 90px of empty ground either side. The steps are where the phone
+     plus the panel's own 20px gutters stop fitting, and they stop at
+     0.74, the largest it is ever drawn.
+
+     Beside the rail from 620px up, the ladder is the original one: there
+     the phone is sharing the panel, not filling it. */
+  @container redi (min-width: 310px) { .rw-phone-holder { --zoom: 0.66; } }
+  @container redi (min-width: 340px) { .rw-phone-holder { --zoom: 0.74; } }
   @container redi (min-width: 620px) { .rw-phone-holder { --zoom: 0.6; } }
   @container redi (min-width: 780px) { .rw-phone-holder { --zoom: 0.68; } }
   @container redi (min-width: 900px) { .rw-phone-holder { --zoom: 0.74; } }
@@ -1953,6 +2091,24 @@
     .rl-heading { font-size: 3rem; line-height: 1; }
     .rl-stage { height: 520px; }
   }
+
+  /* Phone widths. 480px of frame is a desktop measurement: on a panel
+     about 330px wide the same content is two or three times as tall, so
+     the fixed height cut the compose box in half on the Gmail steps and
+     hid the generated draft almost entirely on the last one, which is
+     the thing the whole demo is walking towards.
+
+     So the frame stops being a fixed window and becomes as tall as what
+     is in it. The panel grows and the page scrolls, rather than a
+     second scroll opening inside a box the size of a postcard. */
+  @container demo (max-width: 640px) {
+    .rl-demo { padding: 22px 12px 24px; }
+    .rl-card { margin-top: 32px; }
+
+    .rl-stage { height: auto; min-height: 420px; }
+    .rl-gmail { height: auto; }
+    .rl-gmail-view { flex: 0 0 auto; overflow: visible; }
+  }
 }
 
 /* Rilo panel stylesheet, as shipped. Only the selectors changed: each
@@ -2404,5 +2560,26 @@
     .rl-demo .demo-canvas {
       overflow-y:visible;
     }
+  }
+}
+
+/* The panel's own rules, overridden for a phone. Kept out of the block
+   above so that stays the stylesheet Rilo ships, unedited.
+
+   Rilo's narrow layout gives the panel an inner scroll, which works on a
+   window that is narrow but still tall. This panel is neither: at about
+   330px wide it is roughly a third of the height Rilo's own page gives
+   it, and the inner scroll left the generated draft, the thing the whole
+   flow builds to, a 20px sliver at the bottom of the box. So on a phone
+   the panel sizes to its content and the page does the scrolling. */
+@layer components {
+  @container demo (max-width: 640px) {
+    .rl-demo .demo-shell { height: auto; }
+    .rl-demo .demo-main { overflow: visible; }
+    .rl-demo .demo-insights { overflow: visible; }
+    .rl-demo .demo-canvas { overflow: visible; }
+    /* Its own scroll for the same reason: the draft is the payoff, and
+       220px of it on a phone is three or four lines. */
+    .rl-demo .demo-preview-body { max-height: none; }
   }
 }
