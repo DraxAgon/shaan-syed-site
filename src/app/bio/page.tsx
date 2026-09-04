@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = {
   title: "Bio",
   description:
-    "Shaan Syed on piano and cross country, lifeguarding for the City of Toronto, shipping Rilo to the Chrome Web Store, and a Computer Science and BBA double degree at Waterloo and Laurier.",
+    "Shaan Syed on why he chose the Computer Science and BBA double degree at Waterloo and Laurier, shipping Rilo to the Chrome Web Store, aiming for product management, and running, piano, and cooking.",
 };
 
 export default function BioPage() {
@@ -44,54 +44,66 @@ export default function BioPage() {
           ))}
         </div>
 
-        <div className="bio-prose">
-          {bioParagraphs.map((paragraph) => (
-            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-          ))}
+        {/* The prose and the three lists share the right column, so the
+            column runs as long as the rail beside it. With the bio at
+            three paragraphs, prose alone ended level with the second
+            frame and left the last two hanging against nothing. */}
+        <div className="bio-main">
+          <div className="bio-prose">
+            {bioParagraphs.map((paragraph) => (
+              <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+            ))}
+          </div>
+
+          <section aria-labelledby="edu-h" className="stack-section">
+            <h2 id="edu-h" className="stack-heading">
+              Education
+            </h2>
+            <p className="stack-note">{doubleDegree.summary}</p>
+            <ul className="edu-list">
+              {[...doubleDegree.entries, highSchool].map((entry) => (
+                <li key={entry.institution} className="edu-row">
+                  <OrgLogo
+                    src={entry.logo}
+                    name={entry.institution}
+                    size={26}
+                  />
+                  <span className="edu-body">
+                    <span className="edu-name">{entry.institution}</span>
+                    <span className="muted"> {entry.credential}</span>
+                    {entry.note ? (
+                      <span className="edu-note">{entry.note}</span>
+                    ) : null}
+                  </span>
+                  <span className="edu-dates">{entry.dates}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section aria-labelledby="hs-h" className="stack-section">
+            <h2 id="hs-h" className="stack-heading">
+              High school
+            </h2>
+            <ul className="plain-list">
+              {highSchoolRecord.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
+
+          <section aria-labelledby="int-h" className="stack-section">
+            <h2 id="int-h" className="stack-heading">
+              Outside software
+            </h2>
+            <ul className="plain-list">
+              {interests.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
         </div>
       </div>
-
-      <section aria-labelledby="edu-h" className="stack-section">
-        <h2 id="edu-h" className="stack-heading">
-          Education
-        </h2>
-        <p className="stack-note">{doubleDegree.summary}</p>
-        <ul className="edu-list">
-          {[...doubleDegree.entries, highSchool].map((entry) => (
-            <li key={entry.institution} className="edu-row">
-              <OrgLogo src={entry.logo} name={entry.institution} size={26} />
-              <span className="edu-body">
-                <span className="edu-name">{entry.institution}</span>
-                <span className="muted"> {entry.credential}</span>
-                {entry.note ? <span className="edu-note">{entry.note}</span> : null}
-              </span>
-              <span className="edu-dates">{entry.dates}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section aria-labelledby="hs-h" className="stack-section">
-        <h2 id="hs-h" className="stack-heading">
-          High school
-        </h2>
-        <ul className="plain-list">
-          {highSchoolRecord.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section aria-labelledby="int-h" className="stack-section">
-        <h2 id="int-h" className="stack-heading">
-          Outside software
-        </h2>
-        <ul className="plain-list">
-          {interests.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
     </div>
   );
 }

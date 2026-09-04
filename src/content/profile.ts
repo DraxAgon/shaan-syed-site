@@ -8,7 +8,10 @@ export type Profile = {
   subtitle: string;
   /* Written to stay true without edits. The site is a record of what
      has been built, not a status feed, so nothing here says "currently"
-     or names a thing in progress. */
+     or names a thing in progress. The line is a stance rather than a
+     claim, because the Built column beside it already carries the
+     claims, and a second "I shipped" under the headshot read as
+     corny. */
   summary: string;
   location: string;
   email: string;
@@ -23,8 +26,7 @@ export const isMailto = (href: string) => href.startsWith("mailto:");
 export const profile: Profile = {
   name: "Shaan Syed",
   subtitle: "Computer Science @ Waterloo, BBA @ Laurier",
-  summary:
-    "I build software, usually taking it from an idea to something shipped on my own.",
+  summary: "I like deciding what software should do as much as writing it.",
   location: "Toronto, Ontario",
   email: "shaansaifsyed@gmail.com",
   siteUrl: "https://shaan-syed.vercel.app",

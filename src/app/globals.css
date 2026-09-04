@@ -466,8 +466,9 @@
   }
 
   /* ---------------- bio ---------------- */
-  /* Two sides: a rail of photos on the left, the writing on the right.
-     Narrow screens get the rail as a 2x2 scatter above the prose. */
+  /* Two sides: a rail of photos on the left, the writing and the three
+     lists on the right. Narrow screens get the rail as a 2x2 scatter
+     above the prose. */
   .bio-split { display: grid; grid-template-columns: 1fr; gap: 34px; margin-top: 26px; }
   @media (min-width: 900px) {
     .bio-split {
@@ -513,10 +514,15 @@
     box-shadow: 0 20px 38px -26px #000;
   }
 
-  /* Set a step above body copy: at 1rem the column ran out about 200px
-     short of the last frame in the rail, leaving the photos hanging on
-     their own. The measure is held near the old one so only the type
-     grows, not the column. */
+  /* The right column. The lists sit under the prose here rather than
+     full width below the split, so the column runs the length of the
+     rail: three paragraphs on their own ended level with the second
+     frame. min-width 0 lets the edu rows shrink inside the grid track. */
+  .bio-main { min-width: 0; }
+
+  /* Set a step above body copy so the prose reads as the page's text
+     rather than as a caption to the photos. The measure is held at
+     68ch so only the type grows, not the column. */
   .bio-prose { display: grid; gap: 16px; max-width: 68ch; }
   .bio-prose p {
     font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.125rem);
