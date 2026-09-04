@@ -25,8 +25,8 @@ export default function HomePage() {
         <Image
           src="/images/portrait-hero.webp"
           alt="Shaan Syed"
-          width={1200}
-          height={1500}
+          width={960}
+          height={1200}
           priority
           sizes="(min-width: 900px) 208px, 160px"
           className="portrait"

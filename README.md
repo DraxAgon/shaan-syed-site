@@ -51,9 +51,12 @@ It exits non-zero if any hard rule is broken. Run it after editing copy.
 
 ## Images
 
-See `public/images/PLACEHOLDERS.md`. Every slot ships as a committed
-placeholder at the right dimensions; swapping in a real photo is mostly
-a filename drop.
+Every slot holds a real image: the home portrait, the four frames in the
+/bio rail, the org logos, and a screenshot of riloai.app. To swap a
+photo, overwrite the file and update the `width` and `height` next to it
+in `src/app/page.tsx` or `src/content/bio.ts`, since Next uses those to
+reserve the space. `scripts/generate-placeholders.mjs` still fills any
+slot that goes missing.
 
 ## Design
 
@@ -68,4 +71,4 @@ because it fails contrast as a fill behind light text.
     node scripts/fetch-logos.mjs           # org logos from official sites
     node scripts/generate-icons.mjs        # brand icons from simple-icons
     node scripts/shoot-project-sites.mjs   # screenshot riloai.app
-    node scripts/generate-placeholders.mjs # portrait placeholders
+    node scripts/generate-placeholders.mjs # fills any missing slot

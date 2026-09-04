@@ -6,27 +6,37 @@
 
 ---
 
-## 1. The one thing only you can supply
+## 1. The photos
 
-**Your photos.** Five slots, all still placeholders:
+All five slots now hold real photos, so nothing is outstanding here.
 
 ```
-public/images/portrait-hero.webp   1200x1500  4:5  home
-public/images/portrait-bio.webp    1000x1000  1:1  bio, frame 01
-public/images/bio-piano.webp       1000x1250  4:5  bio, frame 02
-public/images/bio-running.webp     1200x900   4:3  bio, frame 03
-public/images/bio-kitchen.webp     1000x1000  1:1  bio, frame 04
+public/images/portrait-hero.webp    960x1200  4:5   home
+public/images/bio-grad.webp        1000x1333  3:4   bio, frame 01
+public/images/bio-piano.webp       1000x1704  ~4:7  bio, frame 02
+public/images/bio-noodles.webp     1000x750   4:3   bio, frame 03
+public/images/bio-city.webp        1000x1333  3:4   bio, frame 04
 ```
 
-Overwrite each with the same filename and push. No code change. The
-home portrait renders at 208px wide, so crop tight on your face; the
-bio rail renders around 260px wide, and its shapes differ on purpose,
-so crop each one to the ratio listed rather than to a single shape.
-Captions and alt text for the rail live in `src/content/bio.ts`. To
-add or drop a frame, edit that array: the tilt cycles every four
-frames, so the rail stays crooked at any count.
+To swap one, overwrite the file and update its `width` and `height`
+where it is declared: the home portrait in `src/app/page.tsx`, the rail
+in `bioPhotos` in `src/content/bio.ts`. Next needs the real pixel
+dimensions to reserve the space, so a new photo at a different ratio
+means editing those two numbers as well as the file.
 
-Everything else on the site now uses real imagery: organisation logos
+The home portrait renders at 208px wide and is a cutout composited onto
+`--color-lift`, which is the same tone as the plate behind it, so the
+padding around the shoulders is invisible. Match that tone if you
+replace it with another cutout. The bio rail renders around 260px wide
+and its shapes differ on purpose, so crop each frame to its own ratio
+rather than to a single shape.
+
+The rail carries no captions: the prose beside it already says what each
+photo is, so only `alt` text is stored, in `src/content/bio.ts`. To add
+or drop a frame, edit that array; the tilt cycles every four frames, so
+the rail stays crooked at any count.
+
+Everything else on the site uses real imagery too: organisation logos
 pulled from their official sites, brand icons for the tech stack, and a
 live screenshot of riloai.app.
 
@@ -121,7 +131,7 @@ therefore wants both a 200 for the document and no
 node scripts/fetch-logos.mjs           # org logos from official sites
 node scripts/generate-icons.mjs        # brand icons from simple-icons
 node scripts/shoot-project-sites.mjs   # screenshot riloai.app
-node scripts/generate-placeholders.mjs # the two portrait placeholders
+node scripts/generate-placeholders.mjs # fills any missing image slot
 ```
 
 ### The project demos
@@ -270,7 +280,6 @@ first; a broken build on `main` is a failed deploy.
 
 | Item | State | Where |
 |---|---|---|
-| Your portrait | placeholder | `public/images/portrait-*.webp` |
 | Rilo copy vs riloai.app | conflict, see below | `projects.ts` |
 | Rilo's "100+ downloads" | your number, unverified here | `projects.ts` |
 | Phantom links | none, repo is private | `projects.ts` |

@@ -21,7 +21,7 @@ const LIFT = { r: 0x1f, g: 0x19, b: 0x13 };
 const HAIRLINE = { r: 0x2e, g: 0x26, b: 0x20 };
 
 const slots = [
-  { file: "portrait-hero.webp", w: 1200, h: 1500, tone: HAIRLINE },
+  { file: "portrait-hero.webp", w: 960, h: 1200, tone: HAIRLINE },
   // The /bio photo rail, in the order the frames run down the page.
   { file: "bio-grad.webp", w: 1000, h: 1333, tone: HAIRLINE },
   { file: "bio-piano.webp", w: 1000, h: 1704, tone: HAIRLINE },
