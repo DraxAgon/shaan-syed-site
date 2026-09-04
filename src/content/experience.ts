@@ -58,7 +58,7 @@ export const experience: ExperienceEntry[] = [
     bullets: [
       "Tutored math in group sessions, working with roughly 100 students over four years",
       "Ran one-on-one sessions with about ten students",
-      "Proposed changes to how the program ran that were adopted",
+      "Pushed for a drop-in afterschool study hall, because booking a tutor was what stopped most students from coming, and the program adopted it",
     ],
   },
   {

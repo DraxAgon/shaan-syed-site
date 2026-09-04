@@ -45,7 +45,7 @@ live screenshot of riloai.app.
 | Route | Holds |
 |---|---|
 | `/` | Portrait and identity on the left. Built and Experience as expandable rows on the right, then the skills runs. |
-| `/bio` | A tilted photo rail on the left, the first-person paragraphs on the right, then education, high school record, and interests full width. |
+| `/bio` | A tilted photo rail on the left. The first-person paragraphs, then education, high school record, and interests, share the right column so it runs the length of the rail. |
 | `/projects` | A numbered index with a detail panel. `?p=Loxbox` deep-links to one. |
 | `/awards` | Honours, completed certifications, and in-progress certifications. |
 
