@@ -28,7 +28,6 @@ export function Photo({
   sizes,
   priority,
   className,
-  caption,
 }: {
   src: string;
   alt: string;
@@ -37,9 +36,6 @@ export function Photo({
   sizes?: string;
   priority?: boolean;
   className?: string;
-  /* What to say under the enlarged view. The alt text otherwise, which
-     is already a description of the photo. */
-  caption?: string;
 }) {
   /* The overlay only exists once somebody has clicked, which cannot
      happen on the server, so the portal never looks for a document that
@@ -144,7 +140,7 @@ export function Photo({
               aria-label={alt}
               /* Anywhere off the photo closes it, which is what a
                  backdrop is for. Only the photo itself is exempt: the
-                 figure around it runs the width of the window so a
+                 block around it runs the width of the window so a
                  click can land well clear of a tall print and still be
                  inside it. */
               onClick={(event) => {
@@ -154,30 +150,7 @@ export function Photo({
                 if (!hitPhoto) close();
               }}
             >
-              <button
-                type="button"
-                className="lightbox-close"
-                aria-label="Close"
-                autoFocus
-                onClick={close}
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M18 6 6 18" />
-                  <path d="m6 6 12 12" />
-                </svg>
-              </button>
-
-              <figure className="lightbox-figure">
+              <div className="lightbox-figure">
                 <Image
                   src={src}
                   alt={alt}
@@ -196,10 +169,34 @@ export function Photo({
                     } as CSSProperties
                   }
                 />
-                <figcaption className="lightbox-caption">
-                  {caption ?? alt}
-                </figcaption>
-              </figure>
+                {/* The only thing under the photo, and it reads as a
+                    quiet line of type rather than a control until the
+                    pointer is on it. Clicking the backdrop does the
+                    same, so this is the visible half of a habit people
+                    already have. */}
+                <button
+                  type="button"
+                  className="lightbox-close"
+                  autoFocus
+                  onClick={close}
+                >
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                  Close
+                </button>
+              </div>
             </div>,
             document.body,
           )
