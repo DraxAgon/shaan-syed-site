@@ -31,8 +31,8 @@ const nextConfig: NextConfig = {
         permanent: true,
       })),
       /* The index itself. It always rendered the first project, so
-         /projects and /projects/rilo were the same page under two
-         addresses and only one of them said which project you were
+         /projects and that project's own URL were the same page under
+         two addresses and only one of them said which project you were
          reading. Last in the list, because the four above share this
          source and Next takes the first match: a query goes to the
          project it names, everything else lands here.

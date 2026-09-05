@@ -55,27 +55,35 @@ export function ScrollReveal() {
     );
 
     /* An element marked data-reveal-after-scroll is in the window at
-       load but is not meant to arrive with whatever is above it. The
-       photo rail is two columns on a phone, so its first two prints
-       share a row and used to slide in together, which read as the page
-       loading in halves rather than one print landing and the rest
-       following. Held out of the observer, they wait for the first
-       scroll and then come in exactly as they always did — the observer
-       decides when, so one already in the window arrives at once and
-       the ones below it still wait their turn.
+       load but is not meant to arrive with whatever is above it. On the
+       bio page only the first print lands on load; the rest are held
+       out of the observer, so what the reader sees is one photo, and
+       then the rail filling in underneath them as they go.
+
+       The hold breaks a short way down the page rather than on the
+       first scroll event of any size. A wheel notch or a trackpad
+       twitch fires a scroll at a few pixels, which released the next
+       print while the page had not visibly moved — it read as a delayed
+       part of the load rather than as an answer to the scroll. Once the
+       hold breaks the observer decides the rest as it always did: one
+       already in the window arrives at once, and the ones further down
+       still wait their turn and keep the beat between them.
 
        Three ways out of the gate, because a held element that is never
        released is a hole in the layout rather than a nicety: nothing is
-       held unless the page can actually be scrolled, or if the window
-       was restored partway down, and the release runs on the first
-       scroll of any kind. */
+       held unless the page has room to scroll well past the line, nor
+       if the window was restored below it, and the release fires on any
+       scroll that reaches it, however it got there. */
     const held = new Set(
       targets.filter((el) => el.hasAttribute("data-reveal-after-scroll")),
     );
+    /* Far enough that the page has plainly moved, near enough that a
+       single nudge of a wheel or a thumb covers it. */
+    const releaseAt = 80;
     const gated =
       held.size > 0 &&
-      window.scrollY === 0 &&
-      root.scrollHeight > window.innerHeight + 4;
+      window.scrollY < releaseAt &&
+      root.scrollHeight - window.innerHeight > releaseAt * 2;
 
     for (const el of targets) {
       if (gated && held.has(el)) continue;
@@ -85,9 +93,11 @@ export function ScrollReveal() {
     if (!gated) return () => observer.disconnect();
 
     const release = () => {
+      if (window.scrollY < releaseAt) return;
+      window.removeEventListener("scroll", release);
       for (const el of held) observer.observe(el);
     };
-    window.addEventListener("scroll", release, { passive: true, once: true });
+    window.addEventListener("scroll", release, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", release);

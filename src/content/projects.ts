@@ -102,7 +102,45 @@ export type Project = {
   mockup?: { component: "redi"; label: string };
 };
 
+/* Order is the section's running order, and the first entry is where
+   /projects lands, what the rail opens on and what leads the Built
+   column on the home page. Redi AI is first because it is the thing
+   being built now, which is what the bio says too; Rilo follows as the
+   one that shipped. Nothing keys off a name, so moving an entry here
+   moves the landing page, the rail and the home column with it. */
 export const projects: Project[] = [
+  {
+    slug: "redi-ai",
+    name: "Redi AI",
+    descriptor: "Interview prep, generated per role",
+    metaDescription:
+      "Interview prep generated per role. Describe a job, a scholarship or a program, answer out loud, and Redi AI scores what you said, broken out by skill.",
+    logo: "/images/logo-redi.webp",
+    railStatus: "Mobile",
+    status: "Mobile, spoken answers scored per skill",
+    stage: "Not published yet",
+    prose: [
+      "You describe a role, whether that's a job, a scholarship, or a program, and Redi generates a question set for it. Answer out loud and it scores what you said.",
+      /* The app's own coverage matrix records the questions NOT following a
+         role edit (AI-7, filed, confirmed at depth), while the brief does
+         rebuild around what you add. This says only the half that holds. */
+      "The score comes back broken out by skill rather than as one number, and each skill is a range rather than a point, so the width of the range is how much the session actually showed. Update the role and the brief rebuilds around what you added.",
+    ],
+    why:
+      "I’ve always been worse in interviews than I am at the thing I’m being interviewed for, and I never found a reliable way to practise. Reading question lists and answering in my head wasn’t preparation, so I built something that generates real questions for the exact role and makes you say the answers out loud.",
+    stack: [
+      "React Native",
+      "Expo",
+      "TypeScript",
+      "Firebase",
+      "Google Gemini API",
+    ],
+    links: [],
+    mockup: {
+      component: "redi",
+      label: "The app rebuilt screen by screen, walk it",
+    },
+  },
   {
     slug: "rilo",
     name: "Rilo",
@@ -149,38 +187,6 @@ export const projects: Project[] = [
          running here. */
       pageUrl: "https://riloai.app",
       pageLabel: "Open riloai.app",
-    },
-  },
-  {
-    slug: "redi-ai",
-    name: "Redi AI",
-    descriptor: "Interview prep, generated per role",
-    metaDescription:
-      "Interview prep generated per role. Describe a job, a scholarship or a program, answer out loud, and Redi AI scores what you said, broken out by skill.",
-    logo: "/images/logo-redi.webp",
-    railStatus: "Mobile",
-    status: "Mobile, spoken answers scored per skill",
-    stage: "Not published yet",
-    prose: [
-      "You describe a role, whether that's a job, a scholarship, or a program, and Redi generates a question set for it. Answer out loud and it scores what you said.",
-      /* The app's own coverage matrix records the questions NOT following a
-         role edit (AI-7, filed, confirmed at depth), while the brief does
-         rebuild around what you add. This says only the half that holds. */
-      "The score comes back broken out by skill rather than as one number, and each skill is a range rather than a point, so the width of the range is how much the session actually showed. Update the role and the brief rebuilds around what you added.",
-    ],
-    why:
-      "I’ve always been worse in interviews than I am at the thing I’m being interviewed for, and I never found a reliable way to practise. Reading question lists and answering in my head wasn’t preparation, so I built something that generates real questions for the exact role and makes you say the answers out loud.",
-    stack: [
-      "React Native",
-      "Expo",
-      "TypeScript",
-      "Firebase",
-      "Google Gemini API",
-    ],
-    links: [],
-    mockup: {
-      component: "redi",
-      label: "The app rebuilt screen by screen, walk it",
     },
   },
   {
