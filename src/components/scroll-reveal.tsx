@@ -54,8 +54,45 @@ export function ScrollReveal() {
       { rootMargin: "0px 0px -10% 0px", threshold: 0.08 },
     );
 
-    for (const el of targets) observer.observe(el);
-    return () => observer.disconnect();
+    /* An element marked data-reveal-after-scroll is in the window at
+       load but is not meant to arrive with whatever is above it. The
+       photo rail is two columns on a phone, so its first two prints
+       share a row and used to slide in together, which read as the page
+       loading in halves rather than one print landing and the rest
+       following. Held out of the observer, they wait for the first
+       scroll and then come in exactly as they always did — the observer
+       decides when, so one already in the window arrives at once and
+       the ones below it still wait their turn.
+
+       Three ways out of the gate, because a held element that is never
+       released is a hole in the layout rather than a nicety: nothing is
+       held unless the page can actually be scrolled, or if the window
+       was restored partway down, and the release runs on the first
+       scroll of any kind. */
+    const held = new Set(
+      targets.filter((el) => el.hasAttribute("data-reveal-after-scroll")),
+    );
+    const gated =
+      held.size > 0 &&
+      window.scrollY === 0 &&
+      root.scrollHeight > window.innerHeight + 4;
+
+    for (const el of targets) {
+      if (gated && held.has(el)) continue;
+      observer.observe(el);
+    }
+
+    if (!gated) return () => observer.disconnect();
+
+    const release = () => {
+      for (const el of held) observer.observe(el);
+    };
+    window.addEventListener("scroll", release, { passive: true, once: true });
+
+    return () => {
+      window.removeEventListener("scroll", release);
+      observer.disconnect();
+    };
   }, [pathname]);
 
   return null;

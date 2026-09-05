@@ -45,6 +45,13 @@ export default function BioPage() {
                    reaches the window, a beat behind the one above it, and
                    stays where it lands. */
                 data-reveal="side"
+                /* Only the first arrives on load. The rail is two columns
+                   on a phone, so the second print shares a row with the
+                   first and was in the window from the start: the two of
+                   them sliding in together read as the page loading in
+                   halves. Every print after the first waits for the reader
+                   to scroll, and then lands as it always did. */
+                data-reveal-after-scroll={index > 0 ? "" : undefined}
                 style={{ "--reveal-delay": `${index * 90}ms` } as CSSProperties}
               >
                 <Photo
