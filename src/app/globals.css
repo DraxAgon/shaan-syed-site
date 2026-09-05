@@ -229,8 +229,11 @@
     animation: rise 520ms cubic-bezier(.2,.7,.2,1) both;
   }
 
+  /* The identity column is sized off the longest thing in it, which is
+     now the degree line rather than the portrait: at 300px it broke
+     "Computer Science @ Waterloo" across two lines. */
   @media (min-width: 900px) {
-    .home { grid-template-columns: minmax(232px, 300px) minmax(0, 1fr); align-items: start; }
+    .home { grid-template-columns: minmax(232px, 340px) minmax(0, 1fr); align-items: start; }
   }
 
   .portrait {
@@ -249,11 +252,18 @@
     font-variation-settings: "opsz" 32;
   }
 
+  /* The degrees, and the one line under the name a stranger reads
+     before anything else, so it is set closer to the name than to the
+     prose beneath it and scales with the window the same way. */
   .subtitle {
-    margin-top: 8px;
-    font-size: 1.1875rem; font-weight: 600; letter-spacing: -0.012em;
+    margin-top: 10px;
+    font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.5rem);
+    font-weight: 600; letter-spacing: -0.016em; line-height: 1.3;
     color: var(--color-ink);
   }
+  /* One degree per line. Set as blocks so the break falls between them
+     rather than wherever the column runs out. */
+  .subtitle span { display: block; }
 
   .summary {
     margin-top: 12px; max-width: 36ch;

@@ -5,7 +5,12 @@ export type SocialLink = {
 
 export type Profile = {
   name: string;
-  subtitle: string;
+  /* The two degrees, one per entry. They are a list rather than one
+     string because the home page sets each on its own line and the
+     social card runs them together, and a single string left the
+     break where the column happened to run out — after the @, with
+     the university on the next line. */
+  subtitle: string[];
   /* Written to stay true without edits. The site is a record of what
      has been built, not a status feed, so nothing here says "currently"
      or names a thing in progress. The line is a stance rather than a
@@ -25,7 +30,7 @@ export const isMailto = (href: string) => href.startsWith("mailto:");
 
 export const profile: Profile = {
   name: "Shaan Syed",
-  subtitle: "Computer Science @ Waterloo, BBA @ Laurier",
+  subtitle: ["Computer Science @ Waterloo", "BBA @ Laurier"],
   summary: "I like deciding what software should do as much as writing it.",
   location: "Toronto, Ontario",
   email: "shaansaifsyed@gmail.com",

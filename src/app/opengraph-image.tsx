@@ -62,7 +62,7 @@ export default function OpengraphImage() {
               color: INK_MUTED,
             }}
           >
-            {profile.subtitle}
+            {profile.subtitle.join(", ")}
           </div>
           <div style={{ display: "flex", flexGrow: 1 }} />
           <div

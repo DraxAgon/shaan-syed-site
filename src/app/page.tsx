@@ -33,7 +33,11 @@ export default function HomePage() {
         />
 
         <h1 className="name">{profile.name}</h1>
-        <p className="subtitle">{profile.subtitle}</p>
+        <p className="subtitle">
+          {profile.subtitle.map((line) => (
+            <span key={line}>{line}</span>
+          ))}
+        </p>
         <p className="summary">{profile.summary}</p>
 
         <ul className="social-row">
@@ -59,6 +63,31 @@ export default function HomePage() {
       </div>
 
       <div className="home-record">
+        {/* Experience leads the column: where he has worked and what
+            he did there is the first thing a recruiter looks for, and
+            Built below reads as the evidence for it rather than the
+            opening claim. */}
+        <section aria-labelledby="exp-h">
+          <div className="record-head">
+            <h2 id="exp-h">Experience</h2>
+          </div>
+          {experience.map((entry) => (
+            <DisclosureRow
+              key={`${entry.org}-${entry.role}`}
+              logo={entry.logo}
+              title={entry.org}
+              aside={entry.role}
+              meta={entry.meta ? `${entry.dates}, ${entry.meta}` : entry.dates}
+            >
+              <ul className="panel-bullets">
+                {entry.bullets.map((bullet) => (
+                  <li key={bullet}>{bullet}</li>
+                ))}
+              </ul>
+            </DisclosureRow>
+          ))}
+        </section>
+
         <section aria-labelledby="built-h">
           <div className="record-head">
             <h2 id="built-h">Built</h2>
@@ -91,27 +120,6 @@ export default function HomePage() {
               <Link href="/projects" className="panel-link">
                 Open in Projects
               </Link>
-            </DisclosureRow>
-          ))}
-        </section>
-
-        <section aria-labelledby="exp-h">
-          <div className="record-head">
-            <h2 id="exp-h">Experience</h2>
-          </div>
-          {experience.map((entry) => (
-            <DisclosureRow
-              key={`${entry.org}-${entry.role}`}
-              logo={entry.logo}
-              title={entry.org}
-              aside={entry.role}
-              meta={entry.meta ? `${entry.dates}, ${entry.meta}` : entry.dates}
-            >
-              <ul className="panel-bullets">
-                {entry.bullets.map((bullet) => (
-                  <li key={bullet}>{bullet}</li>
-                ))}
-              </ul>
             </DisclosureRow>
           ))}
         </section>
