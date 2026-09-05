@@ -46,7 +46,8 @@ live screenshot of riloai.app.
 |---|---|
 | `/` | Portrait and identity on the left. Built and Experience as expandable rows on the right, then the skills runs. |
 | `/bio` | A tilted photo rail on the left. The first-person paragraphs, then education, high school record, and interests, share the right column so it runs the length of the rail. |
-| `/projects` | A numbered index with a detail panel. `?p=Loxbox` deep-links to one. |
+| `/projects` | A numbered index with a detail panel, opening on the first project. |
+| `/projects/[slug]` | The same index with one project's panel open. One page each: `rilo`, `redi-ai`, `phantom`, `loxbox`. The old `?p=` query URLs redirect here. |
 | `/awards` | Honours, completed certifications, and in-progress certifications. |
 
 There is no resume page. Nothing repeats across pages.
@@ -92,11 +93,12 @@ Exits non-zero if a banned word, an em dash, an en dash, or an
 exclamation point reaches the rendered pages. Point it somewhere else
 with `AUDIT_BASE`, not `BASE`.
 
-`/` `/bio` `/awards` and the 404 are read straight off the wire.
-`/projects` is not: it draws its panels on the client, so the served
-HTML is a few hundred characters and none of the copy. The audit opens
-each project in headless Chrome instead, and walks the Redi rail so
-every caption has been on screen before it reads. It refuses to report
+`/` `/bio` `/awards` and the 404 are read straight off the wire. The
+project pages are not: the Redi walkthrough is loaded client-side only,
+and the demos only reach their later states once something has clicked
+through them. The audit opens each project in headless Chrome instead,
+and walks the Redi rail so every caption has been on screen before it
+reads. It refuses to report
 clean on a panel that did not render, because a check that cannot fail
 is worse than no check. That is not hypothetical here: the banned-word
 half of this script spent its whole life matching a backspace

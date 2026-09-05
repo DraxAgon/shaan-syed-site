@@ -101,7 +101,7 @@ await sleep(400);
 ck("Escape closes it", await ev(`!document.querySelector('.nav-menu').classList.contains('is-open')`));
 
 console.log("Rilo, the rebuilt demo");
-await go("/projects?p=Rilo");
+await go("/projects/rilo");
 
 /* One view now: Rilo's own demo, rebuilt in place. The chip names it and
    the link beside it is the way out to the real page, which is the same
@@ -178,7 +178,7 @@ ck("no framed copy of the page is left in the panel",
 
 
 console.log("Redi AI, the walkthrough");
-await go("/projects?p=Redi%20AI");
+await go("/projects/redi-ai");
 ck("the walkthrough renders", await ev(`!!document.querySelector('.rw')`));
 ck("it says the screens are rebuilt, not recorded",
   (await ev(`document.querySelector('.demo-caption-text')?.textContent`))?.toLowerCase().includes("rebuilt"));
@@ -228,7 +228,7 @@ ck("the role typed earlier survives the restart",
   (await ev(`document.querySelector('.ra-role-name')?.textContent`)) === "Registered nurse");
 
 console.log("Phantom, the guided Kariba case and the live embed");
-await go("/projects?p=Phantom");
+await go("/projects/phantom");
 /* Phantom's case cannot be reached by URL: the app routes on #companies and
    #explorer only, and the region is a hard-coded default. So the panel walks
    the visitor there instead, off the app's illustrative Amazon list and onto
@@ -274,21 +274,21 @@ ck("nothing refuses to be framed",
   JSON.stringify({ documents, docFailures }));
 
 console.log("Stage and tags");
-await go("/projects?p=Rilo");
+await go("/projects/rilo");
 ck("a shipped project reads Published",
   (await ev(`document.querySelector('.browser-stage')?.textContent`)) === "Published");
 ck("the download count is shown as a tag",
   (await ev(`[...document.querySelectorAll('.browser-tag')].map(e=>e.textContent).join('|')`))
     ?.includes("100+ downloads"));
-await go("/projects?p=Redi%20AI");
+await go("/projects/redi-ai");
 ck("an unreleased project does not read as shipped",
   (await ev(`document.querySelector('.browser-stage')?.textContent`)) === "Not published yet");
-await go("/projects?p=Loxbox");
+await go("/projects/loxbox");
 ck("an early project reads as early rather than as nearly out",
   (await ev(`document.querySelector('.browser-stage')?.textContent`)) === "Early development");
 
 console.log("Deep links");
-ck("?p= selects the right project",
+ck("a project URL opens that project",
   (await ev(`document.querySelector('.browser-title')?.textContent`)) === "Loxbox");
 
 ws.close();

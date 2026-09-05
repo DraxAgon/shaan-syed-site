@@ -16,8 +16,19 @@ export type Stage =
   | "Not published yet";
 
 export type Project = {
+  /* The project's address. Written down rather than derived from the
+     name at request time, so a rename never silently moves a URL that is
+     already in someone's history or an index. Lowercase and hyphenated;
+     /projects/[slug] is generated from exactly these. */
+  slug: string;
   name: string;
   descriptor: string;
+  /* The <meta name="description"> for the project's own page, and nothing
+     else. One per project rather than one shared line, because four pages
+     answering a search with the same sentence compete with each other.
+     Not rendered anywhere on the page: the panel already says all of this
+     at length. */
+  metaDescription: string;
   /* The project’s own mark, 256x256 in public/images. Built by
      scripts/build-project-logos.mjs, which records where each one came
      from: Rilo and Redi carry the marks they actually ship, while
@@ -93,8 +104,11 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    slug: "rilo",
     name: "Rilo",
     descriptor: "AI reply assistant for Gmail",
+    metaDescription:
+      "An AI reply assistant for Gmail, on the Chrome Web Store. Rilo reads only the email open on screen, never sends anything, and returns drafts in several tones.",
     logo: "/images/logo-rilo.webp",
     railStatus: "Live",
     status: "On the Chrome Web Store since July 2026",
@@ -138,8 +152,11 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: "redi-ai",
     name: "Redi AI",
     descriptor: "Interview prep, generated per role",
+    metaDescription:
+      "Interview prep generated per role. Describe a job, a scholarship or a program, answer out loud, and Redi AI scores what you said, broken out by skill.",
     logo: "/images/logo-redi.webp",
     railStatus: "Mobile",
     status: "Mobile, spoken answers scored per skill",
@@ -167,8 +184,11 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: "phantom",
     name: "Phantom",
     descriptor: "Independent check on forest carbon credits",
+    metaDescription:
+      "An independent check on forest carbon credits. Phantom tests a project's claim against free public satellite data by comparing the land it protects to similar land nearby.",
     logo: "/images/logo-phantom.webp",
     railStatus: "Team build",
     status: "Environmental track",
@@ -220,8 +240,11 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: "loxbox",
     name: "Loxbox",
     descriptor: "Group photos, locked until reveal day",
+    metaDescription:
+      "Group photos locked until reveal day. Everyone adds to one shared box and nobody sees a single photo until the timer hits zero and the whole box opens at once.",
     logo: "/images/logo-loxbox.webp",
     railStatus: "Mobile",
     status: "Mobile, one shared album per group",
@@ -241,3 +264,11 @@ export const projects: Project[] = [
     links: [],
   },
 ];
+
+/* The four addresses /projects/[slug] is built from, and the lookup the
+   page and its share card share. A slug that is not one of these is not a
+   project, which is what lets the route 404 rather than guess. */
+export const projectSlugs = projects.map((project) => project.slug);
+
+export const projectBySlug = (slug: string): Project | undefined =>
+  projects.find((project) => project.slug === slug);

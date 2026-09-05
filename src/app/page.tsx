@@ -117,7 +117,7 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/projects" className="panel-link">
+              <Link href={`/projects/${project.slug}`} className="panel-link">
                 Open in Projects
               </Link>
             </DisclosureRow>
