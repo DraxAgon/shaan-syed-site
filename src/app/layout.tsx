@@ -9,7 +9,6 @@ import {
 } from "next/font/google";
 import Link from "next/link";
 
-import { AmbientField } from "@/components/ambient-field";
 import { Icon } from "@/components/icon";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { SiteNav } from "@/components/site-nav";
@@ -150,7 +149,6 @@ export default function RootLayout({
           Skip to content
         </a>
 
-        <AmbientField />
         <ScrollReveal />
 
         <header className="site-header">

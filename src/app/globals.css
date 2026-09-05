@@ -958,34 +958,68 @@
     .lightbox-img { width: min(100%, (100dvh - 90px) * var(--photo-ratio)); }
   }
 
-  /* ---------------- the marks in the background ----------------
-     A fixed layer under everything, drawing nothing on its own. The
-     spans inside it are added and dropped by AmbientField, and each one
-     lives for as long as its own animation. */
-  .ambient {
-    position: fixed; inset: 0; z-index: 0;
+  /* ---------------- the ring behind the home page ----------------
+     The centre sits off the left edge, so the spiral is cut by the
+     window and what shows is an arc running up through the left column.
+     Fixed and behind the content: -1 keeps it under the page's own
+     in-flow text while staying inside .site-main's stacking context, so
+     it can never rise above anything. */
+  .halo {
+    position: fixed; inset: 0; z-index: -1;
     overflow: hidden; pointer-events: none;
     contain: strict;
   }
 
-  .ambient-mark {
-    position: absolute;
-    font-family: var(--font-mono);
-    line-height: 1;
-    color: var(--color-brass);
-    opacity: 0;
-    white-space: nowrap;
-    will-change: opacity, translate;
-    animation: ambient-mark var(--mark-duration, 9s) ease-in-out both;
+  /* A whole turn takes five minutes, which is not a movement you can
+     watch. It is there so the ring is never in quite the same place
+     twice, and so the arc drifts across the column over a long visit. */
+  .halo-spiral {
+    position: absolute; left: -40px; top: 56%;
+    width: 0; height: 0;
+    animation: halo-turn 300s linear infinite;
   }
 
-  /* Up and out. The hold in the middle is most of the life of a mark:
-     without it they read as blinking rather than as surfacing. */
-  @keyframes ambient-mark {
-    0%   { opacity: 0; translate: 0 10px; }
-    22%  { opacity: var(--mark-peak, 0.07); }
-    68%  { opacity: var(--mark-peak, 0.07); }
-    100% { opacity: 0; translate: 0 calc(-1 * var(--mark-drift, 24px)); }
+  /* Each tick is placed by its own transform: out along its ray to its
+     radius, then back half its thickness so the ray runs through its
+     middle. The glow is baked into the shadow and costs nothing while
+     the tick is dim, which is nearly all of the time. */
+  .halo-tick {
+    position: absolute; left: 0; top: 0;
+    transform-origin: 0 0;
+    border-radius: 1px;
+    background: var(--color-brass);
+    /* Two shadows: a tight one that reads as the tick being hot, and a
+       wide soft one that puts light on the plate around it. Both are
+       painted at the tick's own opacity, so they are as absent as it is
+       while it waits its turn. */
+    box-shadow:
+      0 0 4px 0 color-mix(in srgb, var(--color-brass) 70%, transparent),
+      0 0 16px 3px color-mix(in srgb, var(--color-brass) 38%, transparent);
+    opacity: var(--tick-rest, 0.05);
+    animation: halo-tick 21s linear infinite;
+    animation-delay: var(--tick-delay, 0ms);
+  }
+
+  /* Twenty-one seconds, of which the wave is five: the tick lights,
+     falls away over about a second and a half, and the ring is dark for
+     the rest of the turn. Every tick runs this same cycle, and the
+     delay on each one is what makes the light travel. */
+  @keyframes halo-tick {
+    0%   { opacity: var(--tick-rest, 0.05); }
+    1%   { opacity: var(--tick-peak, 0.4); }
+    8%   { opacity: var(--tick-rest, 0.05); }
+    100% { opacity: var(--tick-rest, 0.05); }
+  }
+
+  @keyframes halo-turn {
+    from { rotate: 0deg; }
+    to   { rotate: 360deg; }
+  }
+
+  /* A phone has no margin to hide the centre in, so the whole spiral is
+     scaled down and pulled further off the edge, behind the portrait. */
+  @media (max-width: 899px) {
+    .halo-spiral { left: -30px; top: 40%; scale: 0.62; }
   }
 
   /* ---------------- revealing on scroll ----------------
@@ -1027,7 +1061,7 @@
 @media (prefers-reduced-motion: reduce) {
   /* The reveal is a nicety; being able to read the page is not. */
   [data-reveal] { opacity: 1 !important; translate: none !important; }
-  .ambient { display: none; }
+  .halo { display: none; }
 
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
