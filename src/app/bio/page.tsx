@@ -15,7 +15,7 @@ import {
 export const metadata: Metadata = {
   title: "Bio",
   description:
-    "Shaan Syed on why he chose the Computer Science and BBA double degree at Waterloo and Laurier, shipping Rilo to the Chrome Web Store, aiming for product management, and running, piano, and cooking.",
+    "Shaan Syed on why he chose the Computer Science and BBA double degree at Waterloo and Laurier, building Redi AI, and what running, piano, and chasing a bug all have in common.",
 };
 
 export default function BioPage() {
@@ -69,7 +69,7 @@ export default function BioPage() {
 
           {/* The prose and the three lists share the right column, so the
               column runs as long as the rail beside it. With the bio at
-              three paragraphs, prose alone ended level with the second
+              four short paragraphs, prose alone ended level with the second
               frame and left the last two hanging against nothing. */}
           <div className="bio-main">
             <div className="bio-prose" data-reveal>

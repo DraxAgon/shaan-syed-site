@@ -1,13 +1,13 @@
-/* First person, three paragraphs, kept short on purpose: the program
-   and why, then the work he wants, then what he does outside software.
-   The Built and Experience columns on the home page and the lists under
-   this carry the rest, so nothing here repeats a list. The hackathon
-   result is the fixed wording from projects.ts, a sponsor track
-   placement, never a win. */
+/* First person, four paragraphs, in Shaan's own words. The program and
+   why, then the thing he is building now, then what running and piano
+   and software have in common, then an open door. The Built and
+   Experience columns on the home page and the lists under this carry
+   the record, so nothing here repeats a list. */
 export const bioParagraphs: string[] = [
-  "I chose the Computer Science and Business Administration double degree at Waterloo and Laurier because I'd been doing both halves and didn't want to give one up. The software half was mostly self-taught, building something badly and then working out why it broke. Rilo, my AI reply assistant for Gmail, launched on the Chrome Web Store in July 2026, and shipping it alone meant Stripe billing as a sole proprietorship, refund terms, and the store's review. The business half was a summer of market research for Strello Health's U.S. expansion.",
-  "Every AI email tool I tried wrote in its own voice, which is why Rilo gives you drafts in several tones, and it reads only the email open on screen, never the rest of the inbox. At Ignition Hacks we built Phantom, which uses satellite data to test whether a carbon credit prevented any deforestation, and took 3rd Place, Best Use of Base44, a sponsor track. Choosing what a product does and why is the job I want, so I'm aiming for product management.",
-  "I started running in grade 8, and after two slow years I made the Ontario provincials in grade 10. Piano came earlier, at eleven. My second teacher never fixed a section for me, and most of a practice hour still goes to the same few bars, working out why they break. Cooking began as a way to stop eating the same three meals.",
+  "I'm Shaan, and I'm a double degree student pursuing computer science at Waterloo and business administration at Laurier. I chose the double degree because I wanted to understand the real-world constraints on the software I write and how the call to build it gets made in the first place.",
+  "Right now I'm building Redi AI. You tell it what you're interviewing for, and it asks you the questions; you answer out loud, and then it tells you what was actually weak about what you said. I'm building it because everyone tells you to practice out loud, which mostly means repeating an answer you can't tell is bad.",
+  "I crave the hit that comes with solving a hard problem, which is probably why I fell in love with running and piano. Piano is practice sessions on the same four mind-numbing bars until the change you need to make suddenly makes sense and every finger lands together to produce a sound you can't get any other way. Running works much the same. It's pushing when all you want to do is quit and talk yourself into a few more minutes because you know what's waiting on the other side: the satisfaction of finishing that last lap and getting to be done. That payoff is why I enjoy building software. It's the bug you've been on since noon and still aren't done with, and you stay on it because you know how good it's going to feel when it finally gives.",
+  "Always up for a conversation. I like building with other people and chasing down problems that don't have obvious answers.",
 ];
 
 /* The photo rail that runs down the left of /bio, in page order.

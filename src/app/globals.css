@@ -529,17 +529,19 @@
 
   /* The right column. The lists sit under the prose here rather than
      full width below the split, so the column runs the length of the
-     rail: three paragraphs on their own ended level with the second
+     rail: the prose on its own ended level with the second
      frame. min-width 0 lets the edu rows shrink inside the grid track. */
   .bio-main { min-width: 0; }
 
-  /* Set a step above body copy so the prose reads as the page's text
-     rather than as a caption to the photos. The measure is held at
-     68ch so only the type grows, not the column. */
-  .bio-prose { display: grid; gap: 16px; max-width: 68ch; }
+  /* Set well above body copy so the prose reads as the page's text
+     rather than as a caption to the photos: this is the one page whose
+     job is the writing. The measure is set in rem rather than ch
+     because the serif's zero is narrow — 62ch of it wrapped at fifty
+     characters, well short of a comfortable line. */
+  .bio-prose { display: grid; gap: 20px; max-width: 41rem; }
   .bio-prose p {
-    font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.125rem);
-    line-height: 1.7; text-wrap: pretty;
+    font-size: clamp(1.125rem, 1.0313rem + 0.4vw, 1.3125rem);
+    line-height: 1.65; text-wrap: pretty;
   }
 
   .edu-list { display: grid; gap: 12px; }
