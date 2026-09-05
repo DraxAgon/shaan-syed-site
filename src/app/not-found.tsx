@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AmbientHalo } from "@/components/ambient-halo";
+import { projectsHref } from "@/content/projects";
 
 import type { Metadata } from "next";
 
@@ -29,7 +30,7 @@ export default function NotFound() {
               Bio
             </Link>
             ,{" "}
-            <Link className="link" href="/projects">
+            <Link className="link" href={projectsHref}>
               Projects
             </Link>
             , or{" "}

@@ -4,12 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { projects } from "@/content/projects";
+import { projects, projectsHref } from "@/content/projects";
 
+/* `match` is the prefix that lights the tab, for the one route whose link
+   does not point at the section root. Projects goes to the first project
+   rather than to /projects, which is a redirect; without the prefix the
+   tab would only be lit on that one project and go dark on the other
+   three. Everywhere else the link is the prefix. */
 const routes = [
   { href: "/", label: "Home" },
   { href: "/bio", label: "Bio" },
-  { href: "/projects", label: "Projects", dropdown: true },
+  { href: projectsHref, match: "/projects", label: "Projects", dropdown: true },
   { href: "/awards", label: "Awards" },
 ];
 
@@ -40,8 +45,9 @@ export function SiteNav() {
     <nav aria-label="Primary" className="site-nav">
       <ul className="nav-list">
         {routes.map((route) => {
+          const prefix = route.match ?? route.href;
           const isCurrent =
-            route.href === "/" ? pathname === "/" : pathname.startsWith(route.href);
+            prefix === "/" ? pathname === "/" : pathname.startsWith(prefix);
 
           if (!route.dropdown) {
             return (

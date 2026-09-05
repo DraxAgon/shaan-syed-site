@@ -10,7 +10,7 @@ import { hasIcon } from "@/components/icons";
 import { softwareCertifications } from "@/content/certifications";
 import { experience } from "@/content/experience";
 import { isMailto, profile } from "@/content/profile";
-import { projects } from "@/content/projects";
+import { projects, projectsHref } from "@/content/projects";
 import { skills } from "@/content/skills";
 
 export const metadata: Metadata = {
@@ -98,7 +98,7 @@ export default function HomePage() {
           <section aria-labelledby="built-h">
             <div className="record-head">
               <h2 id="built-h">Built</h2>
-              <Link href="/projects" className="record-more">
+              <Link href={projectsHref} className="record-more">
                 All projects
               </Link>
             </div>

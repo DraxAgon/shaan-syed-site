@@ -11,14 +11,13 @@ import { projects } from "@/content/projects";
    Every row is a real link to a real page, which is the whole reason the
    query param went away.
 
-   Which row is lit comes from the pathname rather than from state: on
-   /projects/<slug> it is that project, and on the index itself it is the
-   first one, which is the project the index renders. */
+   Which row is lit comes from the pathname rather than from state. Every
+   page under this layout is a /projects/<slug>, including the one the
+   section opens on, so the slug in the address is always the row to
+   light and there is no index case to fall back to. */
 export function ProjectsIndex() {
   const pathname = usePathname();
-  const activeSlug = pathname.startsWith("/projects/")
-    ? pathname.slice("/projects/".length)
-    : projects[0].slug;
+  const activeSlug = pathname.slice("/projects/".length);
 
   return (
     <ol className="browser-index">

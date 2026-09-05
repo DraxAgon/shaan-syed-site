@@ -292,3 +292,12 @@ export const projectSlugs = projects.map((project) => project.slug);
 
 export const projectBySlug = (slug: string): Project | undefined =>
   projects.find((project) => project.slug === slug);
+
+/* Where "Projects" goes. The section has no page of its own: /projects
+   rendered the first project while the address bar still said /projects,
+   so the one thing on screen was the one thing the URL would not name.
+   It redirects here now, and every link that used to say /projects says
+   this instead, so following one costs no extra hop. First in the list
+   rather than a named slug, so reordering the four moves the landing
+   page with them. */
+export const projectsHref = `/projects/${projects[0].slug}`;
