@@ -958,25 +958,32 @@
     .lightbox-img { width: min(100%, (100dvh - 90px) * var(--photo-ratio)); }
   }
 
-  /* ---------------- the ring behind the home page ----------------
-     The centre sits off the left edge, so the spiral is cut by the
-     window and what shows is an arc running up through the left column.
-     Fixed and behind the content: -1 keeps it under the page's own
+  /* ---------------- the rings behind the home page ----------------
+     Fixed and behind the content: -1 keeps them under the page's own
      in-flow text while staying inside .site-main's stacking context, so
-     it can never rise above anything. */
+     neither can ever rise above anything. */
   .halo {
     position: fixed; inset: 0; z-index: -1;
     overflow: hidden; pointer-events: none;
     contain: strict;
   }
 
-  /* A whole turn takes five minutes, which is not a movement you can
-     watch. It is there so the ring is never in quite the same place
-     twice, and so the arc drifts across the column over a long visit. */
+  /* Both centres sit off an edge, so what shows is an arc and not a
+     circle: one out past the left, one past the top right corner. A
+     whole turn takes minutes, which is not a movement you can watch. It
+     is there so neither ring is ever in quite the same place twice, and
+     they turn opposite ways so they never drift together. */
   .halo-spiral {
-    position: absolute; left: -40px; top: 56%;
+    position: absolute;
     width: 0; height: 0;
+  }
+  .halo-spiral.is-left {
+    left: -40px; top: 56%;
     animation: halo-turn 300s linear infinite;
+  }
+  .halo-spiral.is-right {
+    right: -70px; top: -54px;
+    animation: halo-turn 240s linear infinite reverse;
   }
 
   /* Each tick is placed by its own transform: out along its ray to its
@@ -996,19 +1003,33 @@
       0 0 4px 0 color-mix(in srgb, var(--color-brass) 70%, transparent),
       0 0 16px 3px color-mix(in srgb, var(--color-brass) 38%, transparent);
     opacity: var(--tick-rest, 0.05);
-    animation: halo-tick 21s linear infinite;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
     animation-delay: var(--tick-delay, 0ms);
   }
 
-  /* Twenty-one seconds, of which the wave is five: the tick lights,
-     falls away over about a second and a half, and the ring is dark for
-     the rest of the turn. Every tick runs this same cycle, and the
-     delay on each one is what makes the light travel. */
-  @keyframes halo-tick {
-    0%   { opacity: var(--tick-rest, 0.05); }
-    1%   { opacity: var(--tick-peak, 0.4); }
-    8%   { opacity: var(--tick-rest, 0.05); }
-    100% { opacity: var(--tick-rest, 0.05); }
+  /* Two clocks that share no common beat inside a visit: the left ring
+     comes round every twelve and a half seconds, the right every ten and
+     a half, so the pair is never in step twice running. Each tick lights
+     for about a second and a half of its own turn — that is the whole of
+     the animation — and the delay on each one is what makes the light
+     travel round. */
+  .is-left .halo-tick { animation-name: halo-pulse-left; animation-duration: 12.5s; }
+  .is-right .halo-tick { animation-name: halo-pulse-right; animation-duration: 10.5s; }
+
+  @keyframes halo-pulse-left {
+    0%    { opacity: var(--tick-rest, 0.05); }
+    0.8%  { opacity: var(--tick-peak, 0.6); }
+    11.5% { opacity: var(--tick-rest, 0.05); }
+    100%  { opacity: var(--tick-rest, 0.05); }
+  }
+
+  @keyframes halo-pulse-right {
+    0%    { opacity: var(--tick-rest, 0.05); }
+    1%    { opacity: var(--tick-peak, 0.5); }
+    13%   { opacity: var(--tick-rest, 0.05); }
+    100%  { opacity: var(--tick-rest, 0.05); }
   }
 
   @keyframes halo-turn {
@@ -1016,10 +1037,12 @@
     to   { rotate: 360deg; }
   }
 
-  /* A phone has no margin to hide the centre in, so the whole spiral is
-     scaled down and pulled further off the edge, behind the portrait. */
+  /* A phone has no margin to hide either centre in, so both spirals are
+     scaled down and pulled further off their edges, one behind the
+     portrait and one behind the top of the nav. */
   @media (max-width: 899px) {
-    .halo-spiral { left: -30px; top: 40%; scale: 0.62; }
+    .halo-spiral.is-left { left: -30px; top: 40%; scale: 0.62; }
+    .halo-spiral.is-right { right: -40px; top: -30px; scale: 0.55; }
   }
 
   /* ---------------- revealing on scroll ----------------
