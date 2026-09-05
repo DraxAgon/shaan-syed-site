@@ -24,7 +24,7 @@ export default function HomePage() {
       {/* Sibling of the page rather than a child of it: .home carries the
           load animation, and a transform on an ancestor is what a fixed
           layer would be positioned against. */}
-      <AmbientHalo />
+      <AmbientHalo page="home" />
 
       <div className="home">
         {/* Left: who. Right: what. */}

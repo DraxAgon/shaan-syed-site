@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { AmbientHalo } from "@/components/ambient-halo";
 import { CertRow } from "@/components/cert-row";
 import { awards } from "@/content/awards";
 import { certifications } from "@/content/certifications";
@@ -12,50 +13,57 @@ export const metadata: Metadata = {
 
 export default function AwardsPage() {
   return (
-    <div className="page">
-      <h1 className="page-title">Awards</h1>
+    <>
+      {/* Sibling of the page rather than a child of it: .page carries the
+          load animation, and a transform on an ancestor is what a fixed
+          layer would be positioned against. */}
+      <AmbientHalo page="awards" />
 
-      <section aria-labelledby="honours-h" className="stack-section" data-reveal>
-        <h2 id="honours-h" className="stack-heading">
-          Honours
-        </h2>
-        <ul className="ledger">
-          {awards.map((award) => (
-            <li key={award.title} className="ledger-row">
-              <span className="ledger-year">{award.year ?? ""}</span>
-              <span className="ledger-body">
-                {award.title}
-                {award.context ? <span className="muted">, {award.context}</span> : null}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <div className="page">
+        <h1 className="page-title">Awards</h1>
 
-      {certifications.map((group) => (
-        <section
-          key={group.label}
-          aria-labelledby={`cert-${group.label.replace(/\s+/g, "-")}`}
-          className="stack-section"
-          data-reveal
-        >
-          <h2
-            id={`cert-${group.label.replace(/\s+/g, "-")}`}
-            className="stack-heading"
-          >
-            {group.label}
+        <section aria-labelledby="honours-h" className="stack-section" data-reveal>
+          <h2 id="honours-h" className="stack-heading">
+            Honours
           </h2>
           <ul className="ledger">
-            {group.items.map((cert) => (
-              <CertRow
-                key={cert.name}
-                cert={cert}
-                muted={group.label === "In progress"}
-              />
+            {awards.map((award) => (
+              <li key={award.title} className="ledger-row">
+                <span className="ledger-year">{award.year ?? ""}</span>
+                <span className="ledger-body">
+                  {award.title}
+                  {award.context ? <span className="muted">, {award.context}</span> : null}
+                </span>
+              </li>
             ))}
           </ul>
         </section>
-      ))}
-    </div>
+
+        {certifications.map((group) => (
+          <section
+            key={group.label}
+            aria-labelledby={`cert-${group.label.replace(/\s+/g, "-")}`}
+            className="stack-section"
+            data-reveal
+          >
+            <h2
+              id={`cert-${group.label.replace(/\s+/g, "-")}`}
+              className="stack-heading"
+            >
+              {group.label}
+            </h2>
+            <ul className="ledger">
+              {group.items.map((cert) => (
+                <CertRow
+                  key={cert.name}
+                  cert={cert}
+                  muted={group.label === "In progress"}
+                />
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </>
   );
 }

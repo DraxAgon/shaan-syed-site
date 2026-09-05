@@ -968,23 +968,28 @@
     contain: strict;
   }
 
-  /* Both centres sit off an edge, so what shows is an arc and not a
-     circle: one out past the left, one past the top right corner. A
-     whole turn takes minutes, which is not a movement you can watch. It
-     is there so neither ring is ever in quite the same place twice, and
-     they turn opposite ways so they never drift together. */
+  /* Every centre hangs off an edge or a corner, so what shows is an arc
+     and not a circle. Which edge is the page's own business — the
+     arrangements live in AmbientHalo. A whole turn takes minutes, which
+     is not a movement you can watch: it is there so a ring is never in
+     quite the same place twice, and the two on a page wind opposite ways
+     so they cannot drift together. */
   .halo-spiral {
     position: absolute;
     width: 0; height: 0;
-  }
-  .halo-spiral.is-left {
-    left: -40px; top: 56%;
     animation: halo-turn 300s linear infinite;
   }
-  .halo-spiral.is-right {
-    right: -70px; top: -54px;
-    animation: halo-turn 240s linear infinite reverse;
+  .halo-spiral:nth-child(even) {
+    animation-duration: 240s;
+    animation-direction: reverse;
   }
+
+  .halo-spiral.is-left         { left: -40px; top: 56%; }
+  .halo-spiral.is-right        { right: -50px; top: 48%; }
+  .halo-spiral.is-top-left     { left: -86px; top: -46px; }
+  .halo-spiral.is-top-right    { right: -70px; top: -54px; }
+  .halo-spiral.is-bottom-left  { left: -70px; bottom: -80px; }
+  .halo-spiral.is-bottom-right { right: -84px; bottom: -66px; }
 
   /* Each tick is placed by its own transform: out along its ray to its
      radius, then back half its thickness so the ray runs through its
@@ -1003,33 +1008,21 @@
       0 0 4px 0 color-mix(in srgb, var(--color-brass) 70%, transparent),
       0 0 16px 3px color-mix(in srgb, var(--color-brass) 38%, transparent);
     opacity: var(--tick-rest, 0.05);
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-fill-mode: both;
+    animation: halo-pulse var(--cycle, 12s) linear infinite both;
     animation-delay: var(--tick-delay, 0ms);
   }
 
-  /* Two clocks that share no common beat inside a visit: the left ring
-     comes round every twelve and a half seconds, the right every ten and
-     a half, so the pair is never in step twice running. Each tick lights
-     for about a second and a half of its own turn — that is the whole of
-     the animation — and the delay on each one is what makes the light
-     travel round. */
-  .is-left .halo-tick { animation-name: halo-pulse-left; animation-duration: 12.5s; }
-  .is-right .halo-tick { animation-name: halo-pulse-right; animation-duration: 10.5s; }
-
-  @keyframes halo-pulse-left {
-    0%    { opacity: var(--tick-rest, 0.05); }
-    0.8%  { opacity: var(--tick-peak, 0.6); }
-    11.5% { opacity: var(--tick-rest, 0.05); }
-    100%  { opacity: var(--tick-rest, 0.05); }
-  }
-
-  @keyframes halo-pulse-right {
-    0%    { opacity: var(--tick-rest, 0.05); }
-    1%    { opacity: var(--tick-peak, 0.5); }
-    13%   { opacity: var(--tick-rest, 0.05); }
-    100%  { opacity: var(--tick-rest, 0.05); }
+  /* One cycle: the tick lights, falls away over about an eighth of the
+     ring's turn, and waits out the rest. Every tick in a ring runs this,
+     and the delay on each one is what makes the light travel round. The
+     ring's own --cycle is what sets how often that happens, so a slower
+     ring also glows a little longer, which is what a slower ring should
+     do. */
+  @keyframes halo-pulse {
+    0%   { opacity: var(--tick-rest, 0.05); }
+    1%   { opacity: var(--tick-peak, 0.6); }
+    12%  { opacity: var(--tick-rest, 0.05); }
+    100% { opacity: var(--tick-rest, 0.05); }
   }
 
   @keyframes halo-turn {
@@ -1037,12 +1030,10 @@
     to   { rotate: 360deg; }
   }
 
-  /* A phone has no margin to hide either centre in, so both spirals are
-     scaled down and pulled further off their edges, one behind the
-     portrait and one behind the top of the nav. */
+  /* A phone has no margin to hide a centre in, so the spirals are scaled
+     down about their own centres and sit further off their edges. */
   @media (max-width: 899px) {
-    .halo-spiral.is-left { left: -30px; top: 40%; scale: 0.62; }
-    .halo-spiral.is-right { right: -40px; top: -30px; scale: 0.55; }
+    .halo-spiral { scale: 0.6; }
   }
 
   /* ---------------- revealing on scroll ----------------
