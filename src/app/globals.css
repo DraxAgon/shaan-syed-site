@@ -189,6 +189,7 @@
     transition: background-color 140ms ease;
   }
   .nav-menu-link:hover, .nav-menu-link:focus-visible { background: #241c15; }
+  .nav-menu-link[aria-current="page"] { background: #241c15; color: var(--color-brass); }
   .nav-menu-note {
     display: block; margin-top: 2px;
     font-family: var(--font-mono); font-size: 0.6875rem;
@@ -577,6 +578,9 @@
     background: none; border: 0; border-left: 2px solid transparent;
     border-radius: 0 6px 6px 0;
     cursor: pointer; text-align: left; color: var(--color-ink-muted);
+    /* The row is an anchor rather than a button now that each project has
+       its own page, so it has a rule to turn off that a button never had. */
+    text-decoration: none;
     font: inherit;
     transition: color 160ms ease, background-color 160ms ease,
                 border-color 160ms ease, transform 160ms cubic-bezier(.2,.7,.2,1);

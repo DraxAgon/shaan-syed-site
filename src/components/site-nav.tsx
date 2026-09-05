@@ -82,18 +82,26 @@ export function SiteNav() {
               </button>
 
               <ul className={`nav-menu${open ? " is-open" : ""}`}>
-                {projects.map((project) => (
-                  <li key={project.name}>
-                    <Link
-                      href={`/projects?p=${encodeURIComponent(project.name)}`}
-                      className="nav-menu-link"
-                      onClick={() => setOpen(false)}
-                    >
-                      <span>{project.name}</span>
-                      <span className="nav-menu-note">{project.descriptor}</span>
-                    </Link>
-                  </li>
-                ))}
+                {projects.map((project) => {
+                  /* Each project has its own page now, so the menu can say
+                     which one you are on rather than only where the menu
+                     goes. */
+                  const href = `/projects/${project.slug}`;
+
+                  return (
+                    <li key={project.slug}>
+                      <Link
+                        href={href}
+                        className="nav-menu-link"
+                        aria-current={pathname === href ? "page" : undefined}
+                        onClick={() => setOpen(false)}
+                      >
+                        <span>{project.name}</span>
+                        <span className="nav-menu-note">{project.descriptor}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </li>
           );

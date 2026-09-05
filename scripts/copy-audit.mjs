@@ -13,13 +13,14 @@ import { spawn } from "node:child_process";
 /* Server-rendered routes can be read straight off the wire. */
 const FETCH_ROUTES = ["/", "/bio", "/awards", "/no-such-page"];
 
-/* /projects renders its panels on the client, so these need a browser. One
-   per project, because only the open panel is in the DOM. */
+/* One route per project, because only the open panel is in the DOM. The
+   panels are served rendered now, but the Redi walkthrough is loaded
+   client-side only, so reading all of the copy still needs a browser. */
 const DOM_ROUTES = [
-  "/projects?p=Rilo",
-  "/projects?p=Redi%20AI",
-  "/projects?p=Phantom",
-  "/projects?p=Loxbox",
+  "/projects/rilo",
+  "/projects/redi-ai",
+  "/projects/phantom",
+  "/projects/loxbox",
 ];
 
 const BASE = process.env.AUDIT_BASE ?? "http://localhost:3000";
@@ -138,10 +139,10 @@ for (const route of FETCH_ROUTES) {
   audit(route, textFrom(await res.text()));
 }
 
-/* /projects draws its panels on the client, so the served HTML carries a few
-   hundred characters and none of the copy. Every demo caption, every guide
-   step and the whole Redi walkthrough live behind that, which is most of the
-   prose written this year. Reading it needs a browser. */
+/* The Redi walkthrough is loaded client-side only, so it is not in the
+   served HTML at all, and the demos only reach their later states once
+   something has clicked through them. That is most of the prose written this
+   year, so reading it needs a browser. */
 const chrome = spawn(CHROME, [
   `--remote-debugging-port=${CDP_PORT}`, "--headless", "--disable-gpu",
   "--no-first-run", "--hide-scrollbars",

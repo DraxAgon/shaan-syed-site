@@ -46,7 +46,8 @@ live screenshot of riloai.app.
 |---|---|
 | `/` | Portrait and identity on the left. Built and Experience as expandable rows on the right, then the skills runs. |
 | `/bio` | A tilted photo rail on the left. The first-person paragraphs, then education, high school record, and interests, share the right column so it runs the length of the rail. |
-| `/projects` | A numbered index with a detail panel. `?p=Loxbox` deep-links to one. |
+| `/projects` | A numbered index with a detail panel, opening on the first project. |
+| `/projects/[slug]` | The same index with one project's panel open. One page each: `rilo`, `redi-ai`, `phantom`, `loxbox`. The old `?p=` query URLs redirect here. |
 | `/awards` | Honours, completed certifications, and in-progress certifications. |
 
 There is no resume page. Nothing repeats across pages.
@@ -92,11 +93,12 @@ Exits non-zero if a banned word, an em dash, an en dash, or an
 exclamation point reaches the rendered pages. Point it somewhere else
 with `AUDIT_BASE`, not `BASE`.
 
-`/` `/bio` `/awards` and the 404 are read straight off the wire.
-`/projects` is not: it draws its panels on the client, so the served
-HTML is a few hundred characters and none of the copy. The audit opens
-each project in headless Chrome instead, and walks the Redi rail so
-every caption has been on screen before it reads. It refuses to report
+`/` `/bio` `/awards` and the 404 are read straight off the wire. The
+project pages are not: the Redi walkthrough is loaded client-side only,
+and the demos only reach their later states once something has clicked
+through them. The audit opens each project in headless Chrome instead,
+and walks the Redi rail so every caption has been on screen before it
+reads. It refuses to report
 clean on a panel that did not render, because a check that cannot fail
 is worse than no check. That is not hypothetical here: the banned-word
 half of this script spent its whole life matching a backspace
@@ -282,7 +284,7 @@ first; a broken build on `main` is a failed deploy.
 |---|---|---|
 | Rilo copy vs riloai.app | conflict, see below | `projects.ts` |
 | Rilo's "100+ downloads" | your number, unverified here | `projects.ts` |
-| Phantom links | none, repo is private | `projects.ts` |
+| Phantom links | none, team repo is private | `projects.ts` |
 | Northern start year | `2022` | `education.ts` |
 | First co-op employer | omitted | `bio.ts` |
 
@@ -314,7 +316,9 @@ Two of these are judgement calls, so check them:
 
 Tags are otherwise deliberately thin. I only wrote ones I could check
 against the repo, so Phantom has none and Loxbox's says only what is
-absent. It is a good slot for real numbers once you have them.
+absent. It is a good slot for real numbers once you have them: Phantom's
+own repo has some that hold, among them 277 measured Amazon parcels and
+an observation window that runs 2008 to 2023.
 
 ### The Rilo conflict is worth a look
 
@@ -330,10 +334,25 @@ needs to change.
 
 ### Phantom has no links
 
-`github.com/rayaandev/ignitionhacks-2026` is a private repo, so it
-returns 404 for anyone who is not a collaborator. Rather than ship a
-dead link the entry has none. Make the repo public, or supply the
-Base44 app URL, and add it back to the `links` array.
+`github.com/rayaandev/ignitionhacks-2026`, the team repo, is private, so
+it returns 404 for anyone who is not a collaborator. Rather than ship a
+dead link the entry has none. There is a public copy of the same build at
+`github.com/DraxAgon/IgnitionHackv7`, but it carries a single squashed
+commit, so linking it shows a reviewer less than no link does. Open the
+team repo, or push real history to the copy, and add it to the `links`
+array.
+
+### Phantom's stack came off the repo, not the listing
+
+The entry used to read `Public satellite forest-loss datasets` and
+`Base44`. Base44 is a sponsor track at Ignition Hacks, and the placement
+that came with it is already on the entry as the award; the string
+appears nowhere in the build except the first line of its README. The
+stack now says what the repo actually is: a Vite/React SPA, MapLibre GL
+JS for the map, Turf for the geometry, jsPDF for the report, a Python
+matching and synthetic-control engine (scikit-learn, CVXPY) beside it,
+INPE PRODES and Hansen/GFW for the measurements, deployed on Render.
+Verified against `DraxAgon/IgnitionHackv7` at `24f8981`.
 
 ## 8. Deliberately left out
 
