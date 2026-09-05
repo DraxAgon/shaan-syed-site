@@ -31,7 +31,8 @@ export const isMailto = (href: string) => href.startsWith("mailto:");
 export const profile: Profile = {
   name: "Shaan Syed",
   subtitle: ["Computer Science @ Waterloo", "BBA @ Laurier"],
-  summary: "I like deciding what software should do as much as writing it.",
+  summary:
+    "Technical enough to build it, close enough to the business to know why.",
   location: "Toronto, Ontario",
   email: "shaansaifsyed@gmail.com",
   siteUrl: "https://shaan-syed.vercel.app",

@@ -11,6 +11,10 @@ export type ExperienceEntry = {
   bullets: string[];
 };
 
+/* Ordered by what a reader should see first, not by date: the
+   internship, then the job he holds now, then the seasonal one, then
+   the two school roles. Dates are on every row, so the list does not
+   have to be a timeline as well. */
 export const experience: ExperienceEntry[] = [
   {
     org: "Strello Health",
@@ -22,18 +26,6 @@ export const experience: ExperienceEntry[] = [
       "Ran market research supporting the company's U.S. expansion",
       "Analyzed competitors and target segments, and summarized findings for the team",
       "The company closed a seed round after the internship",
-    ],
-  },
-  {
-    org: "Target Alpha, Northern Secondary School",
-    role: "Founder & President",
-    dates: "September 2025 to June 2026",
-    location: "Toronto, ON",
-    logo: "/images/logo-targetalpha.webp",
-    bullets: [
-      "Founded the chapter and led an 11-person executive team",
-      "Prepared members for Target Alpha competitions",
-      "Grew it into the second largest Target Alpha chapter in Canada",
     ],
   },
   {
@@ -49,19 +41,6 @@ export const experience: ExperienceEntry[] = [
     ],
   },
   {
-    org: "Peer Tutoring, Northern Secondary School",
-    role: "Peer Tutor",
-    dates: "September 2023 to June 2026",
-    meta: "Volunteer",
-    location: "Toronto, ON",
-    logo: "/images/logo-northern.webp",
-    bullets: [
-      "Tutored math in group sessions, working with roughly 100 students over four years",
-      "Ran one-on-one sessions with about ten students",
-      "Pushed for a drop-in afterschool study hall, because booking a tutor was what stopped most students from coming, and the program adopted it",
-    ],
-  },
-  {
     org: "Sumo Dino",
     role: "Seasonal Sales Associate",
     dates: "August 2024 to Present",
@@ -72,6 +51,31 @@ export const experience: ExperienceEntry[] = [
       "Runs a retail booth at the Canadian National Exhibition, selling to walk-up foot traffic",
       "Handles transactions, restocking, and daily setup and teardown",
       "Also worked the company's booth at Fan Expo Toronto",
+    ],
+  },
+  {
+    org: "Target Alpha, Northern Secondary School",
+    role: "Founder & President",
+    dates: "September 2025 to June 2026",
+    location: "Toronto, ON",
+    logo: "/images/logo-targetalpha.webp",
+    bullets: [
+      "Founded the chapter and led an 11-person executive team",
+      "Prepared members for Target Alpha competitions",
+      "Grew it into the second largest Target Alpha chapter in Canada",
+    ],
+  },
+  {
+    org: "Peer Tutoring, Northern Secondary School",
+    role: "Peer Tutor",
+    dates: "September 2023 to June 2026",
+    meta: "Volunteer",
+    location: "Toronto, ON",
+    logo: "/images/logo-northern.webp",
+    bullets: [
+      "Tutored math in group sessions, working with roughly 100 students over four years",
+      "Ran one-on-one sessions with about ten students",
+      "Pushed for a drop-in afterschool study hall, because booking a tutor was what stopped most students from coming, and the program adopted it",
     ],
   },
 ];

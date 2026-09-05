@@ -104,6 +104,7 @@
   }
 
   .site-main {
+    position: relative; z-index: 1;
     flex: 1;
     display: flex;
     align-items: center;
@@ -114,6 +115,7 @@
   }
 
   .site-footer {
+    position: relative; z-index: 1;
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px;
     justify-content: flex-end;
     max-width: 1260px; margin-inline: auto; width: 100%;
@@ -960,6 +962,118 @@
     .lightbox-img { width: min(100%, (100dvh - 90px) * var(--photo-ratio)); }
   }
 
+  /* ---------------- the rings behind the home page ----------------
+     Fixed and behind the content: -1 keeps them under the page's own
+     in-flow text while staying inside .site-main's stacking context, so
+     neither can ever rise above anything. */
+  .halo {
+    position: fixed; inset: 0; z-index: -1;
+    overflow: hidden; pointer-events: none;
+    contain: strict;
+  }
+
+  /* Both centres sit off an edge, so what shows is an arc and not a
+     circle: one out past the left, one past the top right corner. A
+     whole turn takes minutes, which is not a movement you can watch. It
+     is there so neither ring is ever in quite the same place twice, and
+     they turn opposite ways so they never drift together. */
+  .halo-spiral {
+    position: absolute;
+    width: 0; height: 0;
+  }
+  .halo-spiral.is-left {
+    left: -40px; top: 56%;
+    animation: halo-turn 300s linear infinite;
+  }
+  .halo-spiral.is-right {
+    right: -70px; top: -54px;
+    animation: halo-turn 240s linear infinite reverse;
+  }
+
+  /* Each tick is placed by its own transform: out along its ray to its
+     radius, then back half its thickness so the ray runs through its
+     middle. The glow is baked into the shadow and costs nothing while
+     the tick is dim, which is nearly all of the time. */
+  .halo-tick {
+    position: absolute; left: 0; top: 0;
+    transform-origin: 0 0;
+    border-radius: 1px;
+    background: var(--color-brass);
+    /* Two shadows: a tight one that reads as the tick being hot, and a
+       wide soft one that puts light on the plate around it. Both are
+       painted at the tick's own opacity, so they are as absent as it is
+       while it waits its turn. */
+    box-shadow:
+      0 0 4px 0 color-mix(in srgb, var(--color-brass) 70%, transparent),
+      0 0 16px 3px color-mix(in srgb, var(--color-brass) 38%, transparent);
+    opacity: var(--tick-rest, 0.05);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+    animation-delay: var(--tick-delay, 0ms);
+  }
+
+  /* Two clocks that share no common beat inside a visit: the left ring
+     comes round every twelve and a half seconds, the right every ten and
+     a half, so the pair is never in step twice running. Each tick lights
+     for about a second and a half of its own turn — that is the whole of
+     the animation — and the delay on each one is what makes the light
+     travel round. */
+  .is-left .halo-tick { animation-name: halo-pulse-left; animation-duration: 12.5s; }
+  .is-right .halo-tick { animation-name: halo-pulse-right; animation-duration: 10.5s; }
+
+  @keyframes halo-pulse-left {
+    0%    { opacity: var(--tick-rest, 0.05); }
+    0.8%  { opacity: var(--tick-peak, 0.6); }
+    11.5% { opacity: var(--tick-rest, 0.05); }
+    100%  { opacity: var(--tick-rest, 0.05); }
+  }
+
+  @keyframes halo-pulse-right {
+    0%    { opacity: var(--tick-rest, 0.05); }
+    1%    { opacity: var(--tick-peak, 0.5); }
+    13%   { opacity: var(--tick-rest, 0.05); }
+    100%  { opacity: var(--tick-rest, 0.05); }
+  }
+
+  @keyframes halo-turn {
+    from { rotate: 0deg; }
+    to   { rotate: 360deg; }
+  }
+
+  /* A phone has no margin to hide either centre in, so both spirals are
+     scaled down and pulled further off their edges, one behind the
+     portrait and one behind the top of the nav. */
+  @media (max-width: 899px) {
+    .halo-spiral.is-left { left: -30px; top: 40%; scale: 0.62; }
+    .halo-spiral.is-right { right: -40px; top: -30px; scale: 0.55; }
+  }
+
+  /* ---------------- revealing on scroll ----------------
+     Held down and slightly off its place until the element has been in
+     the window once, then let go for good. The offset is on translate
+     rather than transform so it composes with a transform the element
+     already carries: the bio frames each hang at their own angle, and
+     that angle has to survive the slide. */
+  .reveal-ready [data-reveal] {
+    opacity: 0;
+    translate: 0 16px;
+  }
+  /* The photo rail comes in from the side it sits on. */
+  .reveal-ready [data-reveal="side"] { translate: -26px 0; }
+
+  .reveal-ready [data-reveal][data-revealed] {
+    opacity: 1;
+    translate: none;
+    transition:
+      opacity 620ms cubic-bezier(.2,.7,.2,1),
+      translate 680ms cubic-bezier(.2,.7,.2,1),
+      /* Kept so a frame straightening under the pointer still eases,
+         rather than snapping once this rule takes over its transition. */
+      transform 320ms cubic-bezier(.2,.7,.2,1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
   /* ---------------- motion ---------------- */
   @keyframes rise {
     from { opacity: 0; transform: translateY(10px); }
@@ -972,6 +1086,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* The reveal is a nicety; being able to read the page is not. */
+  [data-reveal] { opacity: 1 !important; translate: none !important; }
+  .halo { display: none; }
+
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;

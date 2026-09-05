@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 
 import { OrgLogo } from "@/components/logo";
 import { Photo } from "@/components/photo";
@@ -30,7 +31,15 @@ export default function BioPage() {
       <div className="bio-split">
         <div className="bio-rail">
           {bioPhotos.map((photo, index) => (
-            <figure key={photo.src} className="bio-frame">
+            <figure
+              key={photo.src}
+              className="bio-frame"
+              /* Each print slides in from the rail's own side as it
+                 reaches the window, a beat behind the one above it, and
+                 stays where it lands. */
+              data-reveal="side"
+              style={{ "--reveal-delay": `${index * 90}ms` } as CSSProperties}
+            >
               <Photo
                 src={photo.src}
                 alt={photo.alt}
@@ -49,13 +58,13 @@ export default function BioPage() {
             three paragraphs, prose alone ended level with the second
             frame and left the last two hanging against nothing. */}
         <div className="bio-main">
-          <div className="bio-prose">
+          <div className="bio-prose" data-reveal>
             {bioParagraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 40)}>{paragraph}</p>
             ))}
           </div>
 
-          <section aria-labelledby="edu-h" className="stack-section">
+          <section aria-labelledby="edu-h" className="stack-section" data-reveal>
             <h2 id="edu-h" className="stack-heading">
               Education
             </h2>
@@ -81,7 +90,7 @@ export default function BioPage() {
             </ul>
           </section>
 
-          <section aria-labelledby="hs-h" className="stack-section">
+          <section aria-labelledby="hs-h" className="stack-section" data-reveal>
             <h2 id="hs-h" className="stack-heading">
               High school
             </h2>
@@ -92,7 +101,7 @@ export default function BioPage() {
             </ul>
           </section>
 
-          <section aria-labelledby="int-h" className="stack-section">
+          <section aria-labelledby="int-h" className="stack-section" data-reveal>
             <h2 id="int-h" className="stack-heading">
               Outside software
             </h2>

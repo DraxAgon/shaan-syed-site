@@ -201,7 +201,27 @@ export const projects: Project[] = [
     ],
     why:
       "Carbon credits are sold on a claim that trees would have been cut down and weren’t, and almost nobody checks whether that’s true. The satellite data to check it has been free and public this whole time, which felt like the kind of gap worth closing.",
-    stack: ["Public satellite forest-loss datasets", "Base44"],
+    /* Read off the repo itself (DraxAgon/IgnitionHackv7), not off the
+       hackathon listing. "Base44" was never in this build: it is the
+       sponsor track the placement came from, which the award line
+       already carries. The app is a Vite/React SPA with a MapLibre map,
+       clipping done in Turf and the report drawn client-side by jsPDF;
+       the matching and synthetic-control engine beside it is Python.
+       Every data source is public and keyless, and the measurements are
+       committed, so the deploy is a static build on Render. */
+    stack: [
+      "React",
+      "Vite",
+      "MapLibre GL JS",
+      "Turf.js",
+      "jsPDF",
+      "Python",
+      "scikit-learn",
+      "CVXPY",
+      "INPE PRODES",
+      "Hansen / Global Forest Watch",
+      "Render",
+    ],
     links: [
       {
         label: "ignitionhackv7.onrender.com",

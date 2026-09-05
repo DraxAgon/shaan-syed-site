@@ -15,7 +15,7 @@ export default function AwardsPage() {
     <div className="page">
       <h1 className="page-title">Awards</h1>
 
-      <section aria-labelledby="honours-h" className="stack-section">
+      <section aria-labelledby="honours-h" className="stack-section" data-reveal>
         <h2 id="honours-h" className="stack-heading">
           Honours
         </h2>
@@ -37,6 +37,7 @@ export default function AwardsPage() {
           key={group.label}
           aria-labelledby={`cert-${group.label.replace(/\s+/g, "-")}`}
           className="stack-section"
+          data-reveal
         >
           <h2
             id={`cert-${group.label.replace(/\s+/g, "-")}`}
