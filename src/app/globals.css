@@ -104,6 +104,7 @@
   }
 
   .site-main {
+    position: relative; z-index: 1;
     flex: 1;
     display: flex;
     align-items: center;
@@ -114,6 +115,7 @@
   }
 
   .site-footer {
+    position: relative; z-index: 1;
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px;
     justify-content: flex-end;
     max-width: 1260px; margin-inline: auto; width: 100%;
@@ -956,6 +958,61 @@
     .lightbox-img { width: min(100%, (100dvh - 90px) * var(--photo-ratio)); }
   }
 
+  /* ---------------- the marks in the background ----------------
+     A fixed layer under everything, drawing nothing on its own. The
+     spans inside it are added and dropped by AmbientField, and each one
+     lives for as long as its own animation. */
+  .ambient {
+    position: fixed; inset: 0; z-index: 0;
+    overflow: hidden; pointer-events: none;
+    contain: strict;
+  }
+
+  .ambient-mark {
+    position: absolute;
+    font-family: var(--font-mono);
+    line-height: 1;
+    color: var(--color-brass);
+    opacity: 0;
+    white-space: nowrap;
+    will-change: opacity, translate;
+    animation: ambient-mark var(--mark-duration, 9s) ease-in-out both;
+  }
+
+  /* Up and out. The hold in the middle is most of the life of a mark:
+     without it they read as blinking rather than as surfacing. */
+  @keyframes ambient-mark {
+    0%   { opacity: 0; translate: 0 10px; }
+    22%  { opacity: var(--mark-peak, 0.07); }
+    68%  { opacity: var(--mark-peak, 0.07); }
+    100% { opacity: 0; translate: 0 calc(-1 * var(--mark-drift, 24px)); }
+  }
+
+  /* ---------------- revealing on scroll ----------------
+     Held down and slightly off its place until the element has been in
+     the window once, then let go for good. The offset is on translate
+     rather than transform so it composes with a transform the element
+     already carries: the bio frames each hang at their own angle, and
+     that angle has to survive the slide. */
+  .reveal-ready [data-reveal] {
+    opacity: 0;
+    translate: 0 16px;
+  }
+  /* The photo rail comes in from the side it sits on. */
+  .reveal-ready [data-reveal="side"] { translate: -26px 0; }
+
+  .reveal-ready [data-reveal][data-revealed] {
+    opacity: 1;
+    translate: none;
+    transition:
+      opacity 620ms cubic-bezier(.2,.7,.2,1),
+      translate 680ms cubic-bezier(.2,.7,.2,1),
+      /* Kept so a frame straightening under the pointer still eases,
+         rather than snapping once this rule takes over its transition. */
+      transform 320ms cubic-bezier(.2,.7,.2,1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
   /* ---------------- motion ---------------- */
   @keyframes rise {
     from { opacity: 0; transform: translateY(10px); }
@@ -968,6 +1025,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* The reveal is a nicety; being able to read the page is not. */
+  [data-reveal] { opacity: 1 !important; translate: none !important; }
+  .ambient { display: none; }
+
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;

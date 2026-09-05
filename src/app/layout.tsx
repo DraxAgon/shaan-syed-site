@@ -9,7 +9,9 @@ import {
 } from "next/font/google";
 import Link from "next/link";
 
+import { AmbientField } from "@/components/ambient-field";
 import { Icon } from "@/components/icon";
+import { ScrollReveal } from "@/components/scroll-reveal";
 import { SiteNav } from "@/components/site-nav";
 import { isMailto, profile } from "@/content/profile";
 
@@ -131,9 +133,25 @@ export default function RootLayout({
       className={`${serif.variable} ${mono.variable} ${rediDisplay.variable} ${rediBody.variable} ${rediMeta.variable} ${riloSans.variable}`}
     >
       <body>
+        {/* First thing in the body, so the class is set while the parser
+            is still working through the markup and the elements that
+            reveal on scroll are never painted before they are hidden.
+            It is also the switch for the whole effect: if this does not
+            run, every one of those elements stays visible. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)" +
+              "document.documentElement.classList.add('reveal-ready')}catch(e){}",
+          }}
+        />
+
         <a href="#main" className="skip-link">
           Skip to content
         </a>
+
+        <AmbientField />
+        <ScrollReveal />
 
         <header className="site-header">
           <div className="site-header-inner">

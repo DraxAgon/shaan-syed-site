@@ -43,7 +43,7 @@ export const highSchoolRecord: string[] = [
   "VP of Production, Junior Achievement Company Program",
   "2x DECA Ontario Provincial Qualifier",
   "OFSAA Provincial Qualifier, Cross Country",
-  "Peer Tutor, 2Learn certified",
+  "Peer Tutor, Learn2Learn certified",
 ];
 
 export const interests: string[] = [

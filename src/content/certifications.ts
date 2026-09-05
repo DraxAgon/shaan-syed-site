@@ -35,7 +35,7 @@ export const certifications: CertificationGroup[] = [
         name: "Standard First Aid & CPR-C, Bronze Cross, Bronze Medallion, Bronze Star",
         issuer: "Royal Life Saving Society",
       },
-      { name: "2Learn Certified Peer Tutor" },
+      { name: "Learn2Learn Certified Peer Tutor" },
     ],
   },
   {
